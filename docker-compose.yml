@@ -1,0 +1,9 @@
+version: "3.3"
+
+services:
+  blog-backend:
+    build:
+      context: .
+    restart: always
+    ports:
+      - "127.0.0.1:7001:1337"
