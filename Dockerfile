@@ -8,6 +8,9 @@ COPY extensions ./
 COPY public ./
 COPY docker-compose.yml ./
 COPY Dockerfile ./
+COPY .editorconfig ./
+COPY .eslintignore ./
+COPY .eslintrc ./
 COPY favicon.ico ./
 COPY package.json ./
 COPY package-lock.json ./
