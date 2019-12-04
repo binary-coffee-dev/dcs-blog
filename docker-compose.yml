@@ -5,7 +5,7 @@ services:
     build:
       context: .
       args:
-        - DATABASE_NAME=$DATABASE_NAME
+        - DATABASE_HOST=$DATABASE_HOST
         - DATABASE_PORT=$DATABASE_PORT
     restart: always
     ports:
