@@ -4,6 +4,9 @@ services:
   blog-backend:
     build:
       context: .
+      args:
+        - DATABASE_NAME=$DATABASE_NAME
+        - DATABASE_PORT=$DATABASE_PORT
     restart: always
     ports:
       - "127.0.0.1:7001:1337"
