@@ -1,5 +1,5 @@
 {
-  "defaultConnection": "default",
+  "defaultConnection": "mongodb",
   "connections": {
     "default": {
       "connector": "strapi-hook-bookshelf",
@@ -9,6 +9,20 @@
       },
       "options": {
         "useNullAsDefault": true
+      }
+    },
+    "mongodb": {
+      "connector": "strapi-hook-mongoose",
+      "settings": {
+        "database": "blog-dev",
+        "host": "127.0.0.1",
+        "srv": false,
+        "port": "27018",
+        "username": "",
+        "password": ""
+      },
+      "options": {
+        "authenticationDatabase": ""
       }
     }
   }
