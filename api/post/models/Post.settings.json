@@ -29,7 +29,8 @@
       "type": "date"
     },
     "description": {
-      "type": "text"
+      "type": "text",
+      "maxLength": 300
     }
   }
 }
