@@ -31,6 +31,11 @@
     "description": {
       "type": "text",
       "maxLength": 300
+    },
+    "banner": {
+      "model": "file",
+      "via": "related",
+      "plugin": "upload"
     }
   }
 }
