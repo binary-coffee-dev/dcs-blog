@@ -22,12 +22,6 @@
       "model": "user",
       "plugin": "users-permissions"
     },
-    "created_at": {
-      "type": "date"
-    },
-    "updated_at": {
-      "type": "date"
-    },
     "description": {
       "type": "text",
       "maxLength": 300
