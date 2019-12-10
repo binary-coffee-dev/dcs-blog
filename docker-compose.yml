@@ -12,7 +12,7 @@ services:
     volumes:
       - $BLOG_RESOURCES:/app/public/uploads
     ports:
-      - "127.0.0.1:7001:1337"
+      - "127.0.0.1:${BACKEND_PORT}:1337"
     networks:
       - blogdb
 
