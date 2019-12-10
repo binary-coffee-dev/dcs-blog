@@ -4,7 +4,7 @@
     "default": {
       "connector": "strapi-hook-mongoose",
       "settings": {
-        "database": "${process.env.DATABASE_NAME || 'blog-dev'}",
+        "database": "${process.env.DATABASE_NAME || 'blog-prod'}",
         "host": "${process.env.DATABASE_HOST || '127.0.0.1'}",
         "port": "${process.env.DATABASE_PORT || 27018}",
         "username": "${process.env.DATABASE_USERNAME || ''}",
