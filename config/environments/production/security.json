@@ -27,7 +27,7 @@
   },
   "cors": {
     "enabled": true,
-    "origin": "https://www.binary-coffee.dev, https://binary-coffee.dev"
+    "origin": "https://www.binary-coffee.dev, https://binary-coffee.dev, https://api.binary-coffee.dev"
   },
   "ip": {
     "enabled": false,
