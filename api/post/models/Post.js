@@ -19,7 +19,20 @@ module.exports = {
 
   // After fetching all values.
   // Fired after a `fetchAll` operation.
-  // afterFetchAll: async (model, results) => {},
+  /**
+   *
+   * @param model
+   * @param results Array
+   * @returns {Promise<void>}
+   */
+  afterFetchAll: async (model, results) => {
+    for (let i = 0; i < results.length; i++) {
+      if (!results[i].enable) {
+        results.splice(i, 1);
+        i--;
+      }
+    }
+  },
 
   // Fired before a `fetch` operation.
   // beforeFetch: async (model) => {},
