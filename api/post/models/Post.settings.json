@@ -30,6 +30,9 @@
       "model": "file",
       "via": "related",
       "plugin": "upload"
+    },
+    "enable": {
+      "type": "boolean"
     }
   }
 }
