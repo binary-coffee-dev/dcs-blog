@@ -1,6 +1,6 @@
 'use strict';
 
-const {sanitizeEntity} = require('strapi-utils');
+const {sanitizeEntity, buildQuery, convertRestQueryParams} = require('strapi-utils');
 
 /**
  * Read the documentation () to implement custom controller functions
@@ -23,4 +23,18 @@ module.exports = {
       return prev;
     }, []);
   },
+  async findOneByName(ctx, next, {populate} = {}) {
+    const params = {name: ctx.params.name || ctx.params._name || ''};
+    const filters = convertRestQueryParams(params);
+    return buildQuery({
+      model: Post,
+      filters,
+      populate: populate || ''
+    }).then((array) => {
+      if (array && array.length > 0) {
+        return array[0];
+      }
+      return null;
+    });
+  }
 };
