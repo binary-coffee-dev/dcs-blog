@@ -33,6 +33,12 @@
     },
     "enable": {
       "type": "boolean"
+    },
+    "name": {
+      "required": true,
+      "unique": true,
+      "type": "string",
+      "configurable": false
     }
   }
 }
