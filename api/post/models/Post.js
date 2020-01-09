@@ -31,7 +31,7 @@ module.exports = {
   // Before creating a value.
   // Fired before an `insert` query.
   beforeCreate: async (model) => {
-    model.name = getNameFromTitle(model.title);
+    model.name = strapi.services.post.getNameFromTitle(model.title);
   },
 
   // After creating a value.
@@ -42,7 +42,7 @@ module.exports = {
   // Fired before an `update` query.
   beforeUpdate: async (model) => {
     if (model._update.title) {
-      model._update.name = getNameFromTitle(model._update.title);
+      model._update.name = strapi.services.post.getNameFromTitle(model._update.title);
     }
   },
 
