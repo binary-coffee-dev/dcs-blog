@@ -58,17 +58,3 @@ module.exports = {
   // Fired after a `delete` query.
   // afterDestroy: async (model, result) => {}
 };
-
-function getNameFromTitle(title) {
-  let result =  '', subVal = '';
-  for (let i = 0; i < title.length; i++) {
-    if (title[i] === ' ') {
-      result += (result !== '' && subVal ? '-' : '') + subVal;
-      subVal = '';
-    } else {
-      subVal += title[i];
-    }
-  }
-  result = result + (result && subVal !== '' ? '-' : '') + subVal;
-  return result.toLowerCase();
-}
