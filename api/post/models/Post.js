@@ -30,7 +30,9 @@ module.exports = {
 
   // Before creating a value.
   // Fired before an `insert` query.
-  // beforeCreate: async (model) => {},
+  beforeCreate: async (model) => {
+    model.name = getNameFromTitle(model.title);
+  },
 
   // After creating a value.
   // Fired after an `insert` query.
@@ -38,7 +40,11 @@ module.exports = {
 
   // Before updating a value.
   // Fired before an `update` query.
-  // beforeUpdate: async (model) => {},
+  beforeUpdate: async (model) => {
+    if (model._update.title) {
+      model._update.name = getNameFromTitle(model._update.title);
+    }
+  },
 
   // After updating a value.
   // Fired after an `update` query.
@@ -52,3 +58,17 @@ module.exports = {
   // Fired after a `delete` query.
   // afterDestroy: async (model, result) => {}
 };
+
+function getNameFromTitle(title) {
+  let result =  '', subVal = '';
+  for (let i = 0; i < title.length; i++) {
+    if (title[i] === ' ') {
+      result += (result !== '' && subVal ? '-' : '') + subVal;
+      subVal = '';
+    } else {
+      subVal += title[i];
+    }
+  }
+  result = result + (result && subVal !== '' ? '-' : '') + subVal;
+  return result.toLowerCase();
+}
