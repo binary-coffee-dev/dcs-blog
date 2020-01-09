@@ -16,6 +16,6 @@ module.exports = {
       }
     }
     result = result + (result && subVal !== '' ? '-' : '') + subVal;
-    return result.toLowerCase();
+    return result.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
   }
 };
