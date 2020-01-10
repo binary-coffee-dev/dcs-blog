@@ -33,6 +33,10 @@
     },
     "enable": {
       "type": "boolean"
+    },
+    "name": {
+      "unique": true,
+      "type": "string"
     }
   }
 }

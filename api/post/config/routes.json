@@ -4,16 +4,19 @@
       "method": "GET",
       "path": "/posts",
       "handler": "Post.find",
-      "config": {
-        "policies": []
-      }
+      "config": {}
     },
     {
       "method": "GET",
       "path": "/posts/count",
       "handler": "Post.count",
+      "config": {}
+    },
+    {
+      "method": "GET",
+      "path": "/posts/name/:name/",
+      "handler": "Post.findOneByName",
       "config": {
-        "policies": []
       }
     },
     {
@@ -21,24 +24,19 @@
       "path": "/posts/:id",
       "handler": "Post.findOne",
       "config": {
-        "policies": []
       }
     },
     {
       "method": "POST",
       "path": "/posts",
       "handler": "Post.create",
-      "config": {
-        "policies": []
-      }
+      "config": {}
     },
     {
       "method": "PUT",
       "path": "/posts/:id",
       "handler": "Post.update",
-      "config": {
-        "policies": []
-      }
+      "config": {}
     },
     {
       "method": "DELETE",

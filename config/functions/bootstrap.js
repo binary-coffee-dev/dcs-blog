@@ -10,4 +10,12 @@
  * See more details here: https://strapi.io/documentation/3.0.0-beta.x/configurations/configurations.html#bootstrap
  */
 
-module.exports = () => {};
+module.exports = async () => {
+  await Post.find({name: null}).then((posts) => {
+    posts.forEach(async post => {
+      if (!post.name) {
+        await Post.update({_id: post._id}, {$set: {name: strapi.services.post.getNameFromTitle(post.title)}});
+      }
+    });
+  });
+};
