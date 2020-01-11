@@ -16,15 +16,13 @@
       "method": "GET",
       "path": "/posts/name/:name/",
       "handler": "Post.findOneByName",
-      "config": {
-      }
+      "config": {}
     },
     {
       "method": "GET",
       "path": "/posts/:id",
       "handler": "Post.findOne",
-      "config": {
-      }
+      "config": {}
     },
     {
       "method": "POST",
@@ -42,9 +40,7 @@
       "method": "DELETE",
       "path": "/posts/:id",
       "handler": "Post.delete",
-      "config": {
-        "policies": []
-      }
+      "config": {}
     }
   ]
 }
