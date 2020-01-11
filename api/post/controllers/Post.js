@@ -24,15 +24,19 @@ module.exports = {
     }, []);
   },
   async findOneByName(ctx, next, {populate} = {}) {
-    const params = {name: ctx.params.name || ctx.params._name || ''};
+    const name = ctx.params.name || ctx.params._name || '';
+    const params = {name};
     const filters = convertRestQueryParams(params);
     return buildQuery({
       model: Post,
       filters,
       populate: populate || ''
-    }).then((array) => {
-      if (array && array.length > 0) {
-        return array[0];
+    }).then(async (posts) => {
+      if (posts && posts.length > 0) {
+        const post = posts[0];
+        post.views = `${parseInt(post.views || 0) + 1}`;
+        await Post.update({name}, {$set: {views: post.views}});
+        return post;
       }
       return null;
     });
