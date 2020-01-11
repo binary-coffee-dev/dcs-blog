@@ -2,7 +2,7 @@
   "defaultConnection": "default",
   "connections": {
     "default": {
-      "connector": "strapi-hook-mongoose",
+      "connector": "mongoose",
       "settings": {
         "database": "${process.env.DATABASE_NAME || 'blog-prod'}",
         "host": "${process.env.DATABASE_HOST || '127.0.0.1'}",

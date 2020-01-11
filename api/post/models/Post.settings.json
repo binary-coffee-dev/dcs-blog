@@ -19,8 +19,8 @@
       "type": "richtext"
     },
     "author": {
-      "model": "user",
-      "plugin": "users-permissions"
+      "plugin": "users-permissions",
+      "model": "user"
     },
     "description": {
       "type": "text",
@@ -29,7 +29,8 @@
     "banner": {
       "model": "file",
       "via": "related",
-      "plugin": "upload"
+      "plugin": "upload",
+      "required": false
     },
     "enable": {
       "type": "boolean"
@@ -37,6 +38,10 @@
     "name": {
       "unique": true,
       "type": "string"
+    },
+    "views": {
+      "type": "biginteger",
+      "default": "0"
     }
   }
 }
