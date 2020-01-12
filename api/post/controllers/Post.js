@@ -17,12 +17,13 @@ module.exports = {
     }
 
     return entities.reduce((prev, entity) => {
-      if (entity.enable) {
+      if (entity.enable && entity.publishedAt && entity.publishedAt.getTime() <= new Date().getTime()) {
         prev.push(sanitizeEntity(entity, {model: strapi.models.post}));
       }
       return prev;
     }, []);
   },
+
   async findOneByName(ctx, next, {populate} = {}) {
     const name = ctx.params.name || ctx.params._name || '';
     const params = {name};

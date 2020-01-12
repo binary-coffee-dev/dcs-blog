@@ -42,6 +42,9 @@
     "views": {
       "type": "biginteger",
       "default": "0"
+    },
+    "publishedAt": {
+      "type": "datetime"
     }
   }
 }
