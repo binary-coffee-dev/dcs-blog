@@ -91,6 +91,7 @@ module.exports = {
           ctx.type = 'application/rss+xml; charset=utf-8';
           return ctx.send(feed.rss2());
         case 'json1':
+          ctx.type = 'application/json; charset=utf-8';
           return ctx.send(feed.json1());
         case 'atom1':
         default:
