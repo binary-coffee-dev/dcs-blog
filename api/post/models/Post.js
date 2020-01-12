@@ -41,7 +41,7 @@ module.exports = {
   // Before updating a value.
   // Fired before an `update` query.
   beforeUpdate: async (model) => {
-    if (model._update.title) {
+    if (model._update && model._update.title) {
       model._update.name = strapi.services.post.getNameFromTitle(model._update.title);
     }
   },
