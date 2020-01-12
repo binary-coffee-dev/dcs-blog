@@ -87,10 +87,14 @@ module.exports = {
         });
       }
       switch (format) {
-        case 'rss2': return ctx.send(feed.rss2());
-        case 'json1': return ctx.send(feed.json1());
+        case 'rss2':
+          ctx.type = 'application/rss+xml; charset=utf-8';
+          return ctx.send(feed.rss2());
+        case 'json1':
+          return ctx.send(feed.json1());
         case 'atom1':
         default:
+          ctx.type = 'application/atom+xml; charset=utf-8';
           return ctx.send(feed.atom1());
       }
     });
