@@ -7,10 +7,15 @@
     "develop": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
-    "strapi": "strapi"
+    "strapi": "strapi",
+    "test": "mocha --ui bdd test/bootstrap.js test/integration/**/*.js"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.0.0"
+  },
   "dependencies": {
+    "feed": "^4.1.0",
     "sqlite3": "^4.1.1",
     "strapi": "3.0.0-beta.18.3",
     "strapi-admin": "3.0.0-beta.18.3",
