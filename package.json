@@ -7,9 +7,13 @@
     "develop": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
-    "strapi": "strapi"
+    "strapi": "strapi",
+    "test": "mocha --require co-mocha test/bootstrap.js test/**/*.test.js"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.0.0"
+  },
   "dependencies": {
     "feed": "^4.1.0",
     "sqlite3": "^4.1.1",
