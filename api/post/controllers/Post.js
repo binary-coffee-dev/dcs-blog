@@ -8,6 +8,14 @@ const {Feed} = require('feed');
  * Read the documentation () to implement custom controller functions
  */
 
+function isWriter(ctx) {
+  return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.name === 'writer';
+}
+
+function isPublished(entity) {
+  return entity && entity.publishedAt && entity.publishedAt.getTime() <= new Date().getTime();
+}
+
 module.exports = {
   async find(ctx) {
     let entities;
@@ -19,7 +27,7 @@ module.exports = {
     }
 
     return entities.reduce((prev, entity) => {
-      if (entity.enable && entity.publishedAt && entity.publishedAt.getTime() <= new Date().getTime()) {
+      if (entity.enable && isPublished(entity) || isWriter(ctx)) {
         prev.push(sanitizeEntity(entity, {model: strapi.models.post}));
       }
       return prev;
