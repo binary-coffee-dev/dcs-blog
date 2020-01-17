@@ -67,11 +67,12 @@ module.exports = {
       filters: convertRestQueryParams(params),
       populate: ['author', 'banner']
     }).then(async (posts) => {
+      const apiUrl = process.env.API_URL || "https://binary-coffee.dev/";
       const feed = new Feed({
         title: "Binary Coffee",
         description: "Last published articles",
-        id: "https://binary-coffee.dev/",
-        link: "https://binary-coffee.dev",
+        id: apiUrl,
+        link: apiUrl,
         language: "es",
         copyright: "All rights reserved 2019, dcs-community",
       });
@@ -79,8 +80,8 @@ module.exports = {
         posts.forEach(post => {
           feed.addItem({
             title: post.title,
-            id: `https://binary-coffee.dev/post/${post.name}`,
-            link: `https://binary-coffee.dev/post/${post.name}`,
+            id: `${apiUrl}/post/${post.name}`,
+            link: `${apiUrl}/post/${post.name}`,
             description: post.description,
             author: [
               {
