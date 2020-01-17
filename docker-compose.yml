@@ -8,6 +8,7 @@ services:
         - DATABASE_HOST=$DATABASE_HOST
         - DATABASE_PORT=$DATABASE_PORT
         - NODE_ENV=$NODE_ENV
+        - API_URL=$API_URL
     restart: always
     volumes:
       - $BLOG_RESOURCES:/app/public/uploads
