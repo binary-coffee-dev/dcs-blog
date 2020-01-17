@@ -67,7 +67,7 @@ module.exports = {
       filters: convertRestQueryParams(params),
       populate: ['author', 'banner']
     }).then(async (posts) => {
-      const apiUrl = process.env.API_URL || "https://binary-coffee.dev/";
+      const apiUrl = process.env.API_URL || "https://binary-coffee.dev";
       const feed = new Feed({
         title: "Binary Coffee",
         description: "Last published articles",
