@@ -91,7 +91,7 @@ module.exports = {
               }
             ],
             date: post.publishedAt,
-            image: post.banner ? `https://api.binary-coffee.dev${post.banner.url}` : undefined
+            image: post.banner ? `${apiUrl}/${post.banner.url}` : undefined
           });
         });
       }
