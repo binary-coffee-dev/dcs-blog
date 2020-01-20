@@ -4,8 +4,9 @@ const Uploads = require('../../../node_modules/strapi-plugin-upload/controllers/
 
 module.exports = _.merge(Uploads, {
   async findConnection(ctx) {
-    await Uploads.find(ctx);
-    const values = ctx.body;
+    const values = await strapi.plugins['upload'].services.upload.fetchAll(
+      ctx.query
+    );
     removeQueries(['limit', 'start'], ctx);
     await Uploads.count(ctx);
 
