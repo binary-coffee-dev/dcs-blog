@@ -8,6 +8,14 @@ const {Feed} = require('feed');
  * Read the documentation () to implement custom controller functions
  */
 
+function isWriter(ctx) {
+  return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.name === 'writer';
+}
+
+function isPublished(entity) {
+  return entity && entity.publishedAt && entity.publishedAt.getTime() <= new Date().getTime();
+}
+
 module.exports = {
   async find(ctx) {
     let entities;
@@ -19,7 +27,7 @@ module.exports = {
     }
 
     return entities.reduce((prev, entity) => {
-      if (entity.enable && entity.publishedAt && entity.publishedAt.getTime() <= new Date().getTime()) {
+      if (entity.enable && isPublished(entity) || isWriter(ctx)) {
         prev.push(sanitizeEntity(entity, {model: strapi.models.post}));
       }
       return prev;
@@ -59,11 +67,12 @@ module.exports = {
       filters: convertRestQueryParams(params),
       populate: ['author', 'banner']
     }).then(async (posts) => {
+      const apiUrl = process.env.API_URL || "https://binary-coffee.dev";
       const feed = new Feed({
         title: "Binary Coffee",
         description: "Last published articles",
-        id: "https://binary-coffee.dev/",
-        link: "https://binary-coffee.dev",
+        id: apiUrl,
+        link: apiUrl,
         language: "es",
         copyright: "All rights reserved 2019, dcs-community",
       });
@@ -71,8 +80,8 @@ module.exports = {
         posts.forEach(post => {
           feed.addItem({
             title: post.title,
-            id: `https://binary-coffee.dev/post/${post.name}`,
-            link: `https://binary-coffee.dev/post/${post.name}`,
+            id: `${apiUrl}/post/${post.name}`,
+            link: `${apiUrl}/post/${post.name}`,
             description: post.description,
             author: [
               {
@@ -82,7 +91,7 @@ module.exports = {
               }
             ],
             date: post.publishedAt,
-            image: post.banner ? `https://api.binary-coffee.dev${post.banner.url}` : undefined
+            image: post.banner ? `${apiUrl}/${post.banner.url}` : undefined
           });
         });
       }
