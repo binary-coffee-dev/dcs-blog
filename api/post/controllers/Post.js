@@ -61,7 +61,7 @@ module.exports = {
     });
   },
 
-  async feed(ctx, next) {
+  async feed(ctx) {
     const format = ctx.params.format || ctx.params._format || '';
     const params = {
       enable: true,
