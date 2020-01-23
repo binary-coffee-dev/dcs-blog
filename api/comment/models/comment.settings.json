@@ -18,8 +18,11 @@
     "email": {
       "type": "email"
     },
-    "Name": {
+    "name": {
       "type": "string"
+    },
+    "post": {
+      "model": "post"
     }
   }
 }

@@ -20,5 +20,20 @@ module.exports = {
       captcha: captcha.data,
       token
     });
+  },
+
+  async createByCaptcha(ctx) {
+    if (strapi.services.comment.checkCaptchaJwt(ctx.request.body.input.token, ctx.request.body.input.captcha, strapi.config.captchaSecret)) {
+      const comment = {
+        body: ctx.request.body.input.body,
+        email: ctx.request.body.input.email,
+        name: ctx.request.body.input.name,
+        post: ctx.request.body.input.post,
+        publishedAt: new Date()
+      };
+
+      return await strapi.services.comment.create(comment);
+    }
+    return new Error('invalid-captcha');
   }
 };
