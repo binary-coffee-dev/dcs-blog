@@ -12,7 +12,7 @@ module.exports = {
     const head = Buffer.from(JSON.stringify({alg: "HS256", typ: "JWT"})).toString('base64');
     const body = Buffer.from(JSON.stringify({
       hash: this.createHash(text.toLowerCase(), key),
-      exp: new Date().getTime() + 60000
+      exp: new Date().getTime() + 180000
     })).toString('base64');
     const sign = this.createHash(`${head}.${body}`, key);
     return `${head}.${body}.${sign}`;
