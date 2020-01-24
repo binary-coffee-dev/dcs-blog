@@ -9,9 +9,11 @@ const svgCaptcha = require('svg-captcha');
 
 module.exports = {
   captcha(ctx) {
-    const captcha = svgCaptcha.create({
-      size: 6,
-      noise: 10
+    const captcha = svgCaptcha.createMathExpr({
+      noise: 10,
+      mathMin: 0,
+      mathMax: 9,
+      mathOperator: '+-'
     });
 
     const token = strapi.services.comment.createCaptchaJwt(captcha.text, strapi.config.captchaSecret);
