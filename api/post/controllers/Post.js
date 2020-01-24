@@ -12,26 +12,34 @@ function isWriter(ctx) {
   return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.name === 'writer';
 }
 
-function isPublished(entity) {
-  return entity && entity.publishedAt && entity.publishedAt.getTime() <= new Date().getTime();
-}
-
 module.exports = {
-  async find(ctx) {
-    let entities;
-
-    if (ctx.query._q) {
-      entities = await strapi.services.post.search(ctx.query);
-    } else {
-      entities = await strapi.services.post.find(ctx.query);
+  async find(ctx, next, extra = {}) {
+    if (!isWriter(ctx)) {
+      ctx.query = {
+        ...ctx.query,
+        publishedAt_lte: new Date().toISOString(),
+        enable: true
+      };
     }
 
-    return entities.reduce((prev, entity) => {
-      if (entity.enable && isPublished(entity) || isWriter(ctx)) {
-        prev.push(sanitizeEntity(entity, {model: strapi.models.post}));
-      }
-      return prev;
-    }, []);
+    const filters = convertRestQueryParams(ctx.query);
+    return buildQuery({
+      model: Post,
+      filters,
+      populate: extra.populate || ''
+    });
+  },
+
+  count(ctx) {
+    if (!isWriter(ctx)) {
+      ctx.query = {
+        ...ctx.query,
+        publishedAt_lte: new Date().toISOString(),
+        enable: true
+      };
+    }
+
+    return strapi.services.post.count(ctx.query);
   },
 
   async findOneByName(ctx, next, extra = {}) {
