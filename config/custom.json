@@ -1,3 +1,4 @@
 {
-  "myCustomConfiguration": "This configuration is accessible through strapi.config.myCustomConfiguration"
+  "myCustomConfiguration": "This configuration is accessible through strapi.config.myCustomConfiguration",
+  "captchaSecret": "${process.env.CAPTCHA_SECRET || 'captcha-secret'}"
 }
