@@ -13,7 +13,7 @@ module.exports = {
       noise: 10,
       mathMin: 0,
       mathMax: 9,
-      mathOperator: '+-'
+      mathOperator: '+'
     });
 
     const token = strapi.services.comment.createCaptchaJwt(captcha.text, strapi.config.captchaSecret);
