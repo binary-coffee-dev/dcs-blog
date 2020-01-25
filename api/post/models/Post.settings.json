@@ -43,6 +43,10 @@
       "type": "biginteger",
       "default": "0"
     },
+    "comments": {
+      "type": "biginteger",
+      "default": "0"
+    },
     "publishedAt": {
       "type": "datetime"
     }
