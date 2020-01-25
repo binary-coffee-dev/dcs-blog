@@ -34,7 +34,10 @@ module.exports = {
         publishedAt: new Date()
       };
 
-      return await strapi.services.comment.create(comment);
+      const response = await strapi.services.comment.create(comment);
+      const countOfComments = await strapi.services.comment.count({post: comment.post});
+      await strapi.services.post.update({id: comment.post}, {comments: countOfComments});
+      return response;
     }
     return new Error('invalid-captcha');
   }
