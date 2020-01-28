@@ -13,10 +13,10 @@ function isWriter(ctx) {
 }
 
 module.exports = {
-  async find(ctx, next, extra = {}) {
+  async find(ctx = {}, next, extra = {}) {
     if (!isWriter(ctx)) {
       ctx.query = {
-        ...ctx.query,
+        ...(ctx.query || {}),
         publishedAt_lte: new Date().toISOString(),
         enable: true
       };

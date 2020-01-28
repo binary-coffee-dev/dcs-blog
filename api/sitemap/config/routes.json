@@ -1,0 +1,10 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/sitemap",
+      "handler": "Sitemap.sitemap",
+      "config": {}
+    }
+  ]
+}
