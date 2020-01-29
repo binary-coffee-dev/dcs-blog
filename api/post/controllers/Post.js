@@ -13,10 +13,10 @@ function isWriter(ctx) {
 }
 
 module.exports = {
-  async find(ctx, next, extra = {}) {
+  async find(ctx = {}, next, extra = {}) {
     if (!isWriter(ctx)) {
       ctx.query = {
-        ...ctx.query,
+        ...(ctx.query || {}),
         publishedAt_lte: new Date().toISOString(),
         enable: true
       };
@@ -61,7 +61,7 @@ module.exports = {
     });
   },
 
-  async feed(ctx, next) {
+  async feed(ctx) {
     const format = ctx.params.format || ctx.params._format || '';
     const params = {
       enable: true,
