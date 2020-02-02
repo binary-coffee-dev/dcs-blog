@@ -23,4 +23,15 @@ module.exports = {
       }
     }
   },
+
+  async verify(ctx) {
+    const token = ctx.request.body.token;
+    const subscriptions = await strapi.services.subscription.find({token});
+    if (subscriptions.length > 0) {
+      const subscription = subscriptions[0];
+      const subsUpdated = await strapi.services.subscription.update({id: subscription.id}, {enable: true, verified: true});
+      ctx.send({...subsUpdated, token: undefined, email: undefined});
+    }
+    return null;
+  }
 };
