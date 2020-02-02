@@ -1,4 +1,6 @@
 {
   "myCustomConfiguration": "This configuration is accessible through strapi.config.myCustomConfiguration",
-  "captchaSecret": "${process.env.CAPTCHA_SECRET || 'captcha-secret'}"
+  "captchaSecret": "${process.env.CAPTCHA_SECRET || 'captcha-secret'}",
+  "apiUrl": "${process.env.API_URL || 'https://api.binary-coffee.dev'}",
+  "siteUrl": "${process.env.SITE_URL || 'https://binary-coffee.dev'}"
 }
