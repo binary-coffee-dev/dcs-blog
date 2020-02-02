@@ -1,11 +1,6 @@
 module.exports = {
-  definition: `
-    input SubscribeInput {
-      email: String
-    }
-  `,
   mutation: `
-    subscribe(input: SubscribeInput): Subscription
+    subscribe(email: String!): Subscription
     verify(token: String!): Subscription
   `,
   resolver: {
