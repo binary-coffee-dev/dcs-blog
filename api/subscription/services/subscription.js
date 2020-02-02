@@ -7,7 +7,7 @@
 
 module.exports = {
   generateToken (size = 12) {
-    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
     return new Array(size)
       .fill(undefined)
       .map(() => characters[Math.floor(Math.random() * characters.length)])
