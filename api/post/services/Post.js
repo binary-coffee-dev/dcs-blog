@@ -18,5 +18,9 @@ module.exports = {
       }
     }
     return result + (result && subVal !== '' ? '-' : '') + subVal;
+  },
+  async updateComments(postId) {
+    const countOfComments = await strapi.services.comment.count({post: postId});
+    await strapi.services.post.update({id: postId}, {comments: countOfComments});
   }
 };
