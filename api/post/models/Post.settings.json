@@ -49,6 +49,10 @@
     },
     "publishedAt": {
       "type": "datetime"
+    },
+    "tags": {
+      "via": "posts",
+      "collection": "tag"
     }
   }
 }
