@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Lifecycle callbacks for the `comment` model.
+ * Lifecycle callbacks for the `subscription` model.
  */
 
 module.exports = {
@@ -51,9 +51,5 @@ module.exports = {
 
   // After destroying a value.
   // Fired after a `delete` query.
-  afterDestroy: async (model, attrs, options) => {
-    if(attrs && attrs.post) {
-      await strapi.services.post.updateComments(attrs.post.id);
-    }
-  }
+  // afterDestroy: async (model, attrs, options) => {}
 };

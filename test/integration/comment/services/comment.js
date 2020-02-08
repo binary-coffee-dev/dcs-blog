@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 
 const Comment = require('../../../../api/comment/services/comment');
 
-describe('Post service', () => {
+describe('Comment service', () => {
   it('should create the jwt', () => {
     const jwt = Comment.createCaptchaJwt('Dkd2f', 'this is my key');
     expect(jwt).to.not.equal('');
