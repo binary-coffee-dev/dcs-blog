@@ -49,7 +49,7 @@ function sendEmails(verifySubscribers, subject, html) {
  * [MINUTE] [HOUR] [DAY OF MONTH] [MONTH OF YEAR] [DAY OF WEEK] [YEAR (optional)]
  */
 module.exports = {
-  '* * * * 6': async () => {
+  '0 0 * * 6': async () => {
     const verifySubscribers = await getVerifiedSubscribers();
     const subject = 'Binary Coffee Weekly Posts';
     const html = await getHtmlWithPostsOfTheWeek();
