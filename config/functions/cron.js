@@ -17,8 +17,7 @@ async function getVerifiedSubscribers() {
     .find({verified: true});
 }
 
-async function getHtmlWithPostsOfTheWeek() {
-  const posts = await getPostsOfLast7Days();
+async function getHtmlWithPostsOfTheWeek(posts) {
   // TODO: use template
   var html = '';
   posts.forEach(post => {
@@ -50,9 +49,12 @@ function sendEmails(verifySubscribers, subject, html) {
  */
 module.exports = {
   '0 0 * * 6': async () => {
+    const posts = await getPostsOfLast7Days();
+    if (posts.length === 0)
+      return;
+    const html = await getHtmlWithPostsOfTheWeek(posts);
     const verifySubscribers = await getVerifiedSubscribers();
     const subject = 'Binary Coffee Weekly Posts';
-    const html = await getHtmlWithPostsOfTheWeek();
     sendEmails(verifySubscribers, subject, html);
   }
 };
