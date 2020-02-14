@@ -25,11 +25,11 @@ async function getHtmlWithPostsOfTheWeek(posts) {
   const options = {
   };
 
-  return await new Promise((resolve, reject) => {        
+  return await new Promise((resolve, reject) => {
     ejs.renderFile(
-      './config/functions/posts-for-subscriptions-template.html', 
-      data, 
-      options, 
+      './config/functions/posts-for-subscriptions-template.html',
+      data,
+      options,
       function(err, str){
         if (err)
           reject(err);
@@ -62,7 +62,7 @@ function sendEmails(verifySubscribers, subject, html) {
  * [MINUTE] [HOUR] [DAY OF MONTH] [MONTH OF YEAR] [DAY OF WEEK] [YEAR (optional)]
  */
 module.exports = {
-  '0 0 * * 6': async () => {
+  '*/5 * * * *': async () => {
     const posts = await getPostsOfLast7Days();
     if (posts.length === 0)
       return;
