@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const ejs = require('ejs');
 
 async function getPostsOfLast7Days() {
   var date = new Date();
@@ -18,12 +19,24 @@ async function getVerifiedSubscribers() {
 }
 
 async function getHtmlWithPostsOfTheWeek(posts) {
-  // TODO: use template
-  var html = '';
-  posts.forEach(post => {
-    html += '<p>' + post.title + '</p>'; 
+  const data = {
+    posts: posts
+  };
+  const options = {
+  };
+
+  return await new Promise((resolve, reject) => {        
+    ejs.renderFile(
+      './config/functions/posts-for-subscriptions-template.html', 
+      data, 
+      options, 
+      function(err, str){
+        if (err)
+          reject(err);
+        else
+          resolve(str);
+      });
   });
-  return html;
 }
 
 function sendEmails(verifySubscribers, subject, html) {
