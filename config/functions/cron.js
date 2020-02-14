@@ -30,9 +30,10 @@ function sendEmails(verifySubscribers, subject, html) {
   const BCC_COUNT = 50;
   const chunks = _.chunk(verifySubscribers, BCC_COUNT);
   chunks.forEach(async chunk => {
-    const to = chunk.map(subscriber => subscriber.email).join();
+    const bcc = chunk.map(subscriber => subscriber.email).join();
     const mail = {
-      bcc: to,
+      to: 'subscribers@binary-coffee.dev',
+      bcc: bcc,
       subject: subject,
       html: html
     };
