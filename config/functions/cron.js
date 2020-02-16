@@ -1,58 +1,6 @@
 'use strict';
 
-const _ = require('lodash');
-const ejs = require('ejs');
-
-async function getPostsOfLast7Days() {
-  var date = new Date();
-  date.setDate(date.getDate() - 7);
-  return await strapi.query("post").find({
-    publishedAt_gt: date
-  }); 
-}
-
-async function getVerifiedSubscribers() {
-  return await strapi
-    .services
-    .subscription
-    .find({verified: true});
-}
-
-async function getHtmlWithPostsOfTheWeek(posts) {
-  const data = {
-    posts: posts
-  };
-  const options = {
-  };
-
-  return await new Promise((resolve, reject) => {
-    ejs.renderFile(
-      './config/functions/posts-for-subscriptions-template.html',
-      data,
-      options,
-      function(err, str){
-        if (err)
-          reject(err);
-        else
-          resolve(str);
-      });
-  });
-}
-
-function sendEmails(verifySubscribers, subject, html) {
-  const BCC_COUNT = 50;
-  const chunks = _.chunk(verifySubscribers, BCC_COUNT);
-  chunks.forEach(async chunk => {
-    const bcc = chunk.map(subscriber => subscriber.email).join();
-    const mail = {
-      to: 'subscribers@binary-coffee.dev',
-      bcc: bcc,
-      subject: subject,
-      html: html
-    };
-    await strapi.plugins['email'].services.email.send(mail);
-  });
-}
+const deliveryToEmailSubscriptions = require('./delivery.to.email.subscriptions');
 
 /**
  * Cron config that gives you an opportunity
@@ -62,13 +10,7 @@ function sendEmails(verifySubscribers, subject, html) {
  * [MINUTE] [HOUR] [DAY OF MONTH] [MONTH OF YEAR] [DAY OF WEEK] [YEAR (optional)]
  */
 module.exports = {
-  '*/5 * * * *': async () => {
-    const posts = await getPostsOfLast7Days();
-    if (posts.length === 0)
-      return;
-    const html = await getHtmlWithPostsOfTheWeek(posts);
-    const verifySubscribers = await getVerifiedSubscribers();
-    const subject = 'Binary Coffee Weekly Posts';
-    sendEmails(verifySubscribers, subject, html);
+  '* * * * *': async () => {
+    await deliveryToEmailSubscriptions.send('Binary Coffee Weekly Posts', 7);
   }
 };
