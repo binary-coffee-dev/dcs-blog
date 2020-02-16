@@ -10,7 +10,7 @@ const deliveryToEmailSubscriptions = require('./delivery.to.email.subscriptions'
  * [MINUTE] [HOUR] [DAY OF MONTH] [MONTH OF YEAR] [DAY OF WEEK] [YEAR (optional)]
  */
 module.exports = {
-  '* * * * *': async () => {
+  '0 */1 * * *': async () => {
     await deliveryToEmailSubscriptions.send('Binary Coffee Weekly Posts', 7);
   }
 };
