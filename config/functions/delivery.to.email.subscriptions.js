@@ -3,12 +3,11 @@
 const _ = require('lodash');
 const ejs = require('ejs');
 
-async function getPostsOfLastDays(days) {
-  var date = new Date();
-  date.setDate(date.getDate() - days);
-  return await strapi.query("post").find({
-    publishedAt_gt: date
-  }); 
+async function getPublicPostsOfLastDays(previousDays) {
+  return await strapi
+    .services
+    .post
+    .getPublicPostsOfLastDays(previousDays);
 }
 
 async function getVerifiedSubscribers() {
@@ -51,14 +50,13 @@ function sendEmails(verifySubscribers, subject, html) {
       subject: subject,
       html: html
     };
-    console.log(mail);
     await strapi.plugins['email'].services.email.send(mail);
   });
 }
 
 module.exports = {
   send: async (subject, previousDays) => {
-    const posts = await getPostsOfLastDays(previousDays);
+    const posts = await getPublicPostsOfLastDays(previousDays);
     if (posts.length === 0)
       return;
     const html = await getHtmlWithPosts(posts);
