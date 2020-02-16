@@ -42,7 +42,9 @@
                                             <a href="{{urlAuthor}}"
                                                title="{{author}}@binary-coffee.dev"> {{author}} </a>
                                         </span> -->
-                                        <span class="post-info separator"> <%= posts[i].publishedAt %> </span>
+                                        <span class="post-info separator"> 
+                                            <%= posts[i].publishedAt.toString().slice(0, 15) %> 
+                                        </span>
                                     </div>
                                     <span class="post-body-extract">
                                         <%= posts[i].description %>
