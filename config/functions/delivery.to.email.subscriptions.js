@@ -10,11 +10,14 @@ async function getPublicPostsOfLastDays(previousDays) {
     .getPublicPostsOfLastDays(previousDays);
 }
 
-async function getVerifiedSubscribers() {
+async function getVerifiedAndEnableSubscribers() {
   return await strapi
     .services
     .subscription
-    .find({verified: true});
+    .find({
+        verified: true,
+        enable: true
+    });
 }
 
 async function getHtmlWithPosts(posts) {
@@ -60,7 +63,7 @@ module.exports = {
     if (posts.length === 0)
       return;
     const html = await getHtmlWithPosts(posts);
-    const verifySubscribers = await getVerifiedSubscribers();
+    const verifySubscribers = await getVerifiedAndEnableSubscribers();
     sendEmails(verifySubscribers, subject, html);
   }
 };
