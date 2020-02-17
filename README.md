@@ -1,5 +1,8 @@
 # Binary Coffee API
 
+[![codecov](https://codecov.io/gh/dcs-community/dcs-blog/branch/master/graph/badge.svg)](https://codecov.io/gh/dcs-community/dcs-blog)
+[![Build Status](https://travis-ci.com/dcs-community/dcs-blog.svg?branch=master)](https://travis-ci.com/dcs-community/dcs-blog)
+
 This the API application of the website [binary-coffee.dev](https://binary-coffee.dev). This API is based in [strapi](https://strapi.io).
 
 
