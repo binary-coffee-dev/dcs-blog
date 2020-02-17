@@ -9,7 +9,7 @@ const crypto = require('crypto');
 
 module.exports = {
   createCaptchaJwt(text, key) {
-    const head = Buffer.from(JSON.stringify({alg: "HS256", typ: "JWT"})).toString('base64');
+    const head = Buffer.from(JSON.stringify({alg: 'HS256', typ: 'JWT'})).toString('base64');
     const body = Buffer.from(JSON.stringify({
       hash: this.createHash(text.toLowerCase(), key),
       exp: new Date().getTime() + 180000
@@ -28,7 +28,9 @@ module.exports = {
             return body.hash === this.createHash(text.toLowerCase(), key);
           }
         }
-      } catch (ignore) {}
+      } catch (error) {
+        console.error(error);
+      }
     }
     return false;
   },

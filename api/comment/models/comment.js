@@ -51,7 +51,7 @@ module.exports = {
 
   // After destroying a value.
   // Fired after a `delete` query.
-  afterDestroy: async (model, attrs, options) => {
+  afterDestroy: async (model, attrs) => {
     if(attrs && attrs.post) {
       await strapi.services.post.updateComments(attrs.post.id);
     }

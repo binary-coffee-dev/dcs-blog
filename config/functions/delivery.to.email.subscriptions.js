@@ -15,8 +15,8 @@ async function getVerifiedAndEnableSubscribers() {
     .services
     .subscription
     .find({
-        verified: true,
-        enable: true
+      verified: true,
+      enable: true
     });
 }
 

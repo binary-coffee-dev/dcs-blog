@@ -6,8 +6,8 @@
 
 module.exports = {
   getNameFromTitle: (title) => {
-    title = title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    title = title.replace(/[^0-9a-z-A-Z ]/g, "").replace(/ +/, " ");
+    title = title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    title = title.replace(/[^0-9a-z-A-Z ]/g, '').replace(/ +/, ' ');
     let result = '', subVal = '';
     for (let i = 0; i < title.length; i++) {
       if (title[i] === ' ') {
@@ -28,7 +28,7 @@ module.exports = {
   async getPublicPostsOfLastDays(days) {
     var date = new Date();
     date.setDate(date.getDate() - days);
-    return await strapi.query("post").find({
+    return await strapi.query('post').find({
       publishedAt_gt: date,
       enable_eq: true
     });
