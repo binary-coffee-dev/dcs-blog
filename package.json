@@ -23,6 +23,7 @@
     "fast-xml-parser": "^3.16.0",
     "feed": "^4.1.0",
     "nyc": "^15.0.0",
+    "pre-push": "^0.1.1",
     "sqlite3": "^4.1.1",
     "strapi": "3.0.0-beta.18.3",
     "strapi-admin": "3.0.0-beta.18.3",
@@ -36,6 +37,13 @@
     "strapi-provider-email-nodemailer": "^2.0.0",
     "strapi-utils": "3.0.0-beta.18.3",
     "svg-captcha": "^1.4.0"
+  },
+  "pre-push": {
+    "run": [
+      "test",
+      "lint",
+      "build"
+    ]
   },
   "author": {
     "name": "A Strapi developer"
