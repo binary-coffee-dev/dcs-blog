@@ -19,8 +19,18 @@ module.exports = {
     }
     return result + (result && subVal !== '' ? '-' : '') + subVal;
   },
+
   async updateComments(postId) {
     const countOfComments = await strapi.services.comment.count({post: postId});
     await strapi.services.post.update({id: postId}, {comments: countOfComments});
+  },
+
+  async getPublicPostsOfLastDays(days) {
+    var date = new Date();
+    date.setDate(date.getDate() - days);
+    return await strapi.query("post").find({
+      publishedAt_gt: date,
+      enable_eq: true
+    });
   }
 };
