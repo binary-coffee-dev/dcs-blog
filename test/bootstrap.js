@@ -1,3 +1,4 @@
+/* eslint-disable */
 const strapi = require('strapi');
 
 before(function (done) {

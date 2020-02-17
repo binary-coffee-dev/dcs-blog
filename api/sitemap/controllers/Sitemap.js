@@ -1,10 +1,10 @@
 'use strict';
 
-const Parser = require("fast-xml-parser").j2xParser;
+const Parser = require('fast-xml-parser').j2xParser;
 
 module.exports = {
   async sitemap (ctx) {
-    const apiUrl = process.env.API_URL || "https://binary-coffee.dev";
+    const apiUrl = process.env.API_URL || 'https://binary-coffee.dev';
     const parser = new Parser({ignoreAttributes: false});
 
     const mapsite = {

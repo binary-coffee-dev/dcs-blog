@@ -1,6 +1,6 @@
 'use strict';
 
-const {sanitizeEntity, buildQuery, convertRestQueryParams} = require('strapi-utils');
+const {buildQuery, convertRestQueryParams} = require('strapi-utils');
 
 const {Feed} = require('feed');
 
@@ -75,14 +75,14 @@ module.exports = {
       filters: convertRestQueryParams(params),
       populate: ['author', 'banner']
     }).then(async (posts) => {
-      const apiUrl = process.env.API_URL || "https://binary-coffee.dev";
+      const apiUrl = process.env.API_URL || 'https://binary-coffee.dev';
       const feed = new Feed({
-        title: "Binary Coffee",
-        description: "Last published articles",
+        title: 'Binary Coffee',
+        description: 'Last published articles',
         id: apiUrl,
         link: apiUrl,
-        language: "es",
-        copyright: "All rights reserved 2019, dcs-community",
+        language: 'es',
+        copyright: 'All rights reserved 2019, dcs-community',
       });
       if (posts && posts.length > 0) {
         posts.forEach(post => {

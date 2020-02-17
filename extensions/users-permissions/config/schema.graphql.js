@@ -11,7 +11,7 @@ module.exports = {
       avatar: UploadFile
     }
   `,
-  query: `myData: UsersPermissionsMYData`,
+  query: 'myData: UsersPermissionsMYData',
   resolver: {
     Query: {
       myData: {

@@ -13,8 +13,8 @@ module.exports = {
       token: String
     }
   `,
-  query: `captcha: CaptchaSchema!`,
-  mutation: `createCommentByCaptcha(input: createCommentByCaptchaInput): createCommentPayload`,
+  query: 'captcha: CaptchaSchema!',
+  mutation: 'createCommentByCaptcha(input: createCommentByCaptchaInput): createCommentPayload',
   resolver: {
     Query: {
       captcha: {
