@@ -10,7 +10,8 @@
     "strapi": "strapi",
     "test": "nyc --reporter=lcov --reporter=html mocha --ui bdd test/bootstrap.js test/integration/**/*.js",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "check": "npm run test && npm run lint && npm run build"
   },
   "devDependencies": {
     "chai": "^4.2.0",
@@ -40,9 +41,7 @@
   },
   "pre-push": {
     "run": [
-      "test",
-      "lint",
-      "build"
+      "check"
     ]
   },
   "author": {
