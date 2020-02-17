@@ -28,7 +28,7 @@ module.exports = {
   async getPublicPostsOfLastDays(days) {
     var date = new Date();
     date.setDate(date.getDate() - days);
-    return await strapi.query("post").find({
+    return await strapi.query('post').find({
       publishedAt_gt: date,
       enable_eq: true
     });

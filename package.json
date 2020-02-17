@@ -9,7 +9,8 @@
     "build": "strapi build",
     "strapi": "strapi",
     "test": "mocha --ui bdd test/bootstrap.js test/integration/**/*.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "chai": "^4.2.0",
