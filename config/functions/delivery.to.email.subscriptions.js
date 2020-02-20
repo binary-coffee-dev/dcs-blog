@@ -2,6 +2,8 @@
 
 const _ = require('lodash');
 const ejs = require('ejs');
+const minify = require('html-minifier').minify;
+
 
 async function getPublicPostsOfLastDays(previousDays) {
   return await strapi
@@ -24,15 +26,14 @@ async function getHtmlWithPosts(posts) {
   const data = {
     posts: posts
   };
-  const options = {
-  };
+  const options = {};
 
   return await new Promise((resolve, reject) => {
     ejs.renderFile(
       './config/functions/posts-for-subscriptions-template.html',
       data,
       options,
-      function(err, str){
+      function (err, str) {
         if (err)
           reject(err);
         else
@@ -43,7 +44,7 @@ async function getHtmlWithPosts(posts) {
 
 function sendEmails(verifySubscribers, subject, html) {
   const BCC_COUNT = 50;
-  const SUBSCRIBER_RECIPIENT = 'subscribers@binary-coffee.dev'; 
+  const SUBSCRIBER_RECIPIENT = 'subscribers@binary-coffee.dev';
   const chunks = _.chunk(verifySubscribers, BCC_COUNT);
   chunks.forEach(async chunk => {
     const bcc = chunk.map(subscriber => subscriber.email).join();
@@ -62,9 +63,9 @@ module.exports = {
     const posts = await getPublicPostsOfLastDays(previousDays);
     if (posts.length === 0)
       return;
-    const html = await getHtmlWithPosts(posts);
+    let html = await getHtmlWithPosts(posts);
+    html = minify(html, {collapseWhitespace: true, removeComments: true, removeTagWhitespace: true});
     const verifySubscribers = await getVerifiedAndEnableSubscribers();
     sendEmails(verifySubscribers, subject, html);
   }
 };
-  
