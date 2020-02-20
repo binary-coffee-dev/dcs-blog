@@ -75,12 +75,13 @@ module.exports = {
       filters: convertRestQueryParams(params),
       populate: ['author', 'banner']
     }).then(async (posts) => {
-      const apiUrl = process.env.API_URL || 'https://binary-coffee.dev';
+      const apiUrl = strapi.config.apiUrl || 'https://api.binary-coffee.dev';
+      const siteUrl = strapi.config.siteUrl || 'https://binary-coffee.dev';
       const feed = new Feed({
         title: 'Binary Coffee',
         description: 'Last published articles',
-        id: apiUrl,
-        link: apiUrl,
+        id: siteUrl,
+        link: siteUrl,
         language: 'es',
         copyright: 'All rights reserved 2019, dcs-community',
       });
@@ -88,8 +89,8 @@ module.exports = {
         posts.forEach(post => {
           feed.addItem({
             title: post.title,
-            id: `${apiUrl}/post/${post.name}`,
-            link: `${apiUrl}/post/${post.name}`,
+            id: `${siteUrl}/post/${post.name}`,
+            link: `${siteUrl}/post/${post.name}`,
             description: post.description,
             author: [
               {
@@ -99,7 +100,7 @@ module.exports = {
               }
             ],
             date: post.publishedAt,
-            image: post.banner ? `${apiUrl}/${post.banner.url}` : undefined
+            image: post.banner ? `${apiUrl}${post.banner.url}` : undefined
           });
         });
       }
