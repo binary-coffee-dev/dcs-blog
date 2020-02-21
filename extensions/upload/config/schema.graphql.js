@@ -6,7 +6,7 @@ module.exports = {
       aggregate: UploadFileAggregator
     }
   `,
-  query: `uploadsConnection(sort: String, limit: Int, start: Int, where: JSON): UploadFileSchema`,
+  query: 'uploadsConnection(sort: String, limit: Int, start: Int, where: JSON): UploadFileSchema',
   resolver: {
     Query: {
       uploadsConnection: {
