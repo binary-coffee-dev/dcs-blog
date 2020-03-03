@@ -11,7 +11,6 @@
  */
 
 module.exports = async () => {
-  await require('./delivery.to.email.subscriptions').send('Binary Coffee Weekly Posts', 7);
   await Post.find({name: null}).then((posts) => {
     posts.forEach(async post => {
       if (!post.name) {
