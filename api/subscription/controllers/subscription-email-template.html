@@ -26,27 +26,18 @@
         </tr>
         <tr style="width: 100%">
           <td style="background-color:#fff;width: 100%">
-            <% for (var i = 0; i < posts.length; i++) {%>
             <div
               style="flex-direction: row; box-sizing: border-box; display: flex; border-bottom: 1px solid rgba(0, 0, 0, .06); background-color: #fff; width: calc(100% - 48px); padding: 24px; text-decoration: none">
               <div>
-                <a href="<%= siteUrl + '/post/' + posts[i].name %>"
-                   style="text-decoration: none; margin-top: 0; margin-bottom: 6px; font-size: 1.275rem; color: #01b15e; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; font-weight: 200; text-transform: uppercase">
-                  <%= posts[i].title %>
-                </a>
-                <div style="flex-direction: row; box-sizing: border-box; display: flex">
-                  <span
-                    style="color: #959595; font-size: .8125rem; position: relative; margin-right: 15px">
-                      <%= posts[i].publishedAt.toString().slice(0, 15) %>
-                  </span>
-                </div>
-                <span
-                  style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem">
-                  <%= posts[i].description %>
+                <span style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem">
+                  Se ha suscrito al blog Binary Coffee, para terminar el proceso de suscripción, utilice el siguiente link:
                 </span>
+                <a href="<%= verifyLink %>"
+                   style="text-decoration: none; margin-top: 0; margin-bottom: 6px; font-size: .95rem; color: #01b15e; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; font-weight: 200;">
+                  confirmar suscripción
+                </a>
               </div>
             </div>
-            <% } %>
           </td>
         </tr>
         <tr>
