@@ -14,7 +14,7 @@ module.exports = {
       avatar: req.data.avatar_url,
       url: req.data.url,
       name: req.data.name
-    }
+    };
   },
   auth: async (code) => {
     const req = await axios.post('https://github.com/login/oauth/access_token', {
