@@ -12,12 +12,21 @@ module.exports = {
     }
   `,
   query: 'myData: UsersPermissionsMYData',
+  mutation: 'loginWithProvider(provider: String!, code: String!): String',
   resolver: {
     Query: {
       myData: {
         resolver: {
           plugin: 'users-permissions',
           handler: 'User.me'
+        }
+      }
+    },
+    Mutation: {
+      loginWithProvider: {
+        resolver: {
+          plugin: 'users-permissions',
+          handler: 'Auth.loginWithProvider'
         }
       }
     }

@@ -10,6 +10,8 @@ services:
         - NODE_ENV=$NODE_ENV
         - API_URL=$API_URL
         - SITE_URL=$SITE_URL
+        - GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+        - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
     restart: always
     volumes:
       - $BLOG_RESOURCES:/app/public/uploads
