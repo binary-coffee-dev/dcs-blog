@@ -1,0 +1,15 @@
+'use strict';
+
+module.exports = {
+  version: '1.0.0',
+  description: 'Migrate post name attribute to the current setup',
+  migrate: async () => {
+    await Post.find({name: null}).then((posts) => {
+      posts.forEach(async post => {
+        if (!post.name) {
+          await Post.update({_id: post._id}, {$set: {name: strapi.services.post.getNameFromTitle(post.title)}});
+        }
+      });
+    });
+  }
+};
