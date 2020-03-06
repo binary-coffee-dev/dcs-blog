@@ -38,7 +38,6 @@ module.exports = {
         enable: true
       };
     }
-
     return strapi.services.post.count(ctx.query);
   },
 

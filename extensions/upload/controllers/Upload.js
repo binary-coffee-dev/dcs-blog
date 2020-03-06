@@ -1,8 +1,17 @@
-const _ = require('lodash');
+'use strict';
 
 const Uploads = require('../../../node_modules/strapi-plugin-upload/controllers/Upload');
 
-module.exports = _.merge(Uploads, {
+const CREATED_ELEMENT = 0;
+
+module.exports = {
+  ...Uploads,
+  async upload(ctx) {
+    const upload = await Uploads.upload(ctx);
+    await strapi.services.image.create({image: [ctx.body[CREATED_ELEMENT].id], user: ctx.state.user.id});
+    return upload;
+  },
+
   async findConnection(ctx) {
     const values = await strapi.plugins['upload'].services.upload.fetchAll(
       ctx.query
@@ -17,7 +26,7 @@ module.exports = _.merge(Uploads, {
       }
     });
   }
-});
+};
 
 function removeQueries(delQueries, ctx) {
   delQueries.forEach(query => {
