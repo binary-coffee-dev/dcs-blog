@@ -3,6 +3,8 @@
 const Uploads = require('../../../node_modules/strapi-plugin-upload/controllers/Upload');
 
 const CREATED_ELEMENT = 0;
+const MAX_FILE_LIMIT = 5;
+const MIN_FILE_START = 0;
 
 module.exports = {
   ...Uploads,
@@ -13,17 +15,27 @@ module.exports = {
   },
 
   async findConnection(ctx) {
-    const values = await strapi.plugins['upload'].services.upload.fetchAll(
-      ctx.query
-    );
-    removeQueries(['limit', 'start'], ctx);
-    await Uploads.count(ctx);
-
+    let values, count;
+    if (strapi.services.post.isAuthenticated(ctx)) {
+      const images = await Image
+        .find({user: ctx.state.user.id})
+        .limit(Math.min(ctx.query.limit || ctx.query._limit || MAX_FILE_LIMIT, MAX_FILE_LIMIT))
+        .skip(Math.max(ctx.query.start || ctx.query._start || MIN_FILE_START, MIN_FILE_START))
+        .sort({createdAt: -1});
+      count = await Image.count({user: ctx.state.user.id});
+      values = images.map(image => image.image[0]);
+      console.log(images);
+    } else {
+      values = await strapi.plugins['upload'].services.upload.fetchAll(
+        ctx.query
+      );
+      removeQueries(['limit', 'start'], ctx);
+      await Uploads.count(ctx);
+      count = ctx.body.count;
+    }
     ctx.send({
       values,
-      aggregate: {
-        count: ctx.body.count
-      }
+      aggregate: {count}
     });
   }
 };

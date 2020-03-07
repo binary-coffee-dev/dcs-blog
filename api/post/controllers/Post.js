@@ -9,7 +9,7 @@ const {Feed} = require('feed');
  */
 
 const MAX_POST_LIMIT = 20;
-const MIN_START_VALUE = 0;
+const MIN_POST_START = 0;
 
 module.exports = {
   async find(ctx = {}) {
@@ -22,7 +22,7 @@ module.exports = {
     }
     return await Post.find(query)
       .limit(Math.min(ctx.query.limit || ctx.query._limit || MAX_POST_LIMIT, MAX_POST_LIMIT))
-      .skip(Math.max(ctx.query.start || ctx.query._start || MIN_START_VALUE, MIN_START_VALUE))
+      .skip(Math.max(ctx.query.start || ctx.query._start || MIN_POST_START, MIN_POST_START))
       .sort({createdAt: -1});
   },
 
