@@ -8,37 +8,33 @@ const {Feed} = require('feed');
  * Read the documentation () to implement custom controller functions
  */
 
-function isWriter(ctx) {
-  return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.name === 'writer';
-}
+const MAX_POST_LIMIT = 20;
+const MIN_START_VALUE = 0;
 
 module.exports = {
-  async find(ctx = {}, next, extra = {}) {
-    if (!isWriter(ctx)) {
-      ctx.query = {
-        ...(ctx.query || {}),
-        publishedAt_lte: new Date().toISOString(),
-        enable: true
-      };
+  async find(ctx = {}) {
+    let query = {};
+    if (strapi.services.post.isAuthenticated(ctx)) {
+      query = {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
+    } else if (!strapi.services.post.isStaff(ctx)) {
+      // public user
+      query = {publishedAt: {$lte: new Date()}, enable: true};
     }
-
-    const filters = convertRestQueryParams(ctx.query);
-    return buildQuery({
-      model: Post,
-      filters,
-      populate: extra.populate || ''
-    });
+    return await Post.find(query)
+      .limit(Math.min(ctx.query.limit || ctx.query._limit || MAX_POST_LIMIT, MAX_POST_LIMIT))
+      .skip(Math.max(ctx.query.start || ctx.query._start || MIN_START_VALUE, MIN_START_VALUE))
+      .sort({createdAt: -1});
   },
 
-  count(ctx) {
-    if (!isWriter(ctx)) {
-      ctx.query = {
-        ...ctx.query,
-        publishedAt_lte: new Date().toISOString(),
-        enable: true
-      };
+  async count(ctx) {
+    let query;
+    if (strapi.services.post.isAuthenticated(ctx)) {
+      query = {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
+    } else if (!strapi.services.post.isStaff(ctx)) {
+      // public user
+      query = {publishedAt: {$lte: new Date()}, enable: true};
     }
-    return strapi.services.post.count(ctx.query);
+    return await Post.count(query);
   },
 
   async findOneByName(ctx, next, extra = {}) {
@@ -50,13 +46,28 @@ module.exports = {
       filters,
       populate: extra.populate || ''
     }).then(async (posts) => {
+      let ret = null;
       if (posts && posts.length > 0) {
         const post = posts[0];
-        post.views = `${parseInt(post.views || 0) + 1}`;
-        await Post.update({name}, {$set: {views: post.views}});
-        return post;
+        const isPublished = Boolean(post.publishedAt && post.publishedAt.getTime() < new Date().getTime());
+        const isEnable = !!post.enable;
+        if (strapi.services.post.isAuthenticated(ctx) &&
+          ((isPublished && isEnable) || (post.author && post.author.id === ctx.state.user.id))
+        ) {
+          ret = post;
+        } else if (strapi.services.post.isStaff(ctx)) {
+          ret = post;
+        } else if (isPublished && isEnable) {
+          // public user
+          ret = post;
+        }
       }
-      return null;
+      if (!ret) {
+        ctx.status = 403;
+        return {};
+      }
+      await strapi.services.post.updateViews(ret);
+      return ret
     });
   },
 
