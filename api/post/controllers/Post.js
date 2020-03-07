@@ -10,10 +10,19 @@ const {Feed} = require('feed');
 
 const MAX_POST_LIMIT = 20;
 const MIN_POST_START = 0;
+const SORT_ATTR_NAME = 0;
+const SORT_ATTR_VALUE = 1;
 
 module.exports = {
   async find(ctx = {}) {
     let query = {};
+
+    let sort = {};
+    const sortQuery = (ctx.query.sort || ctx.query._sort).split(':');
+    if (sortQuery.length === 2) {
+      sort[sortQuery[SORT_ATTR_NAME]] = sortQuery[SORT_ATTR_VALUE].toLowerCase() === 'asc' ? 1 : -1;
+    }
+
     if (strapi.services.post.isAuthenticated(ctx)) {
       query = {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
     } else if (!strapi.services.post.isStaff(ctx)) {
@@ -23,7 +32,7 @@ module.exports = {
     return await Post.find(query)
       .limit(Math.min(ctx.query.limit || ctx.query._limit || MAX_POST_LIMIT, MAX_POST_LIMIT))
       .skip(Math.max(ctx.query.start || ctx.query._start || MIN_POST_START, MIN_POST_START))
-      .sort({createdAt: -1});
+      .sort(sort);
   },
 
   async count(ctx) {
