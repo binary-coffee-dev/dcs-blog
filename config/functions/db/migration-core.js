@@ -38,10 +38,8 @@ const MigrationCore = {
   saveNewMigrations: async (migrations) => {
     migrations = migrations || [];
     await MigrationCore.connect(strapi.config.connections.default);
-    for (let migration of migrations) {
-      const model = MigrationCore.getMigrationModel();
-      await model.create(migrations);
-    }
+    const model = MigrationCore.getMigrationModel();
+    await model.create(migrations);
     MigrationCore.disconnect();
   },
 
