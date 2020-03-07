@@ -20,6 +20,11 @@ module.exports = {
     return result + (result && subVal !== '' ? '-' : '') + subVal;
   },
 
+  async updateViews(post) {
+    const views = `${parseInt(post.views || 0) + 1}`;
+    await Post.update({name: post.name}, {$set: {views}});
+  },
+
   async updateComments(postId) {
     const countOfComments = await strapi.services.comment.count({post: postId});
     await strapi.services.post.update({id: postId}, {comments: countOfComments});
@@ -32,5 +37,27 @@ module.exports = {
       publishedAt_gt: date,
       enable_eq: true
     });
+  },
+
+  isStaff: (ctx) => {
+    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'staff';
+  },
+
+  isAuthenticated: (ctx) => {
+    // todo: remove the second line after we decide to have the admin role functional
+    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'authenticated' ||
+      ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator';
+  },
+
+  isAdmin: (ctx) => {
+    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator';
+  },
+
+  permissionFilter: (query) => {
+    return {
+      ...(query || {}),
+      publishedAt_lte: new Date().toISOString(),
+      enable: true
+    };
   }
 };

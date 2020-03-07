@@ -73,6 +73,10 @@
     },
     "providers": {
       "collection": "provider"
+    },
+    "images": {
+      "via": "user",
+      "collection": "image"
     }
   }
 }
