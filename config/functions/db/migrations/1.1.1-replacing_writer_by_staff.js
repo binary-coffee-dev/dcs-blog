@@ -1,7 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
-
 module.exports = {
   version: '1.1.1',
   description: 'Replacing all users with writer role by the new staff role',

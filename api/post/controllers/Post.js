@@ -76,7 +76,7 @@ module.exports = {
         return {};
       }
       await strapi.services.post.updateViews(ret);
-      return ret
+      return ret;
     });
   },
 

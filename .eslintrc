@@ -17,7 +17,8 @@
   },
   "globals": {
     "strapi": true,
-    "Post":  true
+    "Post":  true,
+    "Image": true
   },
   "rules": {
     "indent": ["error", 2, { "SwitchCase": 1 }],
