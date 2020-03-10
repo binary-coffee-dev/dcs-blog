@@ -1,7 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
-
 const User = require('strapi-plugin-users-permissions/controllers/User');
 
 const UserNew = {
