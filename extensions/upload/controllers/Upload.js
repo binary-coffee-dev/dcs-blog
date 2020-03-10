@@ -24,7 +24,6 @@ module.exports = {
         .sort({createdAt: -1});
       count = await Image.count({user: ctx.state.user.id});
       values = images.map(image => image.image[0]);
-      console.log(images);
     } else {
       values = await strapi.plugins['upload'].services.upload.fetchAll(
         ctx.query
@@ -37,6 +36,16 @@ module.exports = {
       values,
       aggregate: {count}
     });
+  },
+
+  async count(ctx) {
+    if (strapi.services.post.isAuthenticated(ctx)) {
+      return await Image.count({user: ctx.state.user.id});
+    } else {
+      return await strapi.plugins['upload'].services.upload.count(
+        ctx.query
+      );
+    }
   }
 };
 
