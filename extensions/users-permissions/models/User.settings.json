@@ -77,6 +77,10 @@
     "images": {
       "via": "user",
       "collection": "image"
+    },
+    "comments": {
+      "via": "user",
+      "collection": "comment"
     }
   }
 }

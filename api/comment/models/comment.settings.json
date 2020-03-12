@@ -23,6 +23,11 @@
     },
     "post": {
       "model": "post"
+    },
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "comments"
     }
   }
 }
