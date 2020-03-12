@@ -8,6 +8,9 @@ const svgCaptcha = require('svg-captcha');
  */
 
 module.exports = {
+  /**
+   * @deprecated
+   */
   captcha(ctx) {
     const captcha = svgCaptcha.createMathExpr({
       noise: 10,
@@ -24,6 +27,9 @@ module.exports = {
     });
   },
 
+  /**
+   * @deprecated
+   */
   async createByCaptcha(ctx) {
     if (strapi.services.comment.checkCaptchaJwt(ctx.request.body.input.token, ctx.request.body.input.captcha, strapi.config.captchaSecret)) {
       const comment = {
@@ -39,5 +45,20 @@ module.exports = {
       return response;
     }
     return new Error('invalid-captcha');
+  },
+
+  async create(ctx) {
+    const obj = {
+      body: ctx.request.body.body,
+      post: ctx.request.body.post,
+      user: ctx.state.user.id,
+      publishedAt: new Date()
+    };
+    if (obj.body && obj.post && obj.user) {
+      const comment = await strapi.services.comment.create(obj);
+      await strapi.services.post.updateComments(comment.post);
+      return comment;
+    }
+    return new Error('invalid-data');
   }
 };
