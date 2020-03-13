@@ -62,6 +62,10 @@
       "plugin": "upload",
       "required": false
     },
+    "avatarUrl": {
+      "type": "string",
+      "maxLength": 100
+    },
     "name": {
       "type": "string",
       "required": true,
@@ -77,6 +81,10 @@
     "images": {
       "via": "user",
       "collection": "image"
+    },
+    "comments": {
+      "via": "user",
+      "collection": "comment"
     }
   }
 }
