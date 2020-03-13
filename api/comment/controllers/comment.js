@@ -48,28 +48,6 @@ module.exports = {
     return new Error('invalid-captcha');
   },
 
-  async find(ctx) {
-    const filters = convertRestQueryParams(ctx.query);
-    const comments = await buildQuery({
-      model: Comment,
-      filters
-    });
-    let commentsRet = [];
-    for (let comment of comments) {
-      comment = comment.toObject();
-      if (comment.user) {
-        let user = (await strapi.plugins['users-permissions'].models.user.findOne({_id: comment.user})).toObject();
-        if (!user.avatar) {
-          const url = await strapi.services.provider.getProviderAvatar(user.providers);
-          user.avatar = {id: 'none', _id: 'none', url};
-        }
-        comment.user = user;
-      }
-      commentsRet.push(comment);
-    }
-    return commentsRet;
-  },
-
   async create(ctx) {
     const obj = {
       body: ctx.request.body.body,
