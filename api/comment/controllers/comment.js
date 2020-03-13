@@ -1,7 +1,6 @@
 'use strict';
 
 const svgCaptcha = require('svg-captcha');
-const {buildQuery, convertRestQueryParams} = require('strapi-utils');
 
 /**
  * Read the documentation (https://strapi.io/documentation/3.0.0-beta.x/concepts/controllers.html#core-controllers)
