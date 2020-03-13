@@ -49,6 +49,7 @@ const AuthNew = _.merge(Auth, {
       blocked: false,
       name: provider.name,
       page: provider.url,
+      avatarUrl: provider.avatar,
       providers: [provider.id],
       role: authenticatedRole.id
     });
