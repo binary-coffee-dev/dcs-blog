@@ -15,6 +15,16 @@ const UserNew = {
       };
     }
   },
+
+  async update(ctx) {
+    await User.update(ctx);
+    const user = await strapi.plugins['users-permissions'].models.user.findOne({_id: ctx.params.id});
+    if (user.avatar) {
+      user.avatarUrl = user.avatar.url;
+      await user.save();
+    }
+    ctx.send(user);
+  }
 };
 
 module.exports = UserNew;
