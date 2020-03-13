@@ -28,6 +28,7 @@
       "type": "string"
     },
     "token": {
+      "private": true,
       "type": "string"
     }
   }

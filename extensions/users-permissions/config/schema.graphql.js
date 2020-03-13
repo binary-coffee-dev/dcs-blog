@@ -4,6 +4,7 @@ module.exports = {
       id: ID!
       username: String!
       email: String!
+      avatarUrl: String!
       confirmed: Boolean
       blocked: Boolean
       role: UsersPermissionsMeRole
