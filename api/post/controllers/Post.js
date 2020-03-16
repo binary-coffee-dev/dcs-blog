@@ -68,7 +68,7 @@ module.exports = {
         const isPublished = Boolean(post.publishedAt && post.publishedAt.getTime() < new Date().getTime());
         const isEnable = !!post.enable;
         if (strapi.services.post.isAuthenticated(ctx) &&
-          ((isPublished && isEnable) || (post.author && post.author.id === ctx.state.user.id))
+          ((isPublished && isEnable) || (post.author && post.author._id.toString() === ctx.state.user.id.toString()))
         ) {
           ret = post;
         } else if (strapi.services.post.isStaff(ctx)) {
