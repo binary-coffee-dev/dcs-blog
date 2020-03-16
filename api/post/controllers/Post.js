@@ -17,15 +17,18 @@ module.exports = {
   async find(ctx = {}) {
     let query = {};
 
+    const publicOnly = (ctx.params._where && ctx.params._where.enable) ||
+      (ctx.params.where && ctx.params.where.enable) || false;
+
     let sort = {};
     const sortQuery = (ctx.query.sort || ctx.query._sort).split(':');
     if (sortQuery.length === 2) {
       sort[sortQuery[SORT_ATTR_NAME]] = sortQuery[SORT_ATTR_VALUE].toLowerCase() === 'asc' ? 1 : -1;
     }
 
-    if (strapi.services.post.isAuthenticated(ctx)) {
+    if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
       query = {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
-    } else if (!strapi.services.post.isStaff(ctx)) {
+    } else if (!strapi.services.post.isStaff(ctx) || publicOnly) {
       // public user
       query = {publishedAt: {$lte: new Date()}, enable: true};
     }
@@ -36,10 +39,14 @@ module.exports = {
   },
 
   async count(ctx) {
-    let query;
-    if (strapi.services.post.isAuthenticated(ctx)) {
+    let query = {};
+
+    const publicOnly = (ctx.params._where && ctx.params._where.enable) ||
+      (ctx.params.where && ctx.params.where.enable) || false;
+
+    if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
       query = {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
-    } else if (!strapi.services.post.isStaff(ctx)) {
+    } else if (!strapi.services.post.isStaff(ctx) || publicOnly) {
       // public user
       query = {publishedAt: {$lte: new Date()}, enable: true};
     }

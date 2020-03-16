@@ -1,7 +1,7 @@
 module.exports = {
   query: `
     postByName(name: String!): Post!
-    countPosts: Int!
+    countPosts(where: JSON): Int!
   `,
   resolver: {
     Query: {
