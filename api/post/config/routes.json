@@ -40,13 +40,21 @@
       "method": "PUT",
       "path": "/posts/:id",
       "handler": "Post.update",
-      "config": {}
+      "config": {
+        "policies": [
+          "global.canModifyPost"
+        ]
+      }
     },
     {
       "method": "DELETE",
       "path": "/posts/:id",
       "handler": "Post.delete",
-      "config": {}
+      "config": {
+        "policies": [
+          "global.canModifyPost"
+        ]
+      }
     }
   ]
 }
