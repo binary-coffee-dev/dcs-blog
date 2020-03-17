@@ -11,6 +11,20 @@ module.exports = {
       countPosts: {
         resolver: 'Post.count'
       }
+    },
+    Mutation: {
+      createPost: {
+        resolver: 'Post.create',
+        policies: [
+          'global.canModifyPost'
+        ]
+      },
+      updatePost: {
+        resolver: 'Post.update',
+        policies: [
+          'global.canModifyPost'
+        ]
+      }
     }
   }
 };
