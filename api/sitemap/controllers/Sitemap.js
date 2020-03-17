@@ -18,7 +18,12 @@ module.exports = {
       }
     };
 
-    const posts = await strapi.controllers.post.find();
+    const sort = {'publishedAt': -1};
+    const query = {publishedAt: {$lte: new Date()}, enable: true};
+    const posts = await Post.find(query)
+      .limit(20)
+      .skip(0)
+      .sort(sort);
 
     posts.forEach(post => mapsite.urlset.url.push({
       loc: `${siteUrl}/post/${post.name}`,

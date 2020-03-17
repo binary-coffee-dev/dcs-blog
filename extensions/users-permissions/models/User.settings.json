@@ -22,8 +22,7 @@
     "email": {
       "type": "email",
       "minLength": 6,
-      "configurable": false,
-      "required": true
+      "configurable": false
     },
     "provider": {
       "type": "string",
@@ -62,6 +61,10 @@
       "plugin": "upload",
       "required": false
     },
+    "avatarUrl": {
+      "type": "string",
+      "maxLength": 100
+    },
     "name": {
       "type": "string",
       "required": true,
@@ -70,6 +73,17 @@
     },
     "page": {
       "type": "string"
+    },
+    "providers": {
+      "collection": "provider"
+    },
+    "images": {
+      "via": "user",
+      "collection": "image"
+    },
+    "comments": {
+      "via": "user",
+      "collection": "comment"
     }
   }
 }

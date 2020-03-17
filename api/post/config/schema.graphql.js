@@ -1,7 +1,7 @@
 module.exports = {
   query: `
     postByName(name: String!): Post!
-    countPosts: Int!
+    countPosts(where: JSON): Int!
   `,
   resolver: {
     Query: {
@@ -10,6 +10,20 @@ module.exports = {
       },
       countPosts: {
         resolver: 'Post.count'
+      }
+    },
+    Mutation: {
+      createPost: {
+        resolver: 'Post.create',
+        policies: [
+          'global.canModifyPost'
+        ]
+      },
+      updatePost: {
+        resolver: 'Post.update',
+        policies: [
+          'global.canModifyPost'
+        ]
       }
     }
   }

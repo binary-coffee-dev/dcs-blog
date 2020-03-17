@@ -3,7 +3,8 @@ module.exports = {
     type UsersPermissionsMYData {
       id: ID!
       username: String!
-      email: String!
+      email: String
+      avatarUrl: String!
       confirmed: Boolean
       blocked: Boolean
       role: UsersPermissionsMeRole
@@ -12,12 +13,21 @@ module.exports = {
     }
   `,
   query: 'myData: UsersPermissionsMYData',
+  mutation: 'loginWithProvider(provider: String!, code: String!): String',
   resolver: {
     Query: {
       myData: {
         resolver: {
           plugin: 'users-permissions',
           handler: 'User.me'
+        }
+      }
+    },
+    Mutation: {
+      loginWithProvider: {
+        resolver: {
+          plugin: 'users-permissions',
+          handler: 'Auth.loginWithProvider'
         }
       }
     }
