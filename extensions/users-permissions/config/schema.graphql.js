@@ -3,7 +3,7 @@ module.exports = {
     type UsersPermissionsMYData {
       id: ID!
       username: String!
-      email: String!
+      email: String
       avatarUrl: String!
       confirmed: Boolean
       blocked: Boolean

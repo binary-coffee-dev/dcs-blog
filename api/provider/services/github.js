@@ -13,7 +13,8 @@ module.exports = {
       username: req.data.login,
       avatar: req.data.avatar_url,
       url: req.data.url,
-      name: req.data.name
+      name: req.data.name,
+      email: req.data.email
     };
   },
   auth: async (code) => {

@@ -22,8 +22,7 @@
     "email": {
       "type": "email",
       "minLength": 6,
-      "configurable": false,
-      "required": true
+      "configurable": false
     },
     "provider": {
       "type": "string",
