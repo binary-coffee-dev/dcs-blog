@@ -34,7 +34,11 @@
       "method": "POST",
       "path": "/posts",
       "handler": "Post.create",
-      "config": {}
+      "config": {
+        "policies": [
+          "global.createPost"
+        ]
+      }
     },
     {
       "method": "PUT",
