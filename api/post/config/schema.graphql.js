@@ -16,6 +16,7 @@ module.exports = {
       createPost: {
         resolver: 'Post.create',
         policies: [
+          'global.createPost',
           'global.canModifyPost'
         ]
       },
