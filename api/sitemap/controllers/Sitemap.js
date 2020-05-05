@@ -21,7 +21,6 @@ module.exports = {
     const sort = {'publishedAt': -1};
     const query = {publishedAt: {$lte: new Date()}, enable: true};
     const posts = await Post.find(query)
-      .limit(20)
       .skip(0)
       .sort(sort);
 
