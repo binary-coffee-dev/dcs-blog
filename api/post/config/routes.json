@@ -20,6 +20,14 @@
     },
     {
       "method": "GET",
+      "path": "/posts/related/:id",
+      "handler": "Post.findSimilarPosts",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/posts/feed/:format",
       "handler": "Post.feed",
       "config": {}
