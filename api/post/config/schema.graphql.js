@@ -2,6 +2,7 @@ module.exports = {
   query: `
     postByName(name: String!): Post!
     countPosts(where: JSON): Int!
+    similarPosts(id: String!, limit: Int): [Post]!
   `,
   resolver: {
     Query: {
@@ -10,6 +11,9 @@ module.exports = {
       },
       countPosts: {
         resolver: 'Post.count'
+      },
+      similarPosts: {
+        resolver: 'Post.findSimilarPosts'
       }
     },
     Mutation: {
