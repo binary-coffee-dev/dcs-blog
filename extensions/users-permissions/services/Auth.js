@@ -1,8 +1,8 @@
 module.exports = {
-  findOrCreateProvide: async ({username, provider, scope, avatar, url, name, token}) => {
+  findOrCreateProvide: async ({username, provider, scope, avatar, html_url, name, token}) => {
     let provide = await strapi.services.provider.findOne({username, provider});
     if (!provide) {
-      provide = await strapi.services.provider.create({username, provider, scope, avatar, url, name, token});
+      provide = await strapi.services.provider.create({username, provider, scope, avatar, url: html_url, name, token});
     }
     return provide;
   },
