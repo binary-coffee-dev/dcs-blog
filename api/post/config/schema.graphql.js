@@ -2,7 +2,7 @@ module.exports = {
   query: `
     postByName(name: String!): Post!
     countPosts(where: JSON): Int!
-    similarPosts(id: String!, limit: Int): [Post]!
+    similarPosts(id: ID!, limit: Int): [Post]!
   `,
   resolver: {
     Query: {
