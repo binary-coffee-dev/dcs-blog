@@ -77,7 +77,7 @@ module.exports = {
       const comment = await strapi.services.comment.create(obj);
       await strapi.services.post.updateComments(comment.post);
       
-      const msg = "[" + comment.publishedAt.toString() + "]" + "  " + comment.user.username + " commented: \n" + '`' + comment.body + '`';
+      const msg = "[" + comment.publishedAt + "]" + " *" + comment.user.username + "* commented: \n\n" + '`' + comment.body + '`';
 
       Request.post({
         "headers": { "content-type": "application/json" },
