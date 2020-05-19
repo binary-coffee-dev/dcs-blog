@@ -81,7 +81,7 @@ module.exports = {
       const comment = await strapi.services.comment.create(obj);
       await strapi.services.post.updateComments(comment.post);
 
-      this.notifyViaTelegram(obj.body);
+      notifyViaTelegram(obj.body);
       return comment;
     }
     return new Error('invalid-data');
