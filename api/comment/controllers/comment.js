@@ -77,11 +77,13 @@ module.exports = {
       const comment = await strapi.services.comment.create(obj);
       await strapi.services.post.updateComments(comment.post);
       
+      const msg = "[" + comment.publishedAt.toString() + "]" + "  " + comment.user.username + " commented: \n" + '`' + comment.body + '`';
+
       Request.post({
         "headers": { "content-type": "application/json" },
         "url": "https://botnotifier.binary-coffee.dev/notify/channel",
         "body": JSON.stringify({
-          "Message": obj.body,
+          "Message": msg,
           "ChannelName": "bcStaffs"
         })
       }, (error, response, body) => {
