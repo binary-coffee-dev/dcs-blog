@@ -1,6 +1,11 @@
 'use strict';
 
+const NOTIFIER_TELEGRAM_API = 'https://botnotifier.binary-coffee.dev/notify/channel';
+const CHANNEL_NAME = 'bcStaffs';
+
 const svgCaptcha = require('svg-captcha');
+
+const Request = require('request');
 
 /**
  * Read the documentation (https://strapi.io/documentation/3.0.0-beta.x/concepts/controllers.html#core-controllers)
@@ -8,6 +13,24 @@ const svgCaptcha = require('svg-captcha');
  */
 
 module.exports = {
+
+  notifyViaTelegram(msg){
+    Request.post({
+      "headers": { "content-type": "application/json" },
+      "url": NOTIFIER_TELEGRAM_API,
+      "body": JSON.stringify({
+        "Message": msg,
+        "ChannelName": CHANNEL_NAME
+      })
+    }, (error, response, body) => {
+        if(error) {
+            return console.log(error);
+        }
+        console.log(JSON.parse(body));
+    });
+  },
+
+
   /**
    * @deprecated
    */
@@ -57,6 +80,8 @@ module.exports = {
     if (obj.body && obj.post && obj.user) {
       const comment = await strapi.services.comment.create(obj);
       await strapi.services.post.updateComments(comment.post);
+
+      this.notifyViaTelegram(obj.body);
       return comment;
     }
     return new Error('invalid-data');
