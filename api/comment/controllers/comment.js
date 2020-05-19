@@ -1,10 +1,6 @@
 'use strict';
 
-const NOTIFIER_TELEGRAM_API = 'https://botnotifier.binary-coffee.dev/notify/channel';
-const CHANNEL_NAME = 'bcStaffs';
-
 const svgCaptcha = require('svg-captcha');
-
 const Request = require('request');
 
 /**
@@ -13,23 +9,6 @@ const Request = require('request');
  */
 
 module.exports = {
-
-  notifyViaTelegram(msg){
-    Request.post({
-      "headers": { "content-type": "application/json" },
-      "url": NOTIFIER_TELEGRAM_API,
-      "body": JSON.stringify({
-        "Message": msg,
-        "ChannelName": CHANNEL_NAME
-      })
-    }, (error, response, body) => {
-        if(error) {
-            return console.log(error);
-        }
-        console.log(JSON.parse(body));
-    });
-  },
-
 
   /**
    * @deprecated
@@ -80,8 +59,21 @@ module.exports = {
     if (obj.body && obj.post && obj.user) {
       const comment = await strapi.services.comment.create(obj);
       await strapi.services.post.updateComments(comment.post);
-
-      notifyViaTelegram(obj.body);
+      
+      Request.post({
+        "headers": { "content-type": "application/json" },
+        "url": "https://botnotifier.binary-coffee.dev/notify/channel",
+        "body": JSON.stringify({
+          "Message": obj.body,
+          "ChannelName": "bcStaffs"
+        })
+      }, (error, response, body) => {
+          if(error) {
+            return console.log(error);
+          }
+          console.log(JSON.parse(body));
+      });
+      
       return comment;
     }
     return new Error('invalid-data');
