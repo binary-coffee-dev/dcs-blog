@@ -3,23 +3,6 @@
 const svgCaptcha = require('svg-captcha');
 const Request = require('request');
 
-const NOTIFIER_API = "https://botnotifier.binary-coffee.dev/notify";
-
-
-//API REFERENCE
-/*
-  **  /user
-      {
-        "Message": "HelloWorld",
-        "Username": "pedris11s"
-      }
-  **  /channel
-      {
-        "Message": "HelloWorld",
-        "ChannelName": "bcStaffs"
-      }
-*/
-
 /**
  * Read the documentation (https://strapi.io/documentation/3.0.0-beta.x/concepts/controllers.html#core-controllers)
  * to customize this controller
@@ -76,23 +59,23 @@ module.exports = {
     if (obj.body && obj.post && obj.user) {
       const comment = await strapi.services.comment.create(obj);
       await strapi.services.post.updateComments(comment.post);
-      
-      const msg = "[[" + comment.publishedAt.toLocaleString() + "]]" + " *" + comment.user.username + "* commented: \n\n" + '`' + comment.body + '`';
+
+      const msg = '[[' + comment.publishedAt.toLocaleString() + ']]' + ' *' + comment.user.username + '* commented: \n\n' + '`' + comment.body + '`';
 
       Request.post({
-        "headers": { "content-type": "application/json" },
-        "url": "https://botnotifier.binary-coffee.dev/notify/channel",
-        "body": JSON.stringify({
-          "Message": msg,
-          "ChannelName": "bcStaffs"
+        'headers': {'content-type': 'application/json'},
+        'url': 'https://botnotifier.binary-coffee.dev/notify/channel',
+        'body': JSON.stringify({
+          'Message': msg,
+          'ChannelName': 'bcStaffs'
         })
       }, (error, response, body) => {
-          if(error) {
-            return console.log(error);
-          }
-          console.log(JSON.parse(body));
+        if (error) {
+          return console.log(error);
+        }
+        console.log(JSON.parse(body));
       });
-      
+
       return comment;
     }
     return new Error('invalid-data');

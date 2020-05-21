@@ -19,7 +19,8 @@
     "strapi": true,
     "Post":  true,
     "Image": true,
-    "Tag": true
+    "Tag": true,
+    "Provider": true
   },
   "rules": {
     "indent": ["error", 2, { "SwitchCase": 1 }],
