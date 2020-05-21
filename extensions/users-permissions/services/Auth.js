@@ -20,7 +20,7 @@ module.exports = {
       username,
       confirmed: true,
       blocked: false,
-      name: provider.name,
+      name: provider.name || username,
       page: provider.url,
       avatarUrl: provider.avatar,
       providers: [provider.id],
