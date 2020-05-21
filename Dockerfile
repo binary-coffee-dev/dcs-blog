@@ -29,7 +29,6 @@ COPY .eslintignore ./.eslintignore
 COPY .eslintrc ./.eslintrc
 COPY favicon.ico ./favicon.ico
 COPY package.json ./package.json
-COPY package-lock.json ./package-lock.json
 
 RUN npm install
 RUN npm run build
