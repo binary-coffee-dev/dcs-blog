@@ -1,5 +1,6 @@
 .env
 .nyc_output
+package-lock.json
 
 ############################
 # OS X
