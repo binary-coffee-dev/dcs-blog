@@ -18,6 +18,9 @@ ENV GOOGLE_CLIENT_SECRET $GOOGLE_CLIENT_SECRET
 
 WORKDIR /app
 
+COPY package.json ./package.json
+RUN npm install
+
 COPY api ./api
 COPY config ./config
 COPY extensions ./extensions
@@ -28,9 +31,7 @@ COPY .editorconfig ./.editorconfig
 COPY .eslintignore ./.eslintignore
 COPY .eslintrc ./.eslintrc
 COPY favicon.ico ./favicon.ico
-COPY package.json ./package.json
 
-RUN npm install
 RUN npm run build
 
 CMD ["npm", "start"]
