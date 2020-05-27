@@ -20,7 +20,8 @@
     "Post":  true,
     "Image": true,
     "Tag": true,
-    "Provider": true
+    "Provider": true,
+    "Comment": true
   },
   "rules": {
     "indent": ["error", 2, { "SwitchCase": 1 }],

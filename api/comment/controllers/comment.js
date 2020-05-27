@@ -79,5 +79,10 @@ module.exports = {
       return comment;
     }
     return new Error('invalid-data');
+  },
+
+  async recentComments(ctx) {
+    const comments = await strapi.services.comment.recentComments();
+    ctx.send(comments);
   }
 };
