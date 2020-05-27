@@ -13,12 +13,18 @@ module.exports = {
       token: String
     }
   `,
-  query: 'captcha: CaptchaSchema!',
+  query: `
+    captcha: CaptchaSchema!
+    recentComments: [Comment]!
+  `,
   mutation: 'createCommentByCaptcha(input: createCommentByCaptchaInput): createCommentPayload',
   resolver: {
     Query: {
       captcha: {
         resolver: 'Comment.captcha'
+      },
+      recentComments: {
+        resolver: 'Comment.recentComments'
       }
     },
     Mutation: {

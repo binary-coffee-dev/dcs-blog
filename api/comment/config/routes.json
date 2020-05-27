@@ -25,6 +25,14 @@
     },
     {
       "method": "GET",
+      "path": "/comments/recent",
+      "handler": "comment.recentComments",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/comments/:id",
       "handler": "comment.findOne",
       "config": {
