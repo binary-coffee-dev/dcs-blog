@@ -38,4 +38,16 @@ module.exports = {
   createHash(text, key) {
     return crypto.createHmac('sha256', key).update(text).digest('base64');
   },
+
+  async recentComments() {
+    // todo: this should be optimized for when the application is big enough to make this query to slow
+    const comments = await Comment
+      .find()
+      .sort({createdAt: 'desc'})
+      .limit(15)
+      .populate(['post', 'user']);
+    return comments.filter(comment => {
+      return strapi.services.post.isPublish(comment.post);
+    });
+  }
 };
