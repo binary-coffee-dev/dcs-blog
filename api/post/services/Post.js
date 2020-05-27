@@ -59,5 +59,9 @@ module.exports = {
       publishedAt_lte: new Date().toISOString(),
       enable: true
     };
+  },
+
+  isPublish(post) {
+    return post && post.enable && post.publishedAt && post.publishedAt.getTime() <= new Date().getTime();
   }
 };
