@@ -22,7 +22,8 @@
       "type": "string"
     },
     "post": {
-      "model": "post"
+      "model": "post",
+      "via": "commentsList"
     },
     "user": {
       "plugin": "users-permissions",

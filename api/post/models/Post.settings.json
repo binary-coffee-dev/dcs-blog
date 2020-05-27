@@ -47,6 +47,10 @@
       "type": "biginteger",
       "default": "0"
     },
+    "commentsList": {
+      "via": "post",
+      "collection": "comment"
+    },
     "publishedAt": {
       "type": "datetime"
     },
