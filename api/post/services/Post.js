@@ -44,9 +44,7 @@ module.exports = {
   },
 
   isAuthenticated: (ctx) => {
-    // todo: remove the second line after we decide to have the admin role functional
-    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'authenticated' ||
-      ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator';
+    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'authenticated';
   },
 
   isAdmin: (ctx) => {
