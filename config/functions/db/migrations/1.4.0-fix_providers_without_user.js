@@ -4,7 +4,7 @@ module.exports = {
   version: '1.4.0',
   description: 'Fix accounts with the user name null in the provider',
   migrate: async () => {
-    const providers = await Provider.find();
+    const providers = await strapi.models.provider.find();
     for (let provider of providers) {
       let user = await strapi.plugins['users-permissions'].models.user.findOne({providers: [provider.id]});
       if (!user) {

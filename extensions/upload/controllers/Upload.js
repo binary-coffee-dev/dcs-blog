@@ -17,7 +17,7 @@ module.exports = {
   async findConnection(ctx) {
     let values;
     if (strapi.services.post.isAuthenticated(ctx)) {
-      const images = await Image
+      const images = await strapi.models.image
         .find({user: ctx.state.user.id})
         .limit(Math.min(ctx.query.limit || ctx.query._limit || MAX_FILE_LIMIT, MAX_FILE_LIMIT))
         .skip(Math.max(ctx.query.start || ctx.query._start || MIN_FILE_START, MIN_FILE_START))
@@ -31,7 +31,7 @@ module.exports = {
 
   async count(ctx) {
     if (strapi.services.post.isAuthenticated(ctx)) {
-      return await Image.count({user: ctx.state.user.id});
+      return await strapi.models.image.count({user: ctx.state.user.id});
     } else {
       return await strapi.plugins['upload'].services.upload.count(ctx.query);
     }

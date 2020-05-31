@@ -20,7 +20,7 @@ module.exports = {
 
     const sort = {'publishedAt': -1};
     const query = {publishedAt: {$lte: new Date()}, enable: true};
-    const posts = await Post.find(query)
+    const posts = await strapi.models.post.find(query)
       .skip(0)
       .sort(sort);
 
