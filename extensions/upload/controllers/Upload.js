@@ -37,10 +37,3 @@ module.exports = {
     }
   }
 };
-
-function removeQueries(delQueries, ctx) {
-  delQueries.forEach(query => {
-    delete ctx.query[query];
-    delete ctx.query[`_${query}`];
-  });
-}
