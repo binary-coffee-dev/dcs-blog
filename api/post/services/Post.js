@@ -22,7 +22,7 @@ module.exports = {
 
   async updateViews(post) {
     const views = `${parseInt(post.views || 0) + 1}`;
-    await Post.update({name: post.name}, {$set: {views}});
+    await strapi.models.post.update({name: post.name}, {$set: {views}});
   },
 
   async updateComments(postId) {
