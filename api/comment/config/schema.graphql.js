@@ -21,15 +21,15 @@ module.exports = {
   resolver: {
     Query: {
       captcha: {
-        resolver: 'Comment.captcha'
+        resolver: 'application::comment.comment.captcha'
       },
       recentComments: {
-        resolver: 'Comment.recentComments'
+        resolver: 'application::comment.comment.recentComments'
       }
     },
     Mutation: {
       createCommentByCaptcha: {
-        resolver: 'Comment.createByCaptcha'
+        resolver: 'application::comment.comment.createByCaptcha'
       }
     }
   }
