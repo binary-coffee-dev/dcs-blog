@@ -44,7 +44,7 @@
       "handler": "Post.create",
       "config": {
         "policies": [
-          "global.createPost"
+          "global::createPost"
         ]
       }
     },
@@ -54,7 +54,7 @@
       "handler": "Post.update",
       "config": {
         "policies": [
-          "global.canModifyPost"
+          "global::canModifyPost"
         ]
       }
     },
@@ -64,7 +64,7 @@
       "handler": "Post.delete",
       "config": {
         "policies": [
-          "global.canModifyPost"
+          "global::canModifyPost"
         ]
       }
     }

@@ -13,16 +13,10 @@ module.exports = {
   resolver: {
     Query: {
       uploadsConnection: {
-        resolver: {
-          plugin: 'upload',
-          handler: 'Upload.findConnection'
-        }
+        resolver: 'plugins::upload.upload.findConnection'
       },
       countUploads: {
-        resolver: {
-          plugin: 'upload',
-          handler: 'Upload.count'
-        }
+        resolver: 'plugins::upload.upload.count'
       }
     }
   }

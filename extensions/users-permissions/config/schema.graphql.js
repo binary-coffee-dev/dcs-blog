@@ -17,18 +17,12 @@ module.exports = {
   resolver: {
     Query: {
       myData: {
-        resolver: {
-          plugin: 'users-permissions',
-          handler: 'User.me'
-        }
+        resolver: 'plugins::users-permissions.user.me'
       }
     },
     Mutation: {
       loginWithProvider: {
-        resolver: {
-          plugin: 'users-permissions',
-          handler: 'Auth.loginWithProvider'
-        }
+        resolver: 'plugins::users-permissions.auth.loginWithProvider'
       }
     }
   }
