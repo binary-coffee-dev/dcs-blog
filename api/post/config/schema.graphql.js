@@ -7,26 +7,26 @@ module.exports = {
   resolver: {
     Query: {
       postByName: {
-        resolver: 'Post.findOneByName'
+        resolver: 'application::post.post.findOneByName'
       },
       countPosts: {
-        resolver: 'Post.count'
+        resolver: 'application::post.post.count'
       },
       similarPosts: {
-        resolver: 'Post.findSimilarPosts'
+        resolver: 'application::post.post.findSimilarPosts'
       }
     },
     Mutation: {
       createPost: {
-        resolver: 'Post.create',
+        resolver: 'application::post.post.create',
         policies: [
-          'global.createPost'
+          'global::createPost'
         ]
       },
       updatePost: {
-        resolver: 'Post.update',
+        resolver: 'application::post.post.update',
         policies: [
-          'global.canModifyPost'
+          'global::canModifyPost'
         ]
       }
     }

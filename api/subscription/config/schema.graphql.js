@@ -8,10 +8,10 @@ module.exports = {
     },
     Mutation: {
       subscribe: {
-        resolver: 'Subscription.subscribe'
+        resolver: 'application::subscription.subscription.subscribe'
       },
       verify : {
-        resolver: 'Subscription.verify'
+        resolver: 'application::subscription.subscription.verify'
       }
     }
   }

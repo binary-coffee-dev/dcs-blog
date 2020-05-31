@@ -21,8 +21,9 @@ module.exports = {
       (ctx.params.where && ctx.params.where.enable) || false;
 
     let sort = {};
-    const sortQuery = (ctx.query.sort || ctx.query._sort).split(':');
-    if (sortQuery.length === 2) {
+    const sortFromRequest = (ctx.query.sort || ctx.query._sort);
+    const sortQuery = sortFromRequest && sortFromRequest.split(':');
+    if (sortQuery && sortQuery.length === 2) {
       sort[sortQuery[SORT_ATTR_NAME]] = sortQuery[SORT_ATTR_VALUE].toLowerCase() === 'asc' ? 1 : -1;
     }
 
@@ -32,7 +33,7 @@ module.exports = {
       // public user
       query = {publishedAt: {$lte: new Date()}, enable: true};
     }
-    return await Post.find(query)
+    return await strapi.models.post.find(query)
       .limit(Math.min(ctx.query.limit || ctx.query._limit || MAX_POST_LIMIT, MAX_POST_LIMIT))
       .skip(Math.max(ctx.query.start || ctx.query._start || MIN_POST_START, MIN_POST_START))
       .sort(sort);
@@ -50,7 +51,7 @@ module.exports = {
       // public user
       query = {publishedAt: {$lte: new Date()}, enable: true};
     }
-    return await Post.count(query);
+    return await strapi.models.post.count(query);
   },
 
   async findOneByName(ctx, next, extra = {}) {
@@ -58,7 +59,7 @@ module.exports = {
     const params = {name};
     const filters = convertRestQueryParams(params);
     return buildQuery({
-      model: Post,
+      model: strapi.models.post,
       filters,
       populate: extra.populate || ''
     }).then(async (posts) => {
@@ -92,13 +93,13 @@ module.exports = {
     limit = Math.max(Math.min(limit, 20), 0);
 
     let postToReturn = [];
-    const post = await Post.findOne({_id: id}).populate(['tags']);
+    const post = await strapi.models.post.findOne({_id: id}).populate(['tags']);
     const tags = post.tags || [];
     const markTags = new Set();
 
     tags.forEach(tag => markTags.add(tag.id));
 
-    const posts = (await Post
+    const posts = (await strapi.models.post
       .find({publishedAt: {$lte: new Date()}, enable: true, _id: {$ne: id}})
       .sort({views: 'desc'})
       .populate(['tags'])) || [];
@@ -126,7 +127,7 @@ module.exports = {
       _start: 0
     };
     return buildQuery({
-      model: Post,
+      model: strapi.models.post,
       filters: convertRestQueryParams(params),
       populate: ['author', 'banner']
     }).then(async (posts) => {

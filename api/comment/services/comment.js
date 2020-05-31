@@ -41,7 +41,7 @@ module.exports = {
 
   async recentComments() {
     // todo: this should be optimized for when the application is big enough to make this query to slow
-    const comments = await Comment
+    const comments = await strapi.models.comment
       .find()
       .sort({createdAt: 'desc'})
       .limit(15)
