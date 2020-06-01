@@ -44,7 +44,6 @@ describe('Should auto-generate the name of the article after create/update it IN
           description: "sfgsd fg sdfg",
           title: "this is an example of title",
           enable: true,
-          tags: ["5eb120d1e7134c0012f4d440"],
           author: "5deee37e98bbd80013a0a844"
         }
       })

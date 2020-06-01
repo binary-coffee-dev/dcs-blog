@@ -60,7 +60,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
           description: "sfgsd fg sdfg",
           title: "The good one",
           enable: true,
-          tags: ["5eb120d1e7134c0012f4d440"],
           author: "5deee37e98bbd80013a0a844",
           publishedAt: new Date()
         }
@@ -75,7 +74,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
       });
   });
 
-  xit('should create an article without the publishedAt attribute (staff user)', (done) => {
+  it('should create an article without the publishedAt attribute (staff user)', (done) => {
     const jwt = generateJwt(strapi, staffUser);
     chai.request(strapi.server)
       .post('/graphql')
@@ -86,7 +85,32 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
           description: "sfgsd fg sdfg",
           title: "not work",
           enable: true,
-          tags: ["5eb120d1e7134c0012f4d440"],
+          author: "5deee37e98bbd80013a0a844",
+          publishedAt: new Date()
+        }
+      })
+      .end((err, res) => {
+        console.log(res.body);
+        getPostById(strapi, res.body.data.createPost.post.id)
+          .then(post => {
+            posts.push(post);
+            expect(!!post.publishedAt).to.equal(false);
+            done();
+          });
+      });
+  });
+
+  it('should create an article without the publishedAt attribute (auth user)', (done) => {
+    const jwt = generateJwt(strapi, authUser);
+    chai.request(strapi.server)
+      .post('/graphql')
+      .set('Authorization', `Bearer ${jwt}`)
+      .send({
+        ...MUTATION_CREATE_POST, variables: {
+          body: "safsadf",
+          description: "sfgsd fg sdfg",
+          title: "not work two",
+          enable: true,
           author: "5deee37e98bbd80013a0a844",
           publishedAt: new Date()
         }
