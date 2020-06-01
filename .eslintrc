@@ -6,7 +6,7 @@
     "es6": true,
     "node": true,
     "browser": false,
-    "jest": true
+    "mocha": true
   },
   "parserOptions": {
     "ecmaFeatures": {

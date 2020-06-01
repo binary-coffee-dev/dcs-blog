@@ -13,10 +13,18 @@ const MIN_POST_START = 0;
 const SORT_ATTR_NAME = 0;
 const SORT_ATTR_VALUE = 1;
 
+const createQueryObject = (ctx, publicOnly) => {
+  if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
+    return {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
+  } else if ((!strapi.services.post.isAdmin(ctx) && !strapi.services.post.isStaff(ctx)) || publicOnly) {
+    // public user
+    return {publishedAt: {$lte: new Date()}, enable: true};
+  }
+  return {};
+};
+
 module.exports = {
   async find(ctx = {}) {
-    let query = {};
-
     const publicOnly = (ctx.params._where && ctx.params._where.enable) ||
       (ctx.params.where && ctx.params.where.enable) || false;
 
@@ -27,12 +35,7 @@ module.exports = {
       sort[sortQuery[SORT_ATTR_NAME]] = sortQuery[SORT_ATTR_VALUE].toLowerCase() === 'asc' ? 1 : -1;
     }
 
-    if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
-      query = {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
-    } else if (!strapi.services.post.isStaff(ctx) || publicOnly) {
-      // public user
-      query = {publishedAt: {$lte: new Date()}, enable: true};
-    }
+    const query = createQueryObject(ctx, publicOnly);
     return await strapi.models.post.find(query)
       .limit(Math.min(ctx.query.limit || ctx.query._limit || MAX_POST_LIMIT, MAX_POST_LIMIT))
       .skip(Math.max(ctx.query.start || ctx.query._start || MIN_POST_START, MIN_POST_START))
@@ -40,17 +43,10 @@ module.exports = {
   },
 
   async count(ctx) {
-    let query = {};
-
     const publicOnly = (ctx.params._where && ctx.params._where.enable) ||
       (ctx.params.where && ctx.params.where.enable) || false;
 
-    if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
-      query = {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
-    } else if (!strapi.services.post.isStaff(ctx) || publicOnly) {
-      // public user
-      query = {publishedAt: {$lte: new Date()}, enable: true};
-    }
+    const query = createQueryObject(ctx, publicOnly);
     return await strapi.models.post.count(query);
   },
 
@@ -131,8 +127,8 @@ module.exports = {
       filters: convertRestQueryParams(params),
       populate: ['author', 'banner']
     }).then(async (posts) => {
-      const apiUrl = strapi.config.apiUrl;
-      const siteUrl = strapi.config.siteUrl;
+      const apiUrl = strapi.config.custom.apiUrl;
+      const siteUrl = strapi.config.custom.siteUrl;
       const feed = new Feed({
         title: 'Binary Coffee',
         description: 'Last published articles',
