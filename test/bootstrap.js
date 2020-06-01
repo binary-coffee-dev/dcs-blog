@@ -1,18 +1,14 @@
 /* eslint-disable */
-const strapi = require('strapi');
+const Strapi = require('strapi');
 
-before(function (done) {
-  // strapi.start({}, function(err) {
-  //   if (err) {
-  //     return done(err);
-  //   }
-  //
-  //   done(err, strapi);
-  // });
-  done();
+const dropDB = require('./helpers/dropDB');
+
+before(async function () {
+  this.timeout(10000);
+  await Strapi().start();
 });
 
-after(function (done) {
-  // strapi.stop(done());
-  done();
+after(async () => {
+  await dropDB(strapi);
+  await strapi.stop();
 });

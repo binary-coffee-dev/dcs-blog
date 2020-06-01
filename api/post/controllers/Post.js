@@ -13,6 +13,16 @@ const MIN_POST_START = 0;
 const SORT_ATTR_NAME = 0;
 const SORT_ATTR_VALUE = 1;
 
+const createQueryObject = (publicOnly) => {
+  if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
+    return {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
+  } else if (!strapi.services.post.isStaff(ctx) || publicOnly) {
+    // public user
+    return {publishedAt: {$lte: new Date()}, enable: true};
+  }
+  return {};
+};
+
 module.exports = {
   async find(ctx = {}) {
     let query = {};
