@@ -28,6 +28,8 @@ describe('Post list (dashboard list) INTEGRATION', () => {
   let authUser;
   let authUserPost;
 
+  let staffUser;
+
   before(async () => {
     posts.push(await strapi.models.post.create({
       title: 'TITLE 1',
@@ -47,7 +49,17 @@ describe('Post list (dashboard list) INTEGRATION', () => {
       enable: true,
       author: authUser
     });
+    posts.push(authUserPost);
 
+    staffUser = await createUser({strapi, roleType: 'staff'});
+    authUserPost = await strapi.models.post.create({
+      title: 'TITLE 3',
+      body: 'SOME',
+      name: randomName(),
+      description: 'SOME 1',
+      enable: true,
+      author: staffUser
+    });
     posts.push(authUserPost);
   });
 
@@ -75,9 +87,19 @@ describe('Post list (dashboard list) INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY)
       .end((err, res) => {
-        console.log(res.body.data.postsConnection.values);
-        expect(res.body.data.postsConnection.values[0].id).to.equal(authUserPost.id);
         expect(res.body.data.countPosts).to.equal(2);
+        done();
+      });
+  });
+
+  it('should get the articles of the current staff user', (done) => {
+    const jwt = generateJwt(strapi, staffUser);
+    chai.request(strapi.server)
+      .post('/graphql')
+      .set('Authorization', `Bearer ${jwt}`)
+      .send(QUERY)
+      .end((err, res) => {
+        expect(res.body.data.countPosts).to.equal(3);
         done();
       });
   });
