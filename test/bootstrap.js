@@ -10,5 +10,5 @@ before(async function () {
 
 after(async () => {
   await dropDB(strapi);
-  await strapi.stop();
+  await strapi.stop(0);
 });

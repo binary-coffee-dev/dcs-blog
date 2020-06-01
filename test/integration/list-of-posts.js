@@ -26,9 +26,8 @@ describe('Post list (dashboard list) INTEGRATION', () => {
   let posts = [];
 
   let authUser;
-  let authUserPost;
-
   let staffUser;
+  let adminUser;
 
   before(async () => {
     posts.push(await strapi.models.post.create({
@@ -41,26 +40,34 @@ describe('Post list (dashboard list) INTEGRATION', () => {
     }));
 
     authUser = await createUser({strapi});
-    authUserPost = await strapi.models.post.create({
+    posts.push(await strapi.models.post.create({
       title: 'TITLE 2',
       body: 'SOME',
       name: randomName(),
       description: 'SOME 1',
       enable: true,
       author: authUser
-    });
-    posts.push(authUserPost);
+    }));
 
     staffUser = await createUser({strapi, roleType: 'staff'});
-    authUserPost = await strapi.models.post.create({
+    posts.push(await strapi.models.post.create({
       title: 'TITLE 3',
       body: 'SOME',
       name: randomName(),
       description: 'SOME 1',
       enable: true,
       author: staffUser
-    });
-    posts.push(authUserPost);
+    }));
+
+    adminUser = await createUser({strapi, roleType: 'administrator'});
+    posts.push(await strapi.models.post.create({
+      title: 'TITLE 4',
+      body: 'SOME',
+      name: randomName(),
+      description: 'SOME 1',
+      enable: true,
+      author: adminUser
+    }));
   });
 
   after(async () => {
@@ -99,7 +106,19 @@ describe('Post list (dashboard list) INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY)
       .end((err, res) => {
-        expect(res.body.data.countPosts).to.equal(3);
+        expect(res.body.data.countPosts).to.equal(4);
+        done();
+      });
+  });
+
+  it('should get the articles of the current admin user', (done) => {
+    const jwt = generateJwt(strapi, adminUser);
+    chai.request(strapi.server)
+      .post('/graphql')
+      .set('Authorization', `Bearer ${jwt}`)
+      .send(QUERY)
+      .end((err, res) => {
+        expect(res.body.data.countPosts).to.equal(4);
         done();
       });
   });
