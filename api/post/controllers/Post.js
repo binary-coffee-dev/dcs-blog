@@ -127,8 +127,8 @@ module.exports = {
       filters: convertRestQueryParams(params),
       populate: ['author', 'banner']
     }).then(async (posts) => {
-      const apiUrl = strapi.config.apiUrl;
-      const siteUrl = strapi.config.siteUrl;
+      const apiUrl = strapi.config.custom.apiUrl;
+      const siteUrl = strapi.config.custom.siteUrl;
       const feed = new Feed({
         title: 'Binary Coffee',
         description: 'Last published articles',

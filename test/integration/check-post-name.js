@@ -4,7 +4,6 @@ const chaiHttp = require('chai-http');
 const createUser = require('../helpers/create-user');
 const deleteUser = require('../helpers/delete-user');
 const deletePost = require('../helpers/delete-post');
-const randomName = require('../helpers/random-name');
 const generateJwt = require('../helpers/generate-jwt-by-user');
 const getPostById = require('../helpers/get-post-by-id');
 
@@ -48,7 +47,6 @@ describe('Should auto-generate the name of the article after create/update it IN
         }
       })
       .end((err, res) => {
-        console.log(res.body.data);
         getPostById(strapi, res.body.data.createPost.post.id)
           .then(post => {
             posts.push(post);

@@ -4,7 +4,7 @@ const Parser = require('fast-xml-parser').j2xParser;
 
 module.exports = {
   async sitemap (ctx) {
-    const siteUrl = strapi.config.siteUrl;
+    const siteUrl = strapi.config.custom.siteUrl;
     const parser = new Parser({ignoreAttributes: false});
 
     const mapsite = {

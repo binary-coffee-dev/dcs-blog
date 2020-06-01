@@ -15,7 +15,7 @@ module.exports = {
         email,
         token
       }) : value[FIRST_ELEMENT];
-      const verifyLink = `${strapi.config.siteUrl}/verify/${subscription.token}`;
+      const verifyLink = `${strapi.config.custom.siteUrl}/verify/${subscription.token}`;
 
       let html = await new Promise((resolve, reject) => {
         ejs.renderFile(

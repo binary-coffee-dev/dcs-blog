@@ -90,7 +90,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
         }
       })
       .end((err, res) => {
-        console.log(res.body);
         getPostById(strapi, res.body.data.createPost.post.id)
           .then(post => {
             posts.push(post);
@@ -116,7 +115,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
         }
       })
       .end((err, res) => {
-        console.log(res.body);
         getPostById(strapi, res.body.data.createPost.post.id)
           .then(post => {
             posts.push(post);

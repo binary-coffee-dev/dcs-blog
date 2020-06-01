@@ -21,7 +21,7 @@ module.exports = {
       mathOperator: '+'
     });
 
-    const token = strapi.services.comment.createCaptchaJwt(captcha.text, strapi.config.captchaSecret);
+    const token = strapi.services.comment.createCaptchaJwt(captcha.text, strapi.config.custom.captchaSecret);
 
     ctx.send({
       captcha: captcha.data,
@@ -33,7 +33,7 @@ module.exports = {
    * @deprecated
    */
   async createByCaptcha(ctx) {
-    if (strapi.services.comment.checkCaptchaJwt(ctx.request.body.input.token, ctx.request.body.input.captcha, strapi.config.captchaSecret)) {
+    if (strapi.services.comment.checkCaptchaJwt(ctx.request.body.input.token, ctx.request.body.input.captcha, strapi.config.custom.captchaSecret)) {
       const comment = {
         body: ctx.request.body.input.body,
         email: ctx.request.body.input.email,
