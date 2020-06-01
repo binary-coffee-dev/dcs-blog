@@ -19,8 +19,8 @@ module.exports = {
   },
   auth: async (code) => {
     const req = await axios.post('https://github.com/login/oauth/access_token', {
-      client_id: strapi.config.googleClientId,
-      client_secret: strapi.config.googleClientSecret,
+      client_id: strapi.config.githubClientId,
+      client_secret: strapi.config.githubClientSecret,
       code,
     }, {
       headers: {

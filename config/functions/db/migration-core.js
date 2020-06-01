@@ -64,7 +64,7 @@ const MigrationCore = {
 
   connect: async (connection) => {
     const {username, password, srv} = connection.settings;
-    const {authenticationDatabase, ssl} = connection.options;
+    const {authenticationDatabase, ssl, useUnifiedTopology} = connection.options;
 
     const connectOptions = {};
 
@@ -83,6 +83,7 @@ const MigrationCore = {
     connectOptions.ssl = !!ssl;
     connectOptions.useNewUrlParser = true;
     connectOptions.dbName = connection.settings.database;
+    connectOptions.useUnifiedTopology = useUnifiedTopology;
 
     return Mongoose.connect(
       `mongodb${srv ? '+srv' : ''}://${connection.settings.host}${

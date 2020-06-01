@@ -1,8 +1,0 @@
-{
-  "myCustomConfiguration": "This configuration is accessible through strapi.config.myCustomConfiguration",
-  "captchaSecret": "${process.env.CAPTCHA_SECRET || 'captcha-secret'}",
-  "apiUrl": "${process.env.API_URL || 'https://api.binary-coffee.dev'}",
-  "siteUrl": "${process.env.SITE_URL || 'https://binary-coffee.dev'}",
-  "googleClientId": "${process.env.GOOGLE_CLIENT_ID || ''}",
-  "googleClientSecret": "${process.env.GOOGLE_CLIENT_SECRET || ''}"
-}
