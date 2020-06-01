@@ -16,7 +16,7 @@ const MUTATION_CREATE_POST = {
   query: 'mutation ($title: String, $body: String, $description: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, description: $description, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
 };
 
-describe('Should auto-generate the name of the article after create/update it INTEGRATION', () => {
+describe('Check auto-generation of the post\'s name in create/update actions INTEGRATION', () => {
   let posts = [];
 
   let authUser;
