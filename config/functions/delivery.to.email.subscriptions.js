@@ -31,7 +31,7 @@ async function getHtmlWithPosts(posts) {
 
   return await new Promise((resolve, reject) => {
     ejs.renderFile(
-      './config/functions/posts-for-subscriptions-template.html',
+      './public/posts-for-subscriptions-template.html',
       data,
       options,
       function (err, str) {
