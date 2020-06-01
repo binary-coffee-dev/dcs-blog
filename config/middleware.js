@@ -3,7 +3,7 @@ module.exports = ({env}) => ({
   load: {
     before: ['responseTime', 'logger', 'cors', 'responses', 'gzip'],
     order: [
-      "Define the middlewares' load order by putting their name in this array is the right order",
+      'Define the middlewares\' load order by putting their name in this array is the right order',
     ],
     after: ['parser', 'router'],
   },
@@ -45,7 +45,7 @@ module.exports = ({env}) => ({
     },
     poweredBy: {
       enabled: true,
-      value: "Binary Coffee <strapi.io>"
+      value: 'Binary Coffee <strapi.io>'
     },
     csp: {
       enabled: true
@@ -60,7 +60,7 @@ module.exports = ({env}) => ({
     },
     xframe: {
       enabled: true,
-      value: "SAMEORIGIN"
+      value: 'SAMEORIGIN'
     },
     xss: {
       enabled: true,

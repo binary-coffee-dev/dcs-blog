@@ -1,5 +1,5 @@
 module.exports = ({env}) => ({
-  myCustomConfiguration: "This configuration is accessible through strapi.config.myCustomConfiguration",
+  myCustomConfiguration: 'This configuration is accessible through strapi.config.myCustomConfiguration',
   captchaSecret: env('CAPTCHA_SECRET', 'captcha-secret'),
   apiUrl: env('API_URL', 'https://api.binary-coffee.dev'),
   siteUrl: env('SITE_URL', 'https://binary-coffee.dev'),
