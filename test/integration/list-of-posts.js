@@ -75,6 +75,8 @@ describe('Post list (dashboard list) INTEGRATION', () => {
       await deletePost(strapi, post);
     }
     await deleteUser(strapi, authUser);
+    await deleteUser(strapi, staffUser);
+    await deleteUser(strapi, adminUser);
   });
 
   it('should get the not published articles to the not authenticated users', (done) => {
