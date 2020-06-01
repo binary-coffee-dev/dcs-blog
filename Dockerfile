@@ -30,6 +30,7 @@ COPY Dockerfile ./Dockerfile
 COPY .editorconfig ./.editorconfig
 COPY .eslintignore ./.eslintignore
 COPY .eslintrc ./.eslintrc
+COPY .env ./.env
 COPY favicon.ico ./favicon.ico
 
 RUN npm run build
