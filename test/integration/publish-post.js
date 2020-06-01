@@ -17,6 +17,11 @@ const MUTATION_CREATE_POST = {
   query: 'mutation ($title: String, $body: String, $description: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, description: $description, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
 };
 
+const MUTATION_UPDATE_POST = {
+  operationName: null,
+  query: 'mutation ($id: ID!, $title: String, $body: String, $description: String, $enable: Boolean, $banner: ID, $tags: [ID], $publishedAt: DateTime) {\n  updatePost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, description: $description, enable: $enable, banner: $banner, tags: $tags}, where: {id: $id}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
+};
+
 describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   let posts = [];
 
@@ -28,16 +33,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     authUser = await createUser({strapi});
     staffUser = await createUser({strapi, roleType: 'staff'});
     adminUser = await createUser({strapi, roleType: 'administrator'});
-
-    posts.push(await strapi.models.post.create({
-      title: 'TITLE 1',
-      name: randomName(),
-      body: 'SOME',
-      description: 'SOME 1',
-      enable: true,
-      author: authUser,
-      publishedAt: new Date(new Date() - 10)
-    }));
   });
 
   after(async () => {
@@ -122,5 +117,122 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
             done();
           });
       });
+  });
+
+  it('should update an article with the publishedAt attribute (admin user)', async () => {
+    const adminPost = await strapi.models.post.create({
+      title: randomName(),
+      name: randomName(),
+      body: 'SOME',
+      description: 'SOME 1',
+      enable: true,
+      author: authUser
+    });
+    posts.push(adminPost);
+    const jwt = generateJwt(strapi, adminUser);
+    return await new Promise(resolve => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({
+          ...MUTATION_UPDATE_POST, variables: {
+            id: adminPost.id,
+            enable: true,
+            title: randomName(),
+            description: 'asdfasdf sd sdf',
+            body: '# fasdfasd f',
+            publishedAt: new Date(),
+            tags: ['5eb120d1e7134c0012f4d440'],
+            banner: null,
+          }
+        })
+        .end((err, res) => {
+          getPostById(strapi, res.body.data.updatePost.post.id)
+            .then(post => {
+              console.log(post);
+              posts.push(post);
+              expect(!!post.publishedAt).to.equal(true);
+              resolve();
+            });
+        });
+    });
+  });
+
+  it('should update an article without the publishedAt attribute (staff user)', async () => {
+    const adminPost = await strapi.models.post.create({
+      title: randomName(),
+      name: randomName(),
+      body: 'SOME',
+      description: 'SOME 1',
+      enable: true,
+      author: authUser
+    });
+    posts.push(adminPost);
+    const jwt = generateJwt(strapi, staffUser);
+    return await new Promise(resolve => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({
+          ...MUTATION_UPDATE_POST, variables: {
+            id: adminPost.id,
+            enable: true,
+            title: randomName(),
+            description: 'asdfasdf sd sdf',
+            body: '# fasdfasd f',
+            publishedAt: new Date(),
+            tags: ['5eb120d1e7134c0012f4d440'],
+            banner: null,
+          }
+        })
+        .end((err, res) => {
+          getPostById(strapi, res.body.data.updatePost.post.id)
+            .then(post => {
+              console.log(post);
+              posts.push(post);
+              expect(!!post.publishedAt).to.equal(false);
+              resolve();
+            });
+        });
+    });
+  });
+
+  it('should update an article without the publishedAt attribute (auth user)', async () => {
+    const adminPost = await strapi.models.post.create({
+      title: randomName(),
+      name: randomName(),
+      body: 'SOME',
+      description: 'SOME 1',
+      enable: true,
+      author: authUser
+    });
+    posts.push(adminPost);
+    const jwt = generateJwt(strapi, authUser);
+    return await new Promise(resolve => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({
+          ...MUTATION_UPDATE_POST, variables: {
+            id: adminPost.id,
+            enable: true,
+            title: randomName(),
+            description: 'asdfasdf sd sdf',
+            body: '# fasdfasd f',
+            publishedAt: new Date(),
+            tags: ['5eb120d1e7134c0012f4d440'],
+            banner: null,
+          }
+        })
+        .end((err, res) => {
+          getPostById(strapi, res.body.data.updatePost.post.id)
+            .then(post => {
+              console.log(post);
+              posts.push(post);
+              expect(!!post.publishedAt).to.equal(false);
+              resolve();
+            });
+        });
+    });
   });
 });
