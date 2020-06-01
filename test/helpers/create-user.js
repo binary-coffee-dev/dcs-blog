@@ -1,8 +1,4 @@
-function randomName(value) {
-  return [...Array(value || 20).keys()]
-    .map(() => 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 'abcdefghijklmnopqrstuvwxyz'.length)])
-    .reduce((p, v) => p + v, '');
-}
+const randomName = require('./random-name');
 
 module.exports = async function ({strapi, roleType = 'authenticated'}) {
   const role = await strapi.plugins['users-permissions'].models.role.findOne({type: roleType});

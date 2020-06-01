@@ -7,7 +7,7 @@ module.exports = {
     const writerRole = await strapi.plugins['users-permissions'].models.role.findOne({type: 'writer'});
     const staffRole = await strapi.plugins['users-permissions'].models.role.findOne({type: 'staff'});
     if (writerRole) {
-      await strapi.plugins['users-permissions'].models.user.update({role: writerRole.id}, {$set: {role: staffRole}});
+      await strapi.plugins['users-permissions'].models.user.updateMany({role: writerRole.id}, {$set: {role: staffRole}});
     }
   }
 };

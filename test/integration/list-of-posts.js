@@ -2,6 +2,10 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const createUser = require('../helpers/create-user');
+const deleteUser = require('../helpers/delete-user');
+const deletePost = require('../helpers/delete-post');
+const randomName = require('../helpers/random-name');
+const generateJwt = require('../helpers/generate-jwt-by-user');
 
 chai.use(chaiHttp);
 
@@ -20,12 +24,14 @@ const QUERY = {
 
 describe('Post list (dashboard list) INTEGRATION', () => {
   let posts = [];
+
   let authUser;
+  let authUserPost;
 
   before(async () => {
     posts.push(await strapi.models.post.create({
       title: 'TITLE 1',
-      name: 'title-1',
+      name: randomName(),
       body: 'SOME',
       description: 'SOME 1',
       enable: true,
@@ -33,21 +39,23 @@ describe('Post list (dashboard list) INTEGRATION', () => {
     }));
 
     authUser = await createUser({strapi});
-
-    posts.push(await strapi.models.post.create({
+    authUserPost = await strapi.models.post.create({
       title: 'TITLE 2',
       body: 'SOME',
-      name: 'title-2',
+      name: randomName(),
       description: 'SOME 1',
       enable: true,
       author: authUser
-    }));
+    });
+
+    posts.push(authUserPost);
   });
 
   after(async () => {
     for (let post of posts) {
-      await strapi.models.post.deleteOne({_id: post._id});
+      await deletePost(strapi, post);
     }
+    await deleteUser(strapi, authUser);
   });
 
   it('should get the not published articles to the not authenticated users', (done) => {
@@ -61,17 +69,15 @@ describe('Post list (dashboard list) INTEGRATION', () => {
   });
 
   it('should get the articles of the current auth user', (done) => {
-
-
-    const jwt = strapi.plugins['users-permissions'].services.jwt.issue({id: authUser.id});
+    const jwt = generateJwt(strapi, authUser);
     chai.request(strapi.server)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY)
       .end((err, res) => {
-        console.log(res.body);
-        expect(res.body.length).to.equal(1);
-        console.log(res.body);
+        console.log(res.body.data.postsConnection.values);
+        expect(res.body.data.postsConnection.values[0].id).to.equal(authUserPost.id);
+        expect(res.body.data.countPosts).to.equal(2);
         done();
       });
   });
