@@ -31,7 +31,7 @@ COPY .editorconfig ./.editorconfig
 COPY .eslintignore ./.eslintignore
 COPY .eslintrc ./.eslintrc
 COPY .env ./.env
-COPY favicon.ico ./favicon.ico
+COPY favicon.png ./favicon.png
 
 RUN npm run build
 
