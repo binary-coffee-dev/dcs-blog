@@ -149,7 +149,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
         .end((err, res) => {
           getPostById(strapi, res.body.data.updatePost.post.id)
             .then(post => {
-              console.log(post);
               posts.push(post);
               expect(!!post.publishedAt).to.equal(true);
               resolve();
@@ -188,7 +187,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
         .end((err, res) => {
           getPostById(strapi, res.body.data.updatePost.post.id)
             .then(post => {
-              console.log(post);
               posts.push(post);
               expect(!!post.publishedAt).to.equal(false);
               resolve();
@@ -227,7 +225,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
         .end((err, res) => {
           getPostById(strapi, res.body.data.updatePost.post.id)
             .then(post => {
-              console.log(post);
               posts.push(post);
               expect(!!post.publishedAt).to.equal(false);
               resolve();
