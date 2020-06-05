@@ -68,7 +68,7 @@ module.exports = {
           ((isPublished && isEnable) || (post.author && post.author._id.toString() === ctx.state.user.id.toString()))
         ) {
           ret = post;
-        } else if (strapi.services.post.isStaff(ctx)) {
+        } else if (strapi.services.post.isStaff(ctx) || strapi.services.post.isAdmin(ctx)) {
           ret = post;
         } else if (isPublished && isEnable) {
           // public user
