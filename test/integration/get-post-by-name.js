@@ -52,7 +52,7 @@ describe('Get post by name INTEGRATION', () => {
     await deleteUser(strapi, adminUser);
   });
 
-  it('should get the post by name the owner of it', (done) => {
+  it('should get the post by name the owner of the article', (done) => {
     const jwt = generateJwt(strapi, authUserOwner);
     chai.request(strapi.server)
       .post('/graphql')
@@ -70,6 +70,16 @@ describe('Get post by name INTEGRATION', () => {
     chai.request(strapi.server)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
+      .send(QUERY_GET_POST_BY_NAME)
+      .end((err, res) => {
+        expect(!!res.body.data).to.equal(false);
+        done();
+      });
+  });
+
+  it('should not have access to an article a public user', (done) => {
+    chai.request(strapi.server)
+      .post('/graphql')
       .send(QUERY_GET_POST_BY_NAME)
       .end((err, res) => {
         expect(!!res.body.data).to.equal(false);
