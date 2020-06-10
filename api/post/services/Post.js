@@ -1,7 +1,5 @@
 'use strict';
 
-const {buildQuery, convertRestQueryParams} = require('strapi-utils');
-
 const {Feed} = require('feed');
 
 /**
@@ -60,6 +58,34 @@ module.exports = {
     }
     ctx.forbidden();
     return {};
+  },
+
+  async findSimilarPosts(ctx, id, limit) {
+    limit = Math.max(Math.min(limit, 20), 0);
+
+    let postToReturn = [];
+    const post = await strapi.models.post.findOne({_id: id}).populate(['tags']);
+    const tags = post.tags || [];
+    const markTags = new Set();
+
+    tags.forEach(tag => markTags.add(tag.id));
+
+    const posts = (await strapi.models.post
+      .find({publishedAt: {$lte: new Date()}, enable: true, _id: {$ne: id}})
+      .sort({views: 'desc'})
+      .populate(['tags'])) || [];
+
+    posts
+      .filter(post => (post.tags || []).reduce((p, v) => p || markTags.has(v.id), false))
+      .forEach(post => {
+        postToReturn.push(post);
+      });
+
+    if (postToReturn.length > limit) {
+      postToReturn = postToReturn.slice(0, limit);
+    }
+
+    ctx.send(postToReturn);
   },
 
   getNameFromTitle: (title) => {
@@ -188,14 +214,6 @@ module.exports = {
 
   isAdmin: (ctx) => {
     return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator';
-  },
-
-  permissionFilter: (query) => {
-    return {
-      ...(query || {}),
-      publishedAt_lte: new Date().toISOString(),
-      enable: true
-    };
   },
 
   isPublish(post) {

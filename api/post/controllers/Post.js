@@ -28,31 +28,7 @@ module.exports = {
 
   async findSimilarPosts(ctx) {
     let {id, limit = 10} = ctx.params;
-    limit = Math.max(Math.min(limit, 20), 0);
-
-    let postToReturn = [];
-    const post = await strapi.models.post.findOne({_id: id}).populate(['tags']);
-    const tags = post.tags || [];
-    const markTags = new Set();
-
-    tags.forEach(tag => markTags.add(tag.id));
-
-    const posts = (await strapi.models.post
-      .find({publishedAt: {$lte: new Date()}, enable: true, _id: {$ne: id}})
-      .sort({views: 'desc'})
-      .populate(['tags'])) || [];
-
-    posts
-      .filter(post => (post.tags || []).reduce((p, v) => p || markTags.has(v.id), false))
-      .forEach(post => {
-        postToReturn.push(post);
-      });
-
-    if (postToReturn.length > limit) {
-      postToReturn = postToReturn.slice(0, limit);
-    }
-
-    ctx.send(postToReturn);
+    return strapi.services.post.findSimilarPosts(ctx, id, limit);
   },
 
   async feedByUsername(ctx) {
