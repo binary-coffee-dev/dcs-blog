@@ -1,5 +1,7 @@
 'use strict';
 
+const {buildQuery, convertRestQueryParams} = require('strapi-utils');
+
 const {Feed} = require('feed');
 
 /**
@@ -40,6 +42,23 @@ module.exports = {
       // public user
       return {publishedAt: {$lte: new Date()}, enable: true};
     }
+    return {};
+  },
+
+  async findOneByName(ctx, name) {
+    const post = await strapi.models.post.findOne({name});
+    if (post) {
+      if (
+        this.isPublish(post) ||
+        (post.author && post.author._id.toString() === ctx.state.user.id.toString()) ||
+        this.isAdmin(ctx) ||
+        this.isStaff(ctx)
+      ) {
+        await this.updateViews(post);
+        return post;
+      }
+    }
+    ctx.forbidden();
     return {};
   },
 

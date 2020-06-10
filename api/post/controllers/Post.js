@@ -1,7 +1,5 @@
 'use strict';
 
-const {buildQuery, convertRestQueryParams} = require('strapi-utils');
-
 /**
  * Read the documentation () to implement custom controller functions
  */
@@ -23,38 +21,9 @@ module.exports = {
     return strapi.services.post.count(ctx, publicOnly);
   },
 
-  async findOneByName(ctx, next, extra = {}) {
+  async findOneByName(ctx) {
     const name = ctx.params.name || ctx.params._name || '';
-    const params = {name};
-    const filters = convertRestQueryParams(params);
-    return buildQuery({
-      model: strapi.models.post,
-      filters,
-      populate: extra.populate || ''
-    }).then(async (posts) => {
-      let ret = null;
-      if (posts && posts.length > 0) {
-        const post = posts[0];
-        const isPublished = Boolean(post.publishedAt && post.publishedAt.getTime() < new Date().getTime());
-        const isEnable = !!post.enable;
-        if (strapi.services.post.isAuthenticated(ctx) &&
-          ((isPublished && isEnable) || (post.author && post.author._id.toString() === ctx.state.user.id.toString()))
-        ) {
-          ret = post;
-        } else if (strapi.services.post.isStaff(ctx) || strapi.services.post.isAdmin(ctx)) {
-          ret = post;
-        } else if (isPublished && isEnable) {
-          // public user
-          ret = post;
-        }
-      }
-      if (!ret) {
-        ctx.status = 403;
-        return {};
-      }
-      await strapi.services.post.updateViews(ret);
-      return ret;
-    });
+    return strapi.services.post.findOneByName(ctx, name);
   },
 
   async findSimilarPosts(ctx) {
