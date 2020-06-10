@@ -6,6 +6,8 @@ const {Feed} = require('feed');
  * Read the documentation () to implement custom service functions
  */
 
+const FEED_ARTICLES_LIMIT = 5;
+
 module.exports = {
   getNameFromTitle: (title) => {
     title = title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -41,6 +43,23 @@ module.exports = {
     });
   },
 
+  async getFeed(ctx, format) {
+    const feed = this.createFeedInstance();
+
+    const posts = await strapi.models.post
+      .find({publishedAt: {$lte: new Date()}, enable: true})
+      .sort({publishedAt: 'desc'})
+      .limit(FEED_ARTICLES_LIMIT);
+
+    if (posts) {
+      posts.forEach(post => feed.addItem(this.createFeedItem(post)));
+    }
+
+    const {res, type} = this.generateXmlResponse(feed, format);
+    ctx.type = type;
+    ctx.send(res);
+  },
+
   async getFeedByUsername(ctx, username, format) {
     const user = await strapi.plugins['users-permissions'].models.user.findOne({username});
 
@@ -50,7 +69,7 @@ module.exports = {
       const posts = await strapi.models.post
         .find({author: user.id, publishedAt: {$lte: new Date()}, enable: true})
         .sort({publishedAt: 'desc'})
-        .limit(5);
+        .limit(FEED_ARTICLES_LIMIT);
 
       if (posts) {
         posts.forEach(post => feed.addItem(this.createFeedItem(post)));

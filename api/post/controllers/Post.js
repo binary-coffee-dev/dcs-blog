@@ -2,8 +2,6 @@
 
 const {buildQuery, convertRestQueryParams} = require('strapi-utils');
 
-const {Feed} = require('feed');
-
 /**
  * Read the documentation () to implement custom controller functions
  */
@@ -119,60 +117,7 @@ module.exports = {
   },
 
   async feed(ctx) {
-    const format = ctx.params.format || ctx.params._format || '';
-    const params = {
-      enable: true,
-      publishedAt_lte: new Date(),
-      _sort: 'publishedAt:desc',
-      _limit: 5,
-      _start: 0
-    };
-    return buildQuery({
-      model: strapi.models.post,
-      filters: convertRestQueryParams(params),
-      populate: ['author', 'banner']
-    }).then(async (posts) => {
-      const apiUrl = strapi.config.custom.apiUrl;
-      const siteUrl = strapi.config.custom.siteUrl;
-      const feed = new Feed({
-        title: 'Binary Coffee',
-        description: 'Last published articles',
-        id: siteUrl,
-        link: siteUrl,
-        language: 'es',
-        copyright: 'All rights reserved 2019, dcs-community',
-      });
-      if (posts && posts.length > 0) {
-        posts.forEach(post => {
-          feed.addItem({
-            title: post.title,
-            id: `${siteUrl}/post/${post.name}`,
-            link: `${siteUrl}/post/${post.name}`,
-            description: post.description,
-            author: [
-              {
-                name: post.author && post.author.name || 'unknow',
-                email: post.author && post.author.email || 'unknow@gmail.com',
-                link: post.author && post.author.page || 'https://unknow.com'
-              }
-            ],
-            date: post.publishedAt,
-            image: post.banner ? `${apiUrl}${post.banner.url}` : undefined
-          });
-        });
-      }
-      switch (format) {
-        case 'rss2':
-          ctx.type = 'application/rss+xml; charset=utf-8';
-          return ctx.send(feed.rss2());
-        case 'json1':
-          ctx.type = 'application/json; charset=utf-8';
-          return ctx.send(feed.json1());
-        case 'atom1':
-        default:
-          ctx.type = 'application/atom+xml; charset=utf-8';
-          return ctx.send(feed.atom1());
-      }
-    });
+    const {format} = ctx.params;
+    return strapi.services.post.getFeed(ctx, format);
   }
 };

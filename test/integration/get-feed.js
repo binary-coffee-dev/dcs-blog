@@ -15,7 +15,7 @@ describe('Get feed INTEGRATION', () => {
 
   let authUser;
 
-  const PUBLISHED_ARTICLES = 5;
+  const PUBLISHED_ARTICLES = 10;
 
   before(async () => {
     authUser = await createUser({strapi});
@@ -53,7 +53,7 @@ describe('Get feed INTEGRATION', () => {
       .get(`/posts/feed/json1`)
       .end((err, res) => {
         expect(!!res.body).to.be.true;
-        expect(res.body.items.length).to.be.equal(PUBLISHED_ARTICLES);
+        expect(res.body.items.length).to.be.equal(5);
         done();
       });
   });
