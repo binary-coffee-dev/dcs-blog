@@ -9,6 +9,7 @@
     "build": "strapi build",
     "strapi": "strapi",
     "test": "nyc --reporter=lcov --reporter=html mocha --ui bdd test/unit/**/*.js",
+    "test:cov": "NODE_ENV=test nyc --reporter=lcov --reporter=html mocha --ui bdd test/bootstrap.js test/integration/**/*.js test/unit/**/*.js",
     "test:int": "NODE_ENV=test nyc --reporter=lcov --reporter=html mocha --ui bdd test/bootstrap.js test/integration/**/*.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

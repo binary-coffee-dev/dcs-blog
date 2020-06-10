@@ -35,5 +35,14 @@ module.exports = {
     } else {
       return await strapi.plugins['upload'].services.upload.count(ctx.query);
     }
+  },
+
+  async destroy(ctx) {
+    const { id } = ctx.params;
+    const image = await strapi.services.image.findOne({image: [id]});
+    if (image) {
+      await strapi.models.image.deleteOne({_id: image.id});
+    }
+    await Uploads.destroy(ctx);
   }
 };
