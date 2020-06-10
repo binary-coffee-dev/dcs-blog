@@ -7,8 +7,42 @@ const {Feed} = require('feed');
  */
 
 const FEED_ARTICLES_LIMIT = 5;
+const MAX_POST_LIMIT = 20;
+const MIN_POST_START = 0;
+const SORT_ATTR_NAME = 0;
+const SORT_ATTR_VALUE = 1;
 
 module.exports = {
+  async find(ctx, publicOnly, limit, start) {
+    let sort = {};
+    const sortFromRequest = (ctx.query.sort || ctx.query._sort);
+    const sortQuery = sortFromRequest && sortFromRequest.split(':');
+    if (sortQuery && sortQuery.length === 2) {
+      sort[sortQuery[SORT_ATTR_NAME]] = sortQuery[SORT_ATTR_VALUE].toLowerCase() === 'asc' ? 1 : -1;
+    }
+
+    const query = this.createQueryObject(ctx, publicOnly);
+    return await strapi.models.post.find(query)
+      .limit(Math.min(limit, MAX_POST_LIMIT))
+      .skip(Math.max(start, MIN_POST_START))
+      .sort(sort);
+  },
+
+  async count(ctx, publicOnly) {
+    const query = this.createQueryObject(ctx, publicOnly);
+    return await strapi.models.post.count(query);
+  },
+
+  createQueryObject(ctx, publicOnly) {
+    if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
+      return {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
+    } else if ((!strapi.services.post.isAdmin(ctx) && !strapi.services.post.isStaff(ctx)) || publicOnly) {
+      // public user
+      return {publishedAt: {$lte: new Date()}, enable: true};
+    }
+    return {};
+  },
+
   getNameFromTitle: (title) => {
     title = title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     title = title.replace(/[^0-9a-z-A-Z ]/g, '').replace(/ +/, ' ');
@@ -35,7 +69,7 @@ module.exports = {
   },
 
   async getPublicPostsOfLastDays(days) {
-    var date = new Date();
+    const date = new Date();
     date.setDate(date.getDate() - days);
     return await strapi.query('post').find({
       publishedAt_gt: date,

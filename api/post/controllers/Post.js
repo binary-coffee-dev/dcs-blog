@@ -6,46 +6,21 @@ const {buildQuery, convertRestQueryParams} = require('strapi-utils');
  * Read the documentation () to implement custom controller functions
  */
 
-const MAX_POST_LIMIT = 20;
-const MIN_POST_START = 0;
-const SORT_ATTR_NAME = 0;
-const SORT_ATTR_VALUE = 1;
-
-const createQueryObject = (ctx, publicOnly) => {
-  if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
-    return {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
-  } else if ((!strapi.services.post.isAdmin(ctx) && !strapi.services.post.isStaff(ctx)) || publicOnly) {
-    // public user
-    return {publishedAt: {$lte: new Date()}, enable: true};
-  }
-  return {};
-};
-
 module.exports = {
-  async find(ctx = {}) {
+  async find(ctx) {
     const publicOnly = (ctx.params._where && ctx.params._where.enable) ||
       (ctx.params.where && ctx.params.where.enable) || false;
+    const limit = parseInt(ctx.query.limit || ctx.query._limit || Number.MAX_SAFE_INTEGER);
+    const start = parseInt(ctx.query.start || ctx.query._start || Number.MIN_SAFE_INTEGER);
 
-    let sort = {};
-    const sortFromRequest = (ctx.query.sort || ctx.query._sort);
-    const sortQuery = sortFromRequest && sortFromRequest.split(':');
-    if (sortQuery && sortQuery.length === 2) {
-      sort[sortQuery[SORT_ATTR_NAME]] = sortQuery[SORT_ATTR_VALUE].toLowerCase() === 'asc' ? 1 : -1;
-    }
-
-    const query = createQueryObject(ctx, publicOnly);
-    return await strapi.models.post.find(query)
-      .limit(Math.min(parseInt(ctx.query.limit || ctx.query._limit || MAX_POST_LIMIT), MAX_POST_LIMIT))
-      .skip(Math.max(parseInt(ctx.query.start || ctx.query._start || MIN_POST_START), MIN_POST_START))
-      .sort(sort);
+    return strapi.services.post.find(ctx, publicOnly, limit, start);
   },
 
   async count(ctx) {
     const publicOnly = (ctx.params._where && ctx.params._where.enable) ||
       (ctx.params.where && ctx.params.where.enable) || false;
 
-    const query = createQueryObject(ctx, publicOnly);
-    return await strapi.models.post.count(query);
+    return strapi.services.post.count(ctx, publicOnly);
   },
 
   async findOneByName(ctx, next, extra = {}) {
