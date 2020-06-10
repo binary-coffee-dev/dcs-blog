@@ -113,6 +113,11 @@ module.exports = {
     ctx.send(postToReturn);
   },
 
+  async feedByUsername(ctx) {
+    const {format, username} = ctx.params;
+    return strapi.services.post.getFeedByUsername(ctx, username, format);
+  },
+
   async feed(ctx) {
     const format = ctx.params.format || ctx.params._format || '';
     const params = {

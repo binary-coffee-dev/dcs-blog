@@ -28,6 +28,12 @@
     },
     {
       "method": "GET",
+      "path": "/posts/feed/:username/:format",
+      "handler": "Post.feedByUsername",
+      "config": {}
+    },
+    {
+      "method": "GET",
       "path": "/posts/feed/:format",
       "handler": "Post.feed",
       "config": {}

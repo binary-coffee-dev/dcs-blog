@@ -1,5 +1,7 @@
 'use strict';
 
+const {Feed} = require('feed');
+
 /**
  * Read the documentation () to implement custom service functions
  */
@@ -37,6 +39,71 @@ module.exports = {
       publishedAt_gt: date,
       enable_eq: true
     });
+  },
+
+  async getFeedByUsername(ctx, username, format) {
+    const user = await strapi.plugins['users-permissions'].models.user.findOne({username});
+
+    const feed = this.createFeedInstance();
+
+    if (user) {
+      const posts = await strapi.models.post
+        .find({author: user.id, publishedAt: {$lte: new Date()}, enable: true})
+        .sort({publishedAt: 'desc'})
+        .limit(5);
+
+      if (posts) {
+        posts.forEach(post => feed.addItem(this.createFeedItem(post)));
+      }
+    }
+
+    const {res, type} = this.generateXmlResponse(feed, format);
+    ctx.type = type;
+    ctx.send(res);
+  },
+
+  createFeedItem(post) {
+    const apiUrl = strapi.config.custom.apiUrl;
+    const siteUrl = strapi.config.custom.siteUrl;
+    return {
+      title: post.title,
+      id: `${siteUrl}/post/${post.name}`,
+      link: `${siteUrl}/post/${post.name}`,
+      description: post.description,
+      author: [
+        {
+          name: post.author && post.author.name || 'unknow',
+          email: post.author && post.author.email || 'unknow@binary-coffee.dev',
+          link: post.author && post.author.page || 'https://aa'
+        }
+      ],
+      date: post.publishedAt,
+      image: post.banner ? `${apiUrl}${post.banner.url}` : undefined
+    };
+  },
+
+  createFeedInstance() {
+    const siteUrl = strapi.config.custom.siteUrl;
+    return new Feed({
+      title: 'Binary Coffee',
+      description: 'Last published articles',
+      id: siteUrl,
+      link: siteUrl,
+      language: 'es',
+      copyright: 'All rights reserved 2019, dcs-community',
+    });
+  },
+
+  generateXmlResponse(feed, format) {
+    switch (format) {
+      case 'atom1':
+        return {type: 'application/atom+xml; charset=utf-8', res: feed.atom1()};
+      case 'rss2':
+        return {type: 'application/rss+xml; charset=utf-8', res: feed.rss2()};
+      case 'json1':
+      default:
+        return {type: 'application/json; charset=utf-8', res: feed.json1()};
+    }
   },
 
   isStaff: (ctx) => {

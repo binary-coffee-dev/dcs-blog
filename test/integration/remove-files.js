@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 
 const expect = chai.expect;
 
-describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
+describe('Remove file/images INTEGRATION', () => {
   const files = [];
   const images = [];
 
