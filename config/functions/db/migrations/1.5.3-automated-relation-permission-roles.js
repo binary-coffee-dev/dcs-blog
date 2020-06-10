@@ -6,6 +6,10 @@ module.exports = {
   migrate: async () => {
     const publicRole = await strapi.plugins['users-permissions'].models.role.findOne({type: 'public'});
     await strapi.plugins['users-permissions'].models.permission
-      .updateMany({controller: 'post', action: ['find', 'count'], role: publicRole.id}, {$set: {enabled: true}});
+      .updateMany({
+        controller: 'post',
+        action: ['find', 'count', 'findsimilarposts', 'feed', 'findone'],
+        role: publicRole.id
+      }, {$set: {enabled: true}});
   },
 };
