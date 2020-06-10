@@ -35,8 +35,8 @@ module.exports = {
 
     const query = createQueryObject(ctx, publicOnly);
     return await strapi.models.post.find(query)
-      .limit(Math.min(ctx.query.limit || ctx.query._limit || MAX_POST_LIMIT, MAX_POST_LIMIT))
-      .skip(Math.max(ctx.query.start || ctx.query._start || MIN_POST_START, MIN_POST_START))
+      .limit(Math.min(parseInt(ctx.query.limit || ctx.query._limit || MAX_POST_LIMIT), MAX_POST_LIMIT))
+      .skip(Math.max(parseInt(ctx.query.start || ctx.query._start || MIN_POST_START), MIN_POST_START))
       .sort(sort);
   },
 
