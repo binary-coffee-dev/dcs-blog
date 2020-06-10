@@ -50,7 +50,7 @@ describe('Get feed INTEGRATION', () => {
 
   it('should get the feed', (done) => {
     chai.request(strapi.server)
-      .get(`/posts/feed/json1`)
+      .get('/posts/feed/json1')
       .end((err, res) => {
         expect(!!res.body).to.be.true;
         expect(res.body.items.length).to.be.equal(5);
