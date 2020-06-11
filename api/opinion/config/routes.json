@@ -29,7 +29,9 @@
       "path": "/opinions",
       "handler": "opinion.create",
       "config": {
-        "policies": []
+        "policies": [
+          "canCreateOpinion"
+        ]
       }
     },
     {
@@ -45,7 +47,9 @@
       "path": "/opinions/:id",
       "handler": "opinion.delete",
       "config": {
-        "policies": []
+        "policies": [
+          "canRemoveOpinion"
+        ]
       }
     }
   ]
