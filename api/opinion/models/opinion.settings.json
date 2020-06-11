@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "opinions",
+  "info": {
+    "name": "opinion"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "post": {
+      "model": "post",
+      "via": "opinions"
+    },
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "opinions"
+    },
+    "type": {
+      "type": "string"
+    }
+  }
+}
