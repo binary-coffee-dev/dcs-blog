@@ -73,8 +73,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: authUser.id});
     const opi = await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: LIKE});
-    const opinion2 = await strapi.models.opinion.findOne({_id: opi.id});
-    const res = await new Promise(resolve => {
+    await new Promise(resolve => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
