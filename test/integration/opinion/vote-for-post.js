@@ -1,9 +1,9 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const createUser = require('../helpers/create-user');
-const generateJwt = require('../helpers/generate-jwt-by-user');
-const createPost = require('../helpers/create-post');
+const createUser = require('../../helpers/create-user');
+const generateJwt = require('../../helpers/generate-jwt-by-user');
+const createPost = require('../../helpers/create-post');
 
 chai.use(chaiHttp);
 

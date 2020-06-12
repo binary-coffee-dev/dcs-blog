@@ -1,11 +1,11 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const createUser = require('../helpers/create-user');
-const deleteUser = require('../helpers/delete-user');
-const deletePost = require('../helpers/delete-post');
-const generateJwt = require('../helpers/generate-jwt-by-user');
-const getPostById = require('../helpers/get-post-by-id');
+const createUser = require('../../helpers/create-user');
+const deleteUser = require('../../helpers/delete-user');
+const deletePost = require('../../helpers/delete-post');
+const generateJwt = require('../../helpers/generate-jwt-by-user');
+const getPostById = require('../../helpers/get-post-by-id');
 
 chai.use(chaiHttp);
 
