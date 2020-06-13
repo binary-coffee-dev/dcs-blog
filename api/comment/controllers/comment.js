@@ -67,14 +67,15 @@ module.exports = {
       // {
         const post = await strapi.models.post.findOne({_id: comment.post});
         
-        var prefix = (process.env.NODE_ENV === 'test') ? 'dev.' : '';
-        var url = 'https://' + prefix + 'binary-coffee.dev/post/' + post.name;
+        // var prefix = (process.env.NODE_ENV === 'test') ? 'dev.' : '';
+        // var url = 'https://' + prefix + 'binary-coffee.dev/post/' + post.name;
 
-        var date = moment(comment.publishedAt);
-        const msg = '[[' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + ']]'
-        + ' *' + comment.user.username + '* commented: \n\n' 
-        + '`' + comment.body + '`' + '\n\n';
-        + url;
+        // var date = moment(comment.publishedAt);
+        // const msg = '[[' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + ']]'
+        // + ' *' + comment.user.username + '* commented: \n\n' 
+        // + '`' + comment.body + '`' + '\n\n';
+        // + url;
+        var msg = JSON.stringify(post);
         
         Request.post({
           'headers': {'content-type': 'application/json'},
