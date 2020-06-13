@@ -13,5 +13,10 @@ module.exports = {
       return await strapi.services.opinion.count(where, user);
     }
     return 0;
-  }
+  },
+
+  // async delete(ctx) {
+  //   console.log(ctx);
+  //   return {};
+  // }
 };

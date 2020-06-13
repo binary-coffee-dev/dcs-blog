@@ -77,7 +77,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: opi.id}})
+        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
         .end((err, res) => resolve(res));
     });
 
@@ -94,7 +94,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: opi.id}})
+        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
         .end((err, res) => resolve(res));
     });
 
