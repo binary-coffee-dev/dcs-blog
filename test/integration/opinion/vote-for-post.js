@@ -121,7 +121,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
         .end((err, res) => resolve(res));
     });
 
-    const opinions = await strapi.models.opinion.find({post: post.id, user: staffUser.id});
+    const opinions = await strapi.models.opinion.find({});
 
     expect(opinions.length).to.be.equal(1);
   });
