@@ -28,6 +28,8 @@
     "fast-xml-parser": "^3.16.0",
     "feed": "^4.1.0",
     "html-minifier": "^4.0.0",
+    "moment": "^2.26.0",
+    "moment-timezone": "^0.5.31",
     "nyc": "^15.0.0",
     "pre-push": "^0.1.1",
     "strapi": "3.0.1",
