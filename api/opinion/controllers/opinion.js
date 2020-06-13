@@ -5,4 +5,18 @@
  * to customize this controller
  */
 
-module.exports = {};
+module.exports = {
+  async count(ctx) {
+    const where = ctx.params._where || ctx.params.where || null;
+    const user = ctx.state && ctx.state.user;
+    if (where) {
+      return await strapi.services.opinion.count(where, user);
+    }
+    return 0;
+  },
+
+  // async delete(ctx) {
+  //   console.log(ctx);
+  //   return {};
+  // }
+};

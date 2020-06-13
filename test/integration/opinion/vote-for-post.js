@@ -1,9 +1,9 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const createUser = require('../helpers/create-user');
-const generateJwt = require('../helpers/generate-jwt-by-user');
-const createPost = require('../helpers/create-post');
+const createUser = require('../../helpers/create-user');
+const generateJwt = require('../../helpers/generate-jwt-by-user');
+const createPost = require('../../helpers/create-post');
 
 chai.use(chaiHttp);
 
@@ -77,7 +77,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: opi.id}})
+        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
         .end((err, res) => resolve(res));
     });
 
@@ -94,7 +94,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: opi.id}})
+        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
         .end((err, res) => resolve(res));
     });
 

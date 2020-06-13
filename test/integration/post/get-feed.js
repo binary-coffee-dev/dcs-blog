@@ -1,10 +1,10 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const createUser = require('../helpers/create-user');
-const deleteUser = require('../helpers/delete-user');
-const deletePost = require('../helpers/delete-post');
-const randomName = require('../helpers/random-name');
+const createUser = require('../../helpers/create-user');
+const deleteUser = require('../../helpers/delete-user');
+const deletePost = require('../../helpers/delete-post');
+const randomName = require('../../helpers/random-name');
 
 chai.use(chaiHttp);
 
