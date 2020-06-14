@@ -69,7 +69,7 @@ module.exports = {
       const date = moment(comment.publishedAt);
       const msg = '[[' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + ']]'
       + ' *' + comment.user.username + '* commented: \n\n' 
-      + '`' + comment.body + '`' + '\n\n';
+      + '`' + comment.body + '`' + '\n\n'
       + postUrl;
       
       Request.post({
