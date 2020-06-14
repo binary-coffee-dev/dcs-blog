@@ -65,10 +65,13 @@ module.exports = {
       
       const post = await strapi.models.post.findOne({_id: comment.post});
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
+      const postTitle = post.title;
 
       const date = moment(comment.publishedAt);
-      const msg = '[[' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + ']]'
-      + ' *' + comment.user.username + '* commented: \n\n' 
+      const msg = '[[' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + ']]' 
+      + '*New comment on: *'
+      + '[' + postTitle + ']' + '(' + postUrl + ')'
+      + ' *' + comment.user.username + '* commented: ' 
       + '`' + comment.body + '`' + '\n\n'
       + postUrl;
       
