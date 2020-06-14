@@ -63,29 +63,23 @@ module.exports = {
       const comment = await strapi.services.comment.create(obj);
       await strapi.services.post.updateComments(comment.post);
       
-      // if(process.env.NODE_ENV != 'test')
-      // {
-        const post = await strapi.models.post.findOne({_id: comment.post});
-        
-        // var prefix = (process.env.NODE_ENV === 'test') ? 'dev.' : '';
-        // var url = 'https://' + prefix + 'binary-coffee.dev/post/' + post.name;
+      const post = await strapi.models.post.findOne({_id: comment.post});
+      const postUrl = `${strapi.config.custom.siteUrl}/post/${post.name}`;
 
-        // var date = moment(comment.publishedAt);
-        // const msg = '[[' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + ']]'
-        // + ' *' + comment.user.username + '* commented: \n\n' 
-        // + '`' + comment.body + '`' + '\n\n';
-        // + url;
-        var msg = JSON.stringify(post);
-        
-        Request.post({
-          'headers': {'content-type': 'application/json'},
-          'url': 'https://botnotifier.binary-coffee.dev/notify/channel',
-          'body': JSON.stringify({
-            'Message': msg,
-            'ChannelName': 'bcStaffs'
-          })
-        });
-      // }
+      const date = moment(comment.publishedAt);
+      const msg = '[[' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + ']]'
+      + ' *' + comment.user.username + '* commented: \n\n' 
+      + '`' + comment.body + '`' + '\n\n';
+      + postUrl;
+      
+      Request.post({
+        'headers': {'content-type': 'application/json'},
+        'url': 'https://botnotifier.binary-coffee.dev/notify/channel',
+        'body': JSON.stringify({
+          'Message': msg,
+          'ChannelName': 'bcStaffs'
+        })
+      });
 
       return comment;
     }
