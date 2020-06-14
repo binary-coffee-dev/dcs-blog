@@ -68,7 +68,7 @@ module.exports = {
       const postTitle = post.title;
 
       const date = moment(comment.publishedAt);
-      const msg = '*---NEW COMMENT---\n'
+      const msg = '*--- NEW COMMENT ---*\n'
                 + '*Date:* ' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n' 
                 + '*Post:* ' + '[' + postTitle + ']' + '(' + postUrl + ')' + '\n'
                 + '*User:* ' + comment.user.username + '\n' 
