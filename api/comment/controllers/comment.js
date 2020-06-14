@@ -64,7 +64,7 @@ module.exports = {
       await strapi.services.post.updateComments(comment.post);
       
       const post = await strapi.models.post.findOne({_id: comment.post});
-      const postUrl = `${strapi.config.custom.siteUrl}/post/${post.name}`;
+      const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
 
       const date = moment(comment.publishedAt);
       const msg = '[[' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + ']]'
