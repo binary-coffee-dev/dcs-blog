@@ -13,6 +13,6 @@ module.exports = async (ctx, next) => {
     ctx.request.body = ctx.params = {...ctx.params, id: opinion.id};
     return await next();
   }
-  ctx.request.body = ctx.params = undefined;
-  return ctx.unauthorized();
+  ctx.unauthorized();
+  throw new Error();
 };

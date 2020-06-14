@@ -12,6 +12,6 @@ module.exports = async (ctx, next) => {
       return await next();
     }
   }
-  ctx.request.body = ctx.params = {};
   ctx.forbidden();
+  throw new Error();
 };
