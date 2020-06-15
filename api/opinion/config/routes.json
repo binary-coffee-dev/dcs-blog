@@ -1,0 +1,56 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/opinions",
+      "handler": "opinion.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/opinions/count",
+      "handler": "opinion.count",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/opinions/:id",
+      "handler": "opinion.findOne",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/opinions",
+      "handler": "opinion.create",
+      "config": {
+        "policies": [
+          "canCreateOpinion"
+        ]
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/opinions/:id",
+      "handler": "opinion.update",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/opinions/:id",
+      "handler": "opinion.delete",
+      "config": {
+        "policies": [
+          "canRemoveOpinion"
+        ]
+      }
+    }
+  ]
+}

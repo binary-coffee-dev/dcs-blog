@@ -2,6 +2,9 @@
 
 const svgCaptcha = require('svg-captcha');
 const Request = require('request');
+const moment = require('moment-timezone');
+
+moment.locale('es_ES')
 
 /**
  * Read the documentation (https://strapi.io/documentation/3.0.0-beta.x/concepts/controllers.html#core-controllers)
@@ -59,9 +62,18 @@ module.exports = {
     if (obj.body && obj.post && obj.user) {
       const comment = await strapi.services.comment.create(obj);
       await strapi.services.post.updateComments(comment.post);
+      
+      const post = await strapi.models.post.findOne({_id: comment.post});
+      const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
+      const postTitle = post.title;
 
-      const msg = '[[' + comment.publishedAt.toLocaleString() + ']]' + ' *' + comment.user.username + '* commented: \n\n' + '`' + comment.body + '`';
-
+      const date = moment(comment.publishedAt);
+      const msg = '*--- NEW COMMENT ---*\n'
+                + '*Date:* ' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n' 
+                + '*Post:* ' + '[' + postTitle + ']' + '(' + postUrl + ')' + '\n'
+                + '*User:* ' + comment.user.username + '\n' 
+                + '*Comment:* ' + '`' + comment.body + '`' + '\n\n';
+      
       Request.post({
         'headers': {'content-type': 'application/json'},
         'url': 'https://botnotifier.binary-coffee.dev/notify/channel',
@@ -69,11 +81,6 @@ module.exports = {
           'Message': msg,
           'ChannelName': 'bcStaffs'
         })
-      }, (error, response, body) => {
-        if (error) {
-          return console.log(error);
-        }
-        console.log(JSON.parse(body));
       });
 
       return comment;

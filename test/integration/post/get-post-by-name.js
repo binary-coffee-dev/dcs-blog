@@ -1,10 +1,10 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const createUser = require('../helpers/create-user');
-const deleteUser = require('../helpers/delete-user');
-const deletePost = require('../helpers/delete-post');
-const generateJwt = require('../helpers/generate-jwt-by-user');
+const createUser = require('../../helpers/create-user');
+const deleteUser = require('../../helpers/delete-user');
+const deletePost = require('../../helpers/delete-post');
+const generateJwt = require('../../helpers/generate-jwt-by-user');
 
 chai.use(chaiHttp);
 
@@ -59,7 +59,7 @@ describe('Get post by name INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY_GET_POST_BY_NAME)
       .end((err, res) => {
-        expect(!!res.body.data.postByName).to.equal(true);
+        expect(!!res.body.data.postByName).to.be.true;
         expect(res.body.data.postByName.name).to.equal('this-is-a-test-yes');
         done();
       });
@@ -72,7 +72,7 @@ describe('Get post by name INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY_GET_POST_BY_NAME)
       .end((err, res) => {
-        expect(!!res.body.data).to.equal(false);
+        expect(!!res.body.data).to.be.false;
         done();
       });
   });
@@ -82,7 +82,7 @@ describe('Get post by name INTEGRATION', () => {
       .post('/graphql')
       .send(QUERY_GET_POST_BY_NAME)
       .end((err, res) => {
-        expect(!!res.body.data).to.equal(false);
+        expect(!!res.body.data).to.be.false;
         done();
       });
   });
@@ -94,7 +94,7 @@ describe('Get post by name INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY_GET_POST_BY_NAME)
       .end((err, res) => {
-        expect(!!res.body.data.postByName).to.equal(true);
+        expect(!!res.body.data.postByName).to.be.true;
         expect(res.body.data.postByName.name).to.equal('this-is-a-test-yes');
         done();
       });
@@ -107,7 +107,7 @@ describe('Get post by name INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY_GET_POST_BY_NAME)
       .end((err, res) => {
-        expect(!!res.body.data.postByName).to.equal(true);
+        expect(!!res.body.data.postByName).to.be.true;
         expect(res.body.data.postByName.name).to.equal('this-is-a-test-yes');
         done();
       });
