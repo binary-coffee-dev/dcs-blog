@@ -25,7 +25,7 @@ async function getVerifiedAndEnableSubscribers() {
 async function getHtmlWithPosts(posts) {
   const data = {
     posts: posts,
-    siteUrl: strapi.config.siteUrl
+    siteUrl: strapi.config.custom.siteUrl
   };
   const options = {};
 
