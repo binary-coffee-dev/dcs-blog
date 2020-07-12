@@ -22,14 +22,19 @@ const QUERY = {
 
 describe('Post list filtered (dashboard list) INTEGRATION', () => {
   let authUser;
+  let authUser2;
 
   before(async () => {
     authUser = await createUser({strapi});
+    authUser2 = await createUser({strapi});
   });
 
   after(async () => {
-    await strapi.models.post.deleteMany({});
     await strapi.plugins['users-permissions'].models.user.deleteMany({});
+  });
+
+  afterEach(async () => {
+    await strapi.models.post.deleteMany({});
   });
 
   it('should get the list of post filter by user', async () => {
@@ -37,6 +42,29 @@ describe('Post list filtered (dashboard list) INTEGRATION', () => {
     await createPost(strapi, {author: authUser.id});
     await createPost(strapi);
     const jwt = generateJwt(strapi, authUser);
+
+    const res = await new Promise(resolve => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({...QUERY, variables: {...QUERY.variables, where: {author: authUser.id}}})
+        .end((err, res) => resolve(res));
+    });
+
+    for (let post of res.body.data.postsConnection.values) {
+      expect(!!post.author).to.be.true;
+      expect(post.author.id).to.be.equal(authUser.id);
+    }
+    expect(res.body.data.countPosts).to.equal(2);
+  });
+
+  it('should get the list of post filter by a different user', async () => {
+    await createPost(strapi, {author: authUser.id});
+    await createPost(strapi, {author: authUser.id});
+    await createPost(strapi, {author: authUser.id, enable: false});
+    await createPost(strapi, {author: authUser.id, publishedAt: undefined});
+    await createPost(strapi, {author: authUser.id, publishedAt: undefined, enable: false});
+    const jwt = generateJwt(strapi, authUser2);
 
     const res = await new Promise(resolve => {
       chai.request(strapi.server)
