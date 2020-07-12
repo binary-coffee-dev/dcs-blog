@@ -50,7 +50,7 @@ module.exports = {
     attributes.forEach(attr => mark.add(attr));
     Object.keys(where).forEach(attr => {
       if (mark.has(attr)) {
-        where[attr] = new RegExp(where[attr]);
+        where[attr] = new RegExp(where[attr], 'i');
       }
     });
     return where;
