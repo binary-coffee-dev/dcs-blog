@@ -14,4 +14,14 @@ describe('Post service', function () {
   it('should remove all not letters and numbers', () => {
     expect(Post.getNameFromTitle('!Que, .pasa 08 )(**&%&*%?')).to.equal('que-pasa-08');
   });
+
+  it('should remove all not allowed atributes in the where object', () => {
+    const where = {author: '123ouhvsodflknl', title: 'sondflksdflkasjdf', not: 'asdf', enable: true};
+    expect(Post.cleanWhere(where)).to.deep.equal({author: '123ouhvsodflknl', title: 'sondflksdflkasjdf'});
+  });
+
+  it('should convert attributes to a reg expresion', () => {
+    const where = {author: '123ouhvsodflknl', title: 'sondflksdflkasjdf', not: 'asdf'};
+    expect(Post.convertToLikeQuery(where)).to.deep.equal({author: '123ouhvsodflknl', title: /sondflksdflkasjdf/, not: 'asdf'});
+  });
 });
