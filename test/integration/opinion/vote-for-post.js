@@ -69,7 +69,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     expect(!!opinion).to.be.true;
   });
 
-  xit('should not remove the opinion of other user (auth)', async () => {
+  it('should not remove the opinion of other user (auth)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: authUser.id});
     const opi = await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: LIKE});

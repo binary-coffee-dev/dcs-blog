@@ -8,17 +8,19 @@ module.exports = {
   async find(ctx) {
     const publicOnly = (ctx.params._where && ctx.params._where.enable) ||
       (ctx.params.where && ctx.params.where.enable) || false;
+    const where = ctx.params._where || ctx.params.where || {};
     const limit = parseInt(ctx.query.limit || ctx.query._limit || Number.MAX_SAFE_INTEGER);
     const start = parseInt(ctx.query.start || ctx.query._start || Number.MIN_SAFE_INTEGER);
 
-    return strapi.services.post.find(ctx, publicOnly, limit, start);
+    return strapi.services.post.find(ctx, publicOnly, limit, start, where);
   },
 
   async count(ctx) {
     const publicOnly = (ctx.params._where && ctx.params._where.enable) ||
       (ctx.params.where && ctx.params.where.enable) || false;
+    const where = ctx.params._where || ctx.params.where || {};
 
-    return strapi.services.post.count(ctx, publicOnly);
+    return strapi.services.post.count(ctx, publicOnly, where);
   },
 
   async findOneByName(ctx) {
