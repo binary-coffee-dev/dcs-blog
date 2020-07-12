@@ -80,4 +80,22 @@ describe('Post list filtered (dashboard list) INTEGRATION', () => {
     }
     expect(res.body.data.countPosts).to.equal(2);
   });
+
+  it('should get the list of post filter by title', async () => {
+    await createPost(strapi, {author: authUser.id, title: 'TEST'});
+    await createPost(strapi, {author: authUser.id, title: 'TEST SOME'});
+    await createPost(strapi, {author: authUser.id, title: 'SOME TEST'});
+    await createPost(strapi, {author: authUser.id, title: 'SOME TEST SOME'});
+    await createPost(strapi, {author: authUser.id, title: 'SOME'});
+
+    const res = await new Promise(resolve => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .send({...QUERY, variables: {...QUERY.variables, where: {enable: true, title: 'tEst'}}})
+        .end((err, res) => resolve(res));
+    });
+
+    expect(res.body.data.postsConnection.values.length).to.equal(4);
+    expect(res.body.data.countPosts).to.equal(4);
+  });
 });
