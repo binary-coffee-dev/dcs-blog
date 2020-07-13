@@ -13,7 +13,7 @@ const SORT_ATTR_NAME = 0;
 const SORT_ATTR_VALUE = 1;
 
 module.exports = {
-  async find(ctx, publicOnly, limit, start) {
+  async find(ctx, publicOnly, limit, start, where) {
     let sort = {};
     const sortFromRequest = (ctx.query.sort || ctx.query._sort);
     const sortQuery = sortFromRequest && sortFromRequest.split(':');
@@ -21,26 +21,50 @@ module.exports = {
       sort[sortQuery[SORT_ATTR_NAME]] = sortQuery[SORT_ATTR_VALUE].toLowerCase() === 'asc' ? 1 : -1;
     }
 
-    const query = this.createQueryObject(ctx, publicOnly);
+    const query = this.createQueryObject(ctx, publicOnly, where);
     return await strapi.models.post.find(query)
       .limit(Math.min(limit, MAX_POST_LIMIT))
       .skip(Math.max(start, MIN_POST_START))
       .sort(sort);
   },
 
-  async count(ctx, publicOnly) {
-    const query = this.createQueryObject(ctx, publicOnly);
+  async count(ctx, publicOnly, where) {
+    const query = this.createQueryObject(ctx, publicOnly, where);
     return await strapi.models.post.count(query);
   },
 
-  createQueryObject(ctx, publicOnly) {
+  createQueryObject(ctx, publicOnly, where = {}) {
+    where = this.cleanWhere(where);
+    where = this.convertToLikeQuery(where);
     if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
-      return {$or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
+      return {...where, $or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
     } else if ((!strapi.services.post.isAdmin(ctx) && !strapi.services.post.isStaff(ctx)) || publicOnly) {
       // public user
-      return {publishedAt: {$lte: new Date()}, enable: true};
+      return {...where, publishedAt: {$lte: new Date()}, enable: true};
     }
-    return {};
+    return where;
+  },
+
+  convertToLikeQuery(where = {}, attributes = ['title']) {
+    const mark = new Set();
+    attributes.forEach(attr => mark.add(attr));
+    Object.keys(where).forEach(attr => {
+      if (mark.has(attr)) {
+        where[attr] = new RegExp(where[attr], 'i');
+      }
+    });
+    return where;
+  },
+
+  cleanWhere(where = {}, allowedAttributes = ['title', 'author']) {
+    const mark = new Set();
+    allowedAttributes.forEach(attr => mark.add(attr));
+    return Object.keys(where).reduce((prev, value) => {
+      if (mark.has(value)) {
+        prev[value] = where[value];
+      }
+      return prev;
+    }, {});
   },
 
   async findOneByName(ctx, name) {
