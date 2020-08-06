@@ -21,7 +21,7 @@ module.exports = ({env}) => ({
       client: 'cookie',
       key: 'strapi.sid',
       prefix: 'strapi:sess:',
-      secretKeys: ['mySecretKey1', 'mySecretKey2'],
+      secretKeys: [env('SECRET1', 'mySecretKey1'), env('SECRET2', 'mySecretKey2')],
       httpOnly: true,
       maxAge: 86400000,
       overwrite: true,
