@@ -24,9 +24,10 @@ module.exports = {
         scope: authData.scope,
         token: authData.access_token
       });
-      let user = await strapi.plugins['users-permissions'].models.user.findOne({providers: [providerItem.id]});
+      let user = await strapi.plugins['users-permissions'].models.user.findOne({providers: [providerItem.id]}).populate(['role']);
       if (!user) {
         user = await authService.createUserByProvider(providerItem);
+        user = await strapi.plugins['users-permissions'].models.user.findOne({_id: user.id}).populate(['role']);
       }
       return strapi.plugins['users-permissions'].services.jwt.issue({id: user.id, role: user.role.type});
     }
