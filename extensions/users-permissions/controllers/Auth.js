@@ -25,7 +25,7 @@ module.exports = {
       if (!user) {
         user = await authService.createUserByProvider(providerItem);
       }
-      return strapi.plugins['users-permissions'].services.jwt.issue({id: user.id});
+      return strapi.plugins['users-permissions'].services.jwt.issue({id: user.id, role: user.role.type});
     }
     return {};
   },
