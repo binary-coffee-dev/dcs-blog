@@ -17,6 +17,8 @@ services:
       - $BLOG_RESOURCES:/app/public/uploads
     ports:
       - "127.0.0.1:${BACKEND_PORT}:1337"
+    environment:
+      - JWT_SECRET=$JWT_SECRET
     networks:
       - blogdb
 
