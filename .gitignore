@@ -1,3 +1,5 @@
+.strapi-updater.json
+
 .env
 .nyc_output
 package-lock.json

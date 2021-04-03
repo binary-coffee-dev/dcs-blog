@@ -39,12 +39,6 @@
       "config": {}
     },
     {
-      "method": "GET",
-      "path": "/posts/:id",
-      "handler": "Post.findOne",
-      "config": {}
-    },
-    {
       "method": "POST",
       "path": "/posts",
       "handler": "Post.create",
@@ -54,6 +48,12 @@
           "canPublishPost"
         ]
       }
+    },
+    {
+      "method": "GET",
+      "path": "/posts/:id",
+      "handler": "Post.findOne",
+      "config": {}
     },
     {
       "method": "PUT",
