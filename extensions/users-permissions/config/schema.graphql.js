@@ -12,12 +12,18 @@ module.exports = {
       avatar: UploadFile
     }
   `,
-  query: 'myData: UsersPermissionsMYData',
+  query: `
+  myData: UsersPermissionsMYData
+  topActiveUsers: [UsersPermissionsUser]
+  `,
   mutation: 'loginWithProvider(provider: String!, code: String!): String',
   resolver: {
     Query: {
       myData: {
         resolver: 'plugins::users-permissions.user.me'
+      },
+      topActiveUsers: {
+        resolver: 'plugins::users-permissions.user.topActiveUsers'
       }
     },
     Mutation: {

@@ -24,6 +24,27 @@ const UserNew = {
       await user.save();
     }
     ctx.send(user);
+  },
+
+  async topPopularUsers(ctx) {
+    ctx.send({});
+  },
+
+  async topActiveUsers(ctx) {
+    const topUsersIds = await strapi.models.post.aggregate([
+      {
+        "$group": {
+          "_id": '$author',
+          "postCount": {"$sum": 1}
+        }
+      },
+      {"$sort": {"postCount": -1}},
+      {"$limit": 5}
+    ]);
+    const users = await strapi.plugins['users-permissions'].models.user.find({_id: {
+        $in: topUsersIds.filter(v => v._id).map(v => v._id)
+      }});
+    ctx.send(users);
   }
 };
 
