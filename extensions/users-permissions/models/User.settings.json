@@ -89,6 +89,11 @@
     "opinions": {
       "via": "user",
       "collection": "opinion"
+    },
+    "confirmationToken": {
+      "type": "string",
+      "configurable": false,
+      "private": true
     }
   }
 }
