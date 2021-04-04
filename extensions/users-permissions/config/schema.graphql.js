@@ -15,6 +15,7 @@ module.exports = {
   query: `
   myData: UsersPermissionsMYData
   topActiveUsers: [UsersPermissionsUser]
+  topPopularUsers: [UsersPermissionsUser]
   `,
   mutation: 'loginWithProvider(provider: String!, code: String!): String',
   resolver: {
@@ -24,6 +25,9 @@ module.exports = {
       },
       topActiveUsers: {
         resolver: 'plugins::users-permissions.user.topActiveUsers'
+      },
+      topPopularUsers: {
+        resolver: 'plugins::users-permissions.user.topPopularUsers'
       }
     },
     Mutation: {

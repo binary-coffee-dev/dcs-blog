@@ -2,6 +2,15 @@
 
 const User = require('strapi-plugin-users-permissions/controllers/User');
 
+// toDo 04.04.21: in the future, add this method to the service file
+const getUsersById = async (userIds) => {
+  return strapi.plugins['users-permissions'].models.user.find({
+    _id: {
+      $in: userIds.filter(v => v._id).map(v => v._id)
+    }
+  });
+}
+
 const UserNew = {
   ...User,
   async me(ctx) {
@@ -27,7 +36,17 @@ const UserNew = {
   },
 
   async topPopularUsers(ctx) {
-    ctx.send({});
+    const topUsersIds = await strapi.models.opinion.aggregate([
+      {
+        "$group": {
+          "_id": '$user',
+          "opinionCount": {"$sum": 1}
+        }
+      },
+      {"$sort": {"opinionCount": -1}},
+      {"$limit": 5}
+    ]);
+    ctx.send(getUsersById(topUsersIds));
   },
 
   async topActiveUsers(ctx) {
@@ -41,10 +60,7 @@ const UserNew = {
       {"$sort": {"postCount": -1}},
       {"$limit": 5}
     ]);
-    const users = await strapi.plugins['users-permissions'].models.user.find({_id: {
-        $in: topUsersIds.filter(v => v._id).map(v => v._id)
-      }});
-    ctx.send(users);
+    ctx.send(getUsersById(topUsersIds));
   }
 };
 
