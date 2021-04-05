@@ -36,17 +36,21 @@ const UserNew = {
   },
 
   async topPopularUsers(ctx) {
-    const topUsersIds = await strapi.models.opinion.aggregate([
+    const topUsersIds = await strapi.models.post.aggregate([
       {
         "$group": {
-          "_id": '$user',
-          "opinionCount": {"$sum": 1}
+          "_id": '$author',
+          "viewsCount": {"$sum": "$likes"}
         }
       },
-      {"$sort": {"opinionCount": -1}},
+      {"$sort": {"viewsCount": -1}},
       {"$limit": 5}
     ]);
-    ctx.send(getUsersById(topUsersIds));
+    const users = await getUsersById(topUsersIds);
+    const positions = new Map();
+    topUsersIds.forEach((u, i) => positions.set(u._id.toString(), i));
+    users.sort((u1, u2) => positions.get(u1._id.toString()) > positions.get(u2._id.toString()));
+    ctx.send(users);
   },
 
   async topActiveUsers(ctx) {
@@ -58,7 +62,7 @@ const UserNew = {
         }
       },
       {"$sort": {"postCount": -1}},
-      {"$limit": 5}
+      {"$limit": 100}
     ]);
     ctx.send(getUsersById(topUsersIds));
   }
