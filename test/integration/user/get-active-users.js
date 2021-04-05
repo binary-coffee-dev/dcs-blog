@@ -6,7 +6,6 @@ const deleteUser = require('../../helpers/delete-user');
 const deletePost = require('../../helpers/delete-post');
 const createPost = require('../../helpers/create-post');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
-const createOpinion = require('../../helpers/create-opinion');
 
 chai.use(chaiHttp);
 
@@ -14,7 +13,7 @@ const expect = chai.expect;
 
 const QUERY_GET_ACTIVE_USERS = {
   operationName: null,
-  query: 'query{\n  topActiveUsers{\n    id\n    _id\n    createdAt\n    updatedAt\n    username\n    email\n    provider\n    confirmed\n    blocked\n    avatarUrl\n    name\n    page\n  }\n}'
+  query: 'query {\n  topActiveUsers {\n    users {\n      id\n      _id\n      createdAt\n      updatedAt\n      username\n      email\n      provider\n      confirmed\n      blocked\n      avatarUrl\n      name\n      page\n    }\n    values\n  }\n}'
 };
 const MAX_NUMBER = 10;
 
@@ -31,7 +30,7 @@ describe('Get more active users INTEGRATION', () => {
 
       // assign posts
       for (let j = 0; j < i; j++) {
-        posts.push(await createPost(strapi,{author: user}));
+        posts.push(await createPost(strapi, {author: user}));
       }
     }
   });
@@ -50,11 +49,17 @@ describe('Get more active users INTEGRATION', () => {
       .post('/graphql')
       .send(QUERY_GET_ACTIVE_USERS)
       .end((err, res) => {
-        const topUsers = res.body.data.topActiveUsers;
+        console.log(res.body)
+        const topUsers = res.body.data.topActiveUsers.users;
+        const topValues = res.body.data.topActiveUsers.values;
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
           expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 1]._id.toString());
+        }
+
+        for (let i = 0; i < topLength; i++) {
+          expect(topValues[i]).to.be.equal(MAX_NUMBER - i - 1);
         }
 
         done();
@@ -68,11 +73,16 @@ describe('Get more active users INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY_GET_ACTIVE_USERS)
       .end((err, res) => {
-        const topUsers = res.body.data.topActiveUsers;
+        const topUsers = res.body.data.topActiveUsers.users;
+        const topValues = res.body.data.topActiveUsers.values;
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
           expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 1]._id.toString());
+        }
+
+        for (let i = 0; i < topLength; i++) {
+          expect(topValues[i]).to.be.equal(MAX_NUMBER - i - 1);
         }
 
         done();

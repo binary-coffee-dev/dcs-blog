@@ -41,21 +41,23 @@ const UserNew = {
 
   async topPopularUsers(ctx) {
     const topUsersIds = await strapi.models.post.aggregate([
+      {"$match": {"author": {"$exists": true}}},
       {
         "$group": {
           "_id": '$author',
-          "viewsCount": {"$sum": "$likes"}
+          "likesCount": {"$sum": "$likes"}
         }
       },
-      {"$sort": {"viewsCount": -1}},
+      {"$sort": {"likesCount": -1}},
       {"$limit": 5}
     ]);
     const users = await getUsersById(topUsersIds);
-    ctx.send(users);
+    ctx.send({users, values: topUsersIds.map(v => v.likesCount)});
   },
 
   async topActiveUsers(ctx) {
     const topUsersIds = await strapi.models.post.aggregate([
+      {"$match": {"author": {"$exists": true}}},
       {
         "$group": {
           "_id": '$author',
@@ -66,7 +68,7 @@ const UserNew = {
       {"$limit": 100}
     ]);
     const users = await getUsersById(topUsersIds);
-    ctx.send(users);
+    ctx.send({users, values: topUsersIds.map(v => v.postCount)});
   }
 };
 

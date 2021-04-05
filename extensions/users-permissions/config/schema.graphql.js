@@ -11,11 +11,15 @@ module.exports = {
       page: String
       avatar: UploadFile
     }
+    type TopUsers {
+      users: [UsersPermissionsUser]
+      values: [Int]
+    }
   `,
   query: `
-  myData: UsersPermissionsMYData
-  topActiveUsers: [UsersPermissionsUser]
-  topPopularUsers: [UsersPermissionsUser]
+    myData: UsersPermissionsMYData
+    topActiveUsers: TopUsers!
+    topPopularUsers: TopUsers!
   `,
   mutation: 'loginWithProvider(provider: String!, code: String!): String',
   resolver: {

@@ -13,7 +13,7 @@ const expect = chai.expect;
 
 const QUERY_GET_POPULAR_USERS = {
   operationName: null,
-  query: 'query{\n  topPopularUsers{\n    id\n    _id\n    createdAt\n    updatedAt\n    username\n    email\n    provider\n    confirmed\n    blocked\n    avatarUrl\n    name\n    page\n  }\n}'
+  query: 'query {\n  topPopularUsers {\n    users {\n      id\n      _id\n      createdAt\n      updatedAt\n      username\n      email\n      provider\n      confirmed\n      blocked\n      avatarUrl\n      name\n      page\n    }\n    values\n  }\n}'
 };
 const MAX_NUMBER = 10;
 
@@ -52,12 +52,14 @@ describe('Get popular users INTEGRATION', () => {
       .post('/graphql')
       .send(QUERY_GET_POPULAR_USERS)
       .end((err, res) => {
-        const topUsers = res.body.data.topPopularUsers;
+        const topUsers = res.body.data.topPopularUsers.users;
+        const topValues = res.body.data.topPopularUsers.values;
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
           expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 1]._id.toString());
         }
+        expect(topValues.length).to.be.equal(topLength);
 
         done();
       });
@@ -70,12 +72,14 @@ describe('Get popular users INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY_GET_POPULAR_USERS)
       .end((err, res) => {
-        const topUsers = res.body.data.topPopularUsers;
+        const topUsers = res.body.data.topPopularUsers.users;
+        const topValues = res.body.data.topPopularUsers.values;
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
           expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 1]._id.toString());
         }
+        expect(topValues.length).to.be.equal(topLength);
 
         done();
       });
