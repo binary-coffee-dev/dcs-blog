@@ -4,11 +4,15 @@ const User = require('strapi-plugin-users-permissions/controllers/User');
 
 // toDo 04.04.21: in the future, add this method to the service file
 const getUsersById = async (userIds) => {
-  return strapi.plugins['users-permissions'].models.user.find({
+  const users = await strapi.plugins['users-permissions'].models.user.find({
     _id: {
       $in: userIds.filter(v => v._id).map(v => v._id)
     }
   });
+  const positions = new Map();
+  userIds.forEach((u, i) => positions.set(u._id.toString(), i));
+  users.sort((u1, u2) => positions.get(u1._id.toString()) > positions.get(u2._id.toString()));
+  return users;
 }
 
 const UserNew = {
@@ -47,9 +51,6 @@ const UserNew = {
       {"$limit": 5}
     ]);
     const users = await getUsersById(topUsersIds);
-    const positions = new Map();
-    topUsersIds.forEach((u, i) => positions.set(u._id.toString(), i));
-    users.sort((u1, u2) => positions.get(u1._id.toString()) > positions.get(u2._id.toString()));
     ctx.send(users);
   },
 
@@ -64,7 +65,8 @@ const UserNew = {
       {"$sort": {"postCount": -1}},
       {"$limit": 100}
     ]);
-    ctx.send(getUsersById(topUsersIds));
+    const users = await getUsersById(topUsersIds);
+    ctx.send(users);
   }
 };
 

@@ -6,18 +6,19 @@ const deleteUser = require('../../helpers/delete-user');
 const deletePost = require('../../helpers/delete-post');
 const createPost = require('../../helpers/create-post');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
+const createOpinion = require('../../helpers/create-opinion');
 
 chai.use(chaiHttp);
 
 const expect = chai.expect;
 
-const QUERY_GET_POPULAR_USERS = {
+const QUERY_GET_ACTIVE_USERS = {
   operationName: null,
-  query: 'query{\n  topPopularUsers{\n    id\n    _id\n    createdAt\n    updatedAt\n    username\n    email\n    provider\n    confirmed\n    blocked\n    avatarUrl\n    name\n    page\n  }\n}'
+  query: 'query{\n  topActiveUsers{\n    id\n    _id\n    createdAt\n    updatedAt\n    username\n    email\n    provider\n    confirmed\n    blocked\n    avatarUrl\n    name\n    page\n  }\n}'
 };
 const MAX_NUMBER = 10;
 
-describe('Get popular users INTEGRATION', () => {
+describe('Get more active users INTEGRATION', () => {
   let posts = [];
 
   let users = [];
@@ -29,11 +30,8 @@ describe('Get popular users INTEGRATION', () => {
       users.push(user);
 
       // assign posts
-      for (let j = 0; j < MAX_NUMBER; j++) {
-        posts.push(await createPost(strapi,{
-          author: user,
-          likes: i * MAX_NUMBER + j
-        }));
+      for (let j = 0; j < i; j++) {
+        posts.push(await createPost(strapi,{author: user}));
       }
     }
   });
@@ -47,12 +45,12 @@ describe('Get popular users INTEGRATION', () => {
     }
   });
 
-  it('should get the the list of popular users', (done) => {
+  it('should get the the list of more active users', (done) => {
     chai.request(strapi.server)
       .post('/graphql')
-      .send(QUERY_GET_POPULAR_USERS)
+      .send(QUERY_GET_ACTIVE_USERS)
       .end((err, res) => {
-        const topUsers = res.body.data.topPopularUsers;
+        const topUsers = res.body.data.topActiveUsers;
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
@@ -63,14 +61,14 @@ describe('Get popular users INTEGRATION', () => {
       });
   });
 
-  it('should get the the list of popular users (auth)', (done) => {
+  it('should get the the list of mroe active users (auth)', (done) => {
     const jwt = generateJwt(strapi, users[0]);
     chai.request(strapi.server)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
-      .send(QUERY_GET_POPULAR_USERS)
+      .send(QUERY_GET_ACTIVE_USERS)
       .end((err, res) => {
-        const topUsers = res.body.data.topPopularUsers;
+        const topUsers = res.body.data.topActiveUsers;
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
