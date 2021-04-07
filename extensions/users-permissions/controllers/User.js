@@ -13,7 +13,7 @@ const getUsersById = async (userIds) => {
   userIds.forEach((u, i) => positions.set(u._id.toString(), i));
   users.sort((u1, u2) => positions.get(u1._id.toString()) > positions.get(u2._id.toString()));
   return users;
-}
+};
 
 const UserNew = {
   ...User,
@@ -41,15 +41,15 @@ const UserNew = {
 
   async topPopularUsers(ctx) {
     const topUsersIds = await strapi.models.post.aggregate([
-      {"$match": {"author": {"$exists": true}}},
+      {$match: {'author': {$exists: true}}},
       {
-        "$group": {
-          "_id": '$author',
-          "likesCount": {"$sum": "$likes"}
+        $group: {
+          '_id': '$author',
+          'likesCount': {$sum: '$likes'}
         }
       },
-      {"$sort": {"likesCount": -1}},
-      {"$limit": 5}
+      {$sort: {'likesCount': -1}},
+      {$limit: 5}
     ]);
     const users = await getUsersById(topUsersIds);
     ctx.send({users, values: topUsersIds.map(v => v.likesCount)});
@@ -57,15 +57,15 @@ const UserNew = {
 
   async topActiveUsers(ctx) {
     const topUsersIds = await strapi.models.post.aggregate([
-      {"$match": {"author": {"$exists": true}}},
+      {$match: {'author': {$exists: true}}},
       {
-        "$group": {
-          "_id": '$author',
-          "postCount": {"$sum": 1}
+        $group: {
+          '_id': '$author',
+          'postCount': {$sum: 1}
         }
       },
-      {"$sort": {"postCount": -1}},
-      {"$limit": 100}
+      {$sort: {'postCount': -1}},
+      {$limit: 100}
     ]);
     const users = await getUsersById(topUsersIds);
     ctx.send({users, values: topUsersIds.map(v => v.postCount)});
