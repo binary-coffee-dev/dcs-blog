@@ -43,9 +43,9 @@ module.exports = {
     // todo: this should be optimized for when the application is big enough to make this query to slow
     const comments = await strapi.models.comment
       .find()
+      .populate(['post', 'user'])
       .sort({createdAt: 'desc'})
-      .limit(15)
-      .populate(['post', 'user']);
+      .limit(15);
     return comments.filter(comment => {
       return strapi.services.post.isPublish(comment.post);
     });
