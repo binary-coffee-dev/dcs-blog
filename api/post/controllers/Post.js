@@ -1,5 +1,7 @@
 'use strict';
 
+const { sanitizeEntity } = require('strapi-utils');
+
 /**
  * Read the documentation () to implement custom controller functions
  */
@@ -12,7 +14,8 @@ module.exports = {
     const limit = parseInt(ctx.query.limit || ctx.query._limit || Number.MAX_SAFE_INTEGER);
     const start = parseInt(ctx.query.start || ctx.query._start || Number.MIN_SAFE_INTEGER);
 
-    return strapi.services.post.find(ctx, publicOnly, limit, start, where);
+    const articles = await strapi.services.post.find(ctx, publicOnly, limit, start, where);
+    return articles.map(article => sanitizeEntity(article, {model: strapi.models.post}));
   },
 
   async count(ctx) {

@@ -49,7 +49,6 @@ describe('Get more active users INTEGRATION', () => {
       .post('/graphql')
       .send(QUERY_GET_ACTIVE_USERS)
       .end((err, res) => {
-        console.log(res.body)
         const topUsers = res.body.data.topActiveUsers.users;
         const topValues = res.body.data.topActiveUsers.values;
         const topLength = topUsers.length;

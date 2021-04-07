@@ -58,7 +58,6 @@ describe('Post list (dashboard list) INTEGRATION', () => {
   });
 
   it('should get the not published articles for the not authenticated users', (done) => {
-    console.log('a');
     chai.request(strapi.server)
       .post('/graphql')
       .send({...QUERY, variables: {...QUERY.variables, 'id': posts[0].id}})
