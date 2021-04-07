@@ -5,6 +5,9 @@ module.exports = ({env}) => ({
     enabled: true
   },
   admin: {
-    autoOpen: false
+    autoOpen: false,
+    auth: {
+      secret: env('ADMIN_JWT_SECRET', '6V#j7xt3ZHBgBphIiwv2')
+    }
   }
 });
