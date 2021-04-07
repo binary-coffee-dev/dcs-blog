@@ -4,6 +4,8 @@ const chaiHttp = require('chai-http');
 const createUser = require('../../helpers/create-user');
 const createPost = require('../../helpers/create-post');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
+const deleteUser = require('../../helpers/delete-user');
+const deletePost = require('../../helpers/delete-post');
 
 chai.use(chaiHttp);
 
@@ -17,30 +19,28 @@ const QUERY = {
     where: {},
     sort: 'createdAt:desc',
   },
-  query: 'query pageQuery($limit: Int\u0021, $start: Int\u0021, $where: JSON\u0021, $sort: String\u0021) {\n  postsConnection(sort: $sort, limit: $limit, start: $start, where: $where) {\n    values {\n      id\n      name\n      title\n      enable\n      body\n      comments\n      description\n      publishedAt\n      views\n      banner {\n        name\n        url\n        __typename\n      }\n      author {\n        id\n        username\n        email\n        page\n        __typename\n      }\n      tags {\n        name\n        __typename\n      }\n      __typename\n    }\n    aggregate {\n      count\n      __typename\n    }\n    __typename\n  }\n  countPosts(where: $where)\n}\n'
+  query: 'query pageQuery($limit: Int!, $start: Int!, $where: JSON!, $sort: String!) {\n  postsConnection(sort: $sort, limit: $limit, start: $start, where: $where) {\n    values {\n      id\n      name\n      title\n      enable\n      body\n      comments\n      description\n      publishedAt\n      views\n      banner {\n        name\n        url\n      }\n      author {\n        id\n        username\n        email\n        page\n      }\n      tags {\n        name\n        __typename\n      }\n      __typename\n    }\n    aggregate {\n      count\n      __typename\n    }\n    __typename\n  }\n  countPosts(where: $where)\n}\n'
 };
 
 describe('Post list filtered (dashboard list) INTEGRATION', () => {
-  let authUser;
-  let authUser2;
-
-  before(async () => {
-    authUser = await createUser({strapi});
-    authUser2 = await createUser({strapi});
-  });
+  const users = [];
+  const posts = [];
 
   after(async () => {
-    await strapi.plugins['users-permissions'].models.user.deleteMany({});
-  });
-
-  afterEach(async () => {
-    await strapi.models.post.deleteMany({});
+    for (let post of posts) {
+      await deletePost(strapi, post);
+    }
+    for (let user of users) {
+      await deleteUser(strapi, user);
+    }
   });
 
   it('should get the list of post filter by user', async () => {
-    await createPost(strapi, {author: authUser.id});
-    await createPost(strapi, {author: authUser.id});
-    await createPost(strapi);
+    const authUser = await createUser({strapi});
+    users.push(authUser);
+    posts.push(await createPost(strapi, {author: authUser.id}));
+    posts.push(await createPost(strapi, {author: authUser.id}));
+    posts.push(await createPost(strapi));
     const jwt = generateJwt(strapi, authUser);
 
     const res = await new Promise(resolve => {
@@ -59,11 +59,15 @@ describe('Post list filtered (dashboard list) INTEGRATION', () => {
   });
 
   it('should get the list of post filter by a different user', async () => {
-    await createPost(strapi, {author: authUser.id});
-    await createPost(strapi, {author: authUser.id});
-    await createPost(strapi, {author: authUser.id, enable: false});
-    await createPost(strapi, {author: authUser.id, publishedAt: undefined});
-    await createPost(strapi, {author: authUser.id, publishedAt: undefined, enable: false});
+    const authUser = await createUser({strapi});
+    const authUser2 = await createUser({strapi});
+    users.push(authUser);
+    users.push(authUser2);
+    posts.push(await createPost(strapi, {author: authUser.id}));
+    posts.push(await createPost(strapi, {author: authUser.id}));
+    posts.push(await createPost(strapi, {author: authUser.id, publishedAt: undefined}));
+    posts.push(await createPost(strapi, {author: authUser.id, enable: false}));
+    posts.push(await createPost(strapi, {author: authUser.id, publishedAt: undefined, enable: false}));
     const jwt = generateJwt(strapi, authUser2);
 
     const res = await new Promise(resolve => {
@@ -82,11 +86,13 @@ describe('Post list filtered (dashboard list) INTEGRATION', () => {
   });
 
   it('should get the list of post filter by title', async () => {
-    await createPost(strapi, {author: authUser.id, title: 'TEST'});
-    await createPost(strapi, {author: authUser.id, title: 'TEST SOME'});
-    await createPost(strapi, {author: authUser.id, title: 'SOME TEST'});
-    await createPost(strapi, {author: authUser.id, title: 'SOME TEST SOME'});
-    await createPost(strapi, {author: authUser.id, title: 'SOME'});
+    const authUser = await createUser({strapi});
+    users.push(authUser);
+    posts.push(await createPost(strapi, {author: authUser.id, title: 'TEST'}));
+    posts.push(await createPost(strapi, {author: authUser.id, title: 'TEST SOME'}));
+    posts.push(await createPost(strapi, {author: authUser.id, title: 'SOME TEST'}));
+    posts.push(await createPost(strapi, {author: authUser.id, title: 'SOME TEST SOME'}));
+    posts.push(await createPost(strapi, {author: authUser.id, title: 'SOME'}));
 
     const res = await new Promise(resolve => {
       chai.request(strapi.server)

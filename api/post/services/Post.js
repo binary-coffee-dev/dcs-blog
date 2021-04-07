@@ -23,6 +23,7 @@ module.exports = {
 
     const query = this.createQueryObject(ctx, publicOnly, where);
     return await strapi.models.post.find(query)
+      .populate(['author', 'banner'])
       .limit(Math.min(limit, MAX_POST_LIMIT))
       .skip(Math.max(start, MIN_POST_START))
       .sort(sort);

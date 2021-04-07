@@ -4,6 +4,7 @@ const chaiHttp = require('chai-http');
 const createUser = require('../../helpers/create-user');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 const createPost = require('../../helpers/create-post');
+const getPostById = require('../../helpers/get-post-by-id');
 
 chai.use(chaiHttp);
 
@@ -40,12 +41,12 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   it('should not create a new opinion if the user is not the same of the opinion (auth)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: authUser.id});
-    const res = await new Promise(resolve => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
-        .end((err, res) => resolve(res));
+        .end((err, res) => err ? reject(err) : resolve(res));
     });
 
     expect(res.body.errors.length).to.be.equal(1);
@@ -54,19 +55,21 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   it('should create a new opinion (auth)', async () => {
     const jwt = generateJwt(strapi, staffUser);
     const post = await createPost(strapi, {author: staffUser.id});
-    const res = await new Promise(resolve => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
-        .end((err, res) => resolve(res));
+        .end((err, res) => err ? reject(err) : resolve(res));
     });
 
     const id = res.body.data.createOpinion.opinion.id;
     const opinion = await strapi.models.opinion.findOne({_id: id});
+    const postUpdated = await getPostById(strapi, post._id);
 
     expect(!!res.body.data.createOpinion.opinion).to.be.true;
     expect(!!opinion).to.be.true;
+    expect(postUpdated.likes.toNumber()).to.be.equal(post.likes.toNumber() + 1);
   });
 
   it('should not remove the opinion of other user (auth)', async () => {
@@ -86,10 +89,17 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     expect(!!opinion).to.be.true;
   });
 
-  it('should the user be able to remove one of his own opinions (auth)', async () => {
+  it('the user be able to remove one of his own opinions (auth)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: staffUser.id});
-    const opi = await strapi.models.opinion.create({user: authUser.id, post: post.id, type: LIKE});
+
+    await new Promise(resolve => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: authUser.id, type: LIKE}})
+        .end((err, res) => resolve(res));
+    });
     await new Promise(resolve => {
       chai.request(strapi.server)
         .post('/graphql')
@@ -98,9 +108,11 @@ describe('create/edit/remove opinion INTEGRATION', () => {
         .end((err, res) => resolve(res));
     });
 
-    const opinion = await strapi.models.opinion.findOne({_id: opi.id});
+    const postUpdated = await getPostById(strapi, post._id);
+    const opinions = await strapi.models.opinion.find({post: post._id, user: authUser._id});
 
-    expect(!!opinion).to.be.false;
+    expect(opinions.length).to.be.equal(0);
+    expect(postUpdated.likes.toNumber()).to.be.equal(0);
   });
 
   it('should not create more than one opinion by user in a post (staff)', async () => {
@@ -121,9 +133,11 @@ describe('create/edit/remove opinion INTEGRATION', () => {
         .end((err, res) => resolve(res));
     });
 
-    const opinions = await strapi.models.opinion.find({});
+    const opinions = await strapi.models.opinion.find({post: post._id, user: staffUser._id});
+    const postUpdated = await getPostById(strapi, post._id);
 
     expect(opinions.length).to.be.equal(1);
+    expect(postUpdated.likes.toNumber()).to.be.equal(1);
   });
 
   it('should not create a new opinion (public)', async () => {

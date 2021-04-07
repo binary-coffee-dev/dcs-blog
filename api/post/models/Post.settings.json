@@ -48,6 +48,10 @@
       "type": "biginteger",
       "default": "0"
     },
+    "likes": {
+      "type": "biginteger",
+      "default": "0"
+    },
     "commentsList": {
       "via": "post",
       "collection": "comment"

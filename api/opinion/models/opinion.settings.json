@@ -1,5 +1,6 @@
 {
   "kind": "collectionType",
+  "connection": "default",
   "collectionName": "opinions",
   "info": {
     "name": "opinion"
