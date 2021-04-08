@@ -17,6 +17,15 @@ const getUsersById = async (userIds) => {
 
 const UserNew = {
   ...User,
+
+  async find(ctx, next, {populate} = {}) {
+    if (ctx.query.username) {
+      ctx.query.username = new RegExp(ctx.query.username, 'i');
+    }
+
+    await User.find(ctx, next, {populate});
+  },
+
   async me(ctx) {
     await User.me(ctx);
     if (!ctx.body.avatar) {
