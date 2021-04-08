@@ -55,4 +55,28 @@ describe('Get recent comments INTEGRATION', () => {
     expect(comments[0].user.id.toString()).to.be.equal(user._id.toString());
     expect(comments[0].post.id.toString()).to.be.equal(post._id.toString());
   });
+
+  it('should get the the list of recent comments (auth)', async () => {
+    const user = await createUser({strapi});
+    users.push(user);
+    const post = await createPost(strapi, {author: user});
+    posts.push(post);
+    for (let i = 0; i < 20; i++) {
+      await createComment(strapi, {user, post});
+    }
+
+    const jwt = generateJwt(strapi, user);
+    const res = await new Promise(resolve => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send(QUERY_GET_RECENT_COMMENTS)
+        .end((err, res) => resolve(res));
+    });
+
+    const comments = res.body.data.recentComments;
+    expect(comments.length).to.be.equal(15);
+    expect(comments[0].user.id.toString()).to.be.equal(user._id.toString());
+    expect(comments[0].post.id.toString()).to.be.equal(post._id.toString());
+  });
 });

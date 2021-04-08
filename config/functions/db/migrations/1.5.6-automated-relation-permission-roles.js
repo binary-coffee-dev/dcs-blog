@@ -17,10 +17,10 @@ module.exports = {
       }, {$set: {enabled: true}});
     }
     await strapi.plugins['users-permissions'].models.permission.updateMany({
-        controller: 'comment',
-        action: ['find', 'count', 'findone', 'recentcomments'],
-        role: publicRole.id
-      },
-      {$set: {enabled: true}});
+      controller: 'comment',
+      action: ['find', 'count', 'findone', 'recentcomments'],
+      role: publicRole.id
+    },
+    {$set: {enabled: true}});
   },
 };
