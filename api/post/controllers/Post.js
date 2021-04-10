@@ -28,7 +28,8 @@ module.exports = {
 
   async findOneByName(ctx) {
     const name = ctx.params.name || ctx.params._name || '';
-    return strapi.services.post.findOneByName(ctx, name);
+    const article = await strapi.services.post.findOneByName(ctx, name);
+    return sanitizeEntity(article, {model: strapi.models.post});
   },
 
   async findSimilarPosts(ctx) {
