@@ -30,7 +30,11 @@ describe('Get more active users INTEGRATION', () => {
 
       // assign posts
       for (let j = 0; j < i; j++) {
-        posts.push(await createPost(strapi, {author: user}));
+        if (i < MAX_NUMBER - 1) {
+          posts.push(await createPost(strapi, {author: user}));
+        } else {
+          posts.push(await createPost(strapi, {author: user, publishedAt: undefined}));
+        }
       }
     }
   });
@@ -54,11 +58,11 @@ describe('Get more active users INTEGRATION', () => {
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
-          expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 1]._id.toString());
+          expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 2]._id.toString());
         }
 
         for (let i = 0; i < topLength; i++) {
-          expect(topValues[i]).to.be.equal(MAX_NUMBER - i - 1);
+          expect(topValues[i]).to.be.equal(MAX_NUMBER - i - 2);
         }
 
         done();
@@ -77,11 +81,11 @@ describe('Get more active users INTEGRATION', () => {
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
-          expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 1]._id.toString());
+          expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 2]._id.toString());
         }
 
         for (let i = 0; i < topLength; i++) {
-          expect(topValues[i]).to.be.equal(MAX_NUMBER - i - 1);
+          expect(topValues[i]).to.be.equal(MAX_NUMBER - i - 2);
         }
 
         done();
