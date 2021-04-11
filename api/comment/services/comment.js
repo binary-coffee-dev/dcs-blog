@@ -39,13 +39,13 @@ module.exports = {
     return crypto.createHmac('sha256', key).update(text).digest('base64');
   },
 
-  async recentComments() {
+  async recentComments(limit = 8) {
     // todo: this should be optimized for when the application is big enough to make this query to slow
     const comments = await strapi.models.comment
       .find()
       .populate(['post', 'user'])
       .sort({createdAt: 'desc'})
-      .limit(15);
+      .limit(limit);
     return comments.filter(comment => {
       return strapi.services.post.isPublish(comment.post);
     });

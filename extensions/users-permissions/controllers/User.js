@@ -24,6 +24,9 @@ const UserNew = {
     }
 
     await User.find(ctx, next, {populate});
+    if (ctx.body) {
+      ctx.body = ctx.body.filter(v => !!v);
+    }
   },
 
   async me(ctx) {

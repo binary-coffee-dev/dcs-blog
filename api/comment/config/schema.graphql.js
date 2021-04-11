@@ -15,7 +15,7 @@ module.exports = {
   `,
   query: `
     captcha: CaptchaSchema!
-    recentComments: [Comment]!
+    recentComments(limit: Int): [Comment]!
   `,
   mutation: 'createCommentByCaptcha(input: createCommentByCaptchaInput): createCommentPayload',
   resolver: {
