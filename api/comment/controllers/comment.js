@@ -6,11 +6,12 @@ const Request = require('request');
 const moment = require('moment-timezone');
 moment.locale('es_ES');
 
+const MAX_RECENT_COMMENTS = 15;
+
 /**
  * Read the documentation (https://strapi.io/documentation/3.0.0-beta.x/concepts/controllers.html#core-controllers)
  * to customize this controller
  */
-
 module.exports = {
 
   /**
@@ -67,6 +68,7 @@ module.exports = {
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
       const postTitle = post.title;
 
+      // toDo 11.04.21: refactor this code, see issue #138
       const date = moment(comment.publishedAt);
       const msg = '*--- NEW COMMENT ---*\n'
         + '*Date:* ' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n'
@@ -89,7 +91,11 @@ module.exports = {
   },
 
   async recentComments(ctx) {
-    const comments = await strapi.services.comment.recentComments();
+    let limit;
+    if (ctx.params && ctx.params._limit) {
+      limit = Math.min(ctx.params._limit, MAX_RECENT_COMMENTS);
+    }
+    const comments = await strapi.services.comment.recentComments(limit);
     ctx.send(sanitizeEntity(comments, {model: strapi.models.comment}));
   }
 };

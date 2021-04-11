@@ -15,7 +15,7 @@ const expect = chai.expect;
 const QUERY_GET_RECENT_COMMENTS = {
   operationName: null,
   // language=GraphQL
-  query: 'query{\n  recentComments {\n    id\n    body\n    createdAt\n    post {\n      name\n      id\n    }\n    user {\n      id\n      username\n      avatarUrl\n    }\n  }\n}'
+  query: 'query ($limit: Int){\n  recentComments (limit: $limit) {\n    id\n    body\n    createdAt\n    post {\n      name\n      id\n    }\n    user {\n      id\n      username\n      avatarUrl\n    }\n  }\n}'
 };
 
 describe('Get recent comments INTEGRATION', () => {
@@ -46,12 +46,12 @@ describe('Get recent comments INTEGRATION', () => {
     const res = await new Promise(resolve => {
       chai.request(strapi.server)
         .post('/graphql')
-        .send(QUERY_GET_RECENT_COMMENTS)
+        .send({...QUERY_GET_RECENT_COMMENTS, variables: {limit: 8}})
         .end((err, res) => resolve(res));
     });
 
     const comments = res.body.data.recentComments;
-    expect(comments.length).to.be.equal(15);
+    expect(comments.length).to.be.equal(8);
     expect(comments[0].user.id.toString()).to.be.equal(user._id.toString());
     expect(comments[0].post.id.toString()).to.be.equal(post._id.toString());
   });
