@@ -70,7 +70,6 @@ module.exports = {
 
   async findOneByName(ctx, name) {
     const post = await strapi.models.post.findOne({name}).populate(['author', 'banner']);
-    console.log(post);
     if (post) {
       if (
         this.isPublish(post) ||
