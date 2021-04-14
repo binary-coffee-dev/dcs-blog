@@ -21,9 +21,11 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   let posts = [];
 
   let authUser;
+  let admin;
 
   before(async () => {
     authUser = await createUser({strapi});
+    admin = await createUser({strapi, roleType: 'administrator'});
   });
 
   after(async () => {
@@ -68,5 +70,24 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
       })
       .end((err, res) => err ? reject(err) : resolve(res)));
     expect(res.body.errors.length).to.be.equal(1);
+  });
+
+  it('should not limit post for admins', async () => {
+    const jwt = generateJwt(strapi, admin);
+    for (let i = 0; i < 10; i++) {
+      const res = await new Promise((resolve, reject) => chai.request(strapi.server)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({
+          ...MUTATION_CREATE_POST, variables: {
+            body: randomName(100),
+            description: randomName(100),
+            title: randomName(15),
+            enable: true
+          }
+        })
+        .end((err, res) => err ? reject(err) : resolve(res)));
+      expect(!!res.body.errors).to.be.false;
+    }
   });
 });

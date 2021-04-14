@@ -26,11 +26,13 @@ function createFile() {
 
 describe('Limit uploads per day INTEGRATION', () => {
   let user;
+  let admin;
   let mockProvider;
   let provider;
 
   before(async () => {
     user = await createUser({strapi});
+    admin = await createUser({strapi, roleType: 'administrator'});
     removeFile();
     createFile();
 
@@ -69,5 +71,18 @@ describe('Limit uploads per day INTEGRATION', () => {
       .attach('files', FILEPATH, 'image6.png')
       .end((err, res) => err ? reject(err) : resolve(res)));
     expect(res.status).to.be.equal(403);
+  });
+
+  it('should not limit the uploads to the admins', async () => {
+    const jwt = generateJwt(strapi, admin);
+    for (let i = 0; i < 20; i++) {
+      const res = await new Promise((resolve, reject) => chai.request(strapi.server)
+        .post('/upload')
+        .set('Authorization', `Bearer ${jwt}`)
+        .set('Content-Type', 'image/png')
+        .attach('files', FILEPATH, `image${i}.png`)
+        .end((err, res) => err ? reject(err) : resolve(res)));
+      expect(res.status).to.be.equal(200);
+    }
   });
 });

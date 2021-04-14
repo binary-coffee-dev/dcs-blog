@@ -21,10 +21,12 @@ const MUTATION_CREATE_COMMENT = {
 
 describe('Create comments INTEGRATION', () => {
   let user;
+  let admin;
   let post;
 
   before(async () => {
     user = await createUser({strapi});
+    admin = await createUser({strapi, roleType: 'administrator'});
     post = await createPost(strapi);
   });
 
@@ -58,5 +60,20 @@ describe('Create comments INTEGRATION', () => {
         .end((err, res) => err ? reject(err) : resolve(res));
     });
     expect(res.body.errors[0].message).to.be.equal('Limit of comments by post');
+  });
+
+  it('should not limit the comments to the admin role', async () => {
+    const jwt = generateJwt(strapi, admin);
+
+    for (let i = 0; i < 40; i++) {
+      const res = await new Promise((resolve, reject) => {
+        chai.request(strapi.server)
+          .post('/graphql')
+          .set('Authorization', `Bearer ${jwt}`)
+          .send({...MUTATION_CREATE_COMMENT, variables: {body: randomName(100), post: post.id}})
+          .end((err, res) => err ? reject(err) : resolve(res));
+      });
+      expect(!!res.body.errors).to.be.false;
+    }
   });
 });
