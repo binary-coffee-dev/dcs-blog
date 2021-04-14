@@ -53,7 +53,6 @@ describe('Get feed by username INTEGRATION', () => {
       .get(`/posts/feed/${authUser.username}/json1`)
       .end((err, res) => err ? reject(err) : resolve(res)));
 
-    console.log(res.body);
     expect(!!res.body).to.be.true;
     expect(res.body.items.length).to.be.equal(5);
   });

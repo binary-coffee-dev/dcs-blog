@@ -53,7 +53,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
           }
         })
         .end((err, res) => err ? reject(err) : resolve(res)));
-      console.log(res.body)
       expect(!!res.body.errors).to.be.false;
     }
     const res = await new Promise((resolve, reject) => chai.request(strapi.server)
@@ -68,7 +67,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
         }
       })
       .end((err, res) => err ? reject(err) : resolve(res)));
-    console.log(res.body)
     expect(res.body.errors.length).to.be.equal(1);
   });
 });
