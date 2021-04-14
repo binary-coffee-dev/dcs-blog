@@ -11,6 +11,7 @@ module.exports = async (ctx, next) => {
     const post = await strapi.services.post.findOne({id: ctx.params.id});
     if (Boolean(post.author) && post.author.id === ctx.state.user.id) {
       delete ctx.request.body.tags;
+      delete ctx.request.body.author;
       return await next();
     }
   }

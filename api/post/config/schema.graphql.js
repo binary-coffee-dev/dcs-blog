@@ -20,7 +20,6 @@ module.exports = {
       createPost: {
         resolver: 'application::post.post.create',
         policies: [
-          'global::createPost',
           'canPublishPost',
           'canCreatePost'
         ]
@@ -28,7 +27,7 @@ module.exports = {
       updatePost: {
         resolver: 'application::post.post.update',
         policies: [
-          'global::canModifyPost',
+          'canModifyPost',
           'canPublishPost'
         ]
       }

@@ -36,16 +36,14 @@
       "method": "GET",
       "path": "/posts/feed/:username/:format",
       "handler": "Post.feedByUsername",
-      "config": {
-        "policies": ["global::disable"]
-      }
+      "config": {}
     },
     {
       "method": "GET",
       "path": "/posts/feed/:format",
       "handler": "Post.feed",
       "config": {
-        "policies": ["global::disable"]
+        "policies": []
       }
     },
     {
