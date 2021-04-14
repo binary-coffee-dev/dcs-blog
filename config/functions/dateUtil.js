@@ -11,4 +11,4 @@ module.exports = {
     date.setDate(date.getDate() + 1);
     return date;
   }
-}
+};

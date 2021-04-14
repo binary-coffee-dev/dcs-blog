@@ -15,7 +15,7 @@ module.exports = async (ctx, next) => {
     });
     if (postCount >= MAX_NUMBER_OF_POST) {
       ctx.forbidden('Limit of posts by user');
-      throw new Error("Limit of posts by user");
+      throw new Error('Limit of posts by user');
     }
     // set the current session as author of the post
     ctx.request.body.author = ctx.state.user.id;

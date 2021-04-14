@@ -15,7 +15,8 @@ const FILEPATH = path.join(__dirname, FILENAME);
 function removeFile() {
   try {
     fs.unlinkSync(FILEPATH);
-  } catch (ignore) {
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -65,7 +66,7 @@ describe('Limit uploads per day INTEGRATION', () => {
       .post('/upload')
       .set('Authorization', `Bearer ${jwt}`)
       .set('Content-Type', 'image/png')
-      .attach('files', FILEPATH, `image6.png`)
+      .attach('files', FILEPATH, 'image6.png')
       .end((err, res) => err ? reject(err) : resolve(res)));
     expect(res.status).to.be.equal(403);
   });

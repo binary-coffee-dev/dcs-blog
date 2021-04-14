@@ -18,5 +18,5 @@ module.exports = async (ctx, next) => {
     }
   }
   ctx.forbidden('Limit of comments by post');
-  throw new Error("Limit of comments by post");
+  throw new Error('Limit of comments by post');
 };
