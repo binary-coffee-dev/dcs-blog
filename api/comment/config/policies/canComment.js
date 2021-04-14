@@ -16,7 +16,8 @@ module.exports = async (ctx, next) => {
     if (commentsCount < 20) {
       return await next();
     }
+    ctx.forbidden('Limit of comments by post');
+    throw new Error('Limit of comments by post');
   }
-  ctx.forbidden('Limit of comments by post');
-  throw new Error('Limit of comments by post');
+  await next();
 };
