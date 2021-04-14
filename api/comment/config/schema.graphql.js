@@ -28,6 +28,10 @@ module.exports = {
       }
     },
     Mutation: {
+      createComment: {
+        resolver: 'application::comment.comment.create',
+        policies: ['canComment']
+      },
       createCommentByCaptcha: {
         resolver: 'application::comment.comment.createByCaptcha'
       }

@@ -4,26 +4,32 @@
       "method": "GET",
       "path": "/posts",
       "handler": "Post.find",
-      "config": {}
+      "config": {
+        "policies": ["global::disable"]
+      }
     },
     {
       "method": "GET",
       "path": "/posts/count",
       "handler": "Post.count",
-      "config": {}
+      "config": {
+        "policies": ["global::disable"]
+      }
     },
     {
       "method": "GET",
       "path": "/posts/name/:name/",
       "handler": "Post.findOneByName",
-      "config": {}
+      "config": {
+        "policies": ["global::disable"]
+      }
     },
     {
       "method": "GET",
       "path": "/posts/related/:id",
       "handler": "Post.findSimilarPosts",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -36,34 +42,32 @@
       "method": "GET",
       "path": "/posts/feed/:format",
       "handler": "Post.feed",
-      "config": {}
+      "config": {
+        "policies": []
+      }
     },
     {
       "method": "POST",
       "path": "/posts",
       "handler": "Post.create",
       "config": {
-        "policies": [
-          "global::createPost",
-          "canPublishPost"
-        ]
+        "policies": ["global::disable"]
       }
     },
     {
       "method": "GET",
       "path": "/posts/:id",
       "handler": "Post.findOne",
-      "config": {}
+      "config": {
+        "policies": ["global::disable"]
+      }
     },
     {
       "method": "PUT",
       "path": "/posts/:id",
       "handler": "Post.update",
       "config": {
-        "policies": [
-          "global::canModifyPost",
-          "canPublishPost"
-        ]
+        "policies": ["global::disable"]
       }
     },
     {
@@ -71,9 +75,7 @@
       "path": "/posts/:id",
       "handler": "Post.delete",
       "config": {
-        "policies": [
-          "global::canModifyPost"
-        ]
+        "policies": ["global::disable"]
       }
     }
   ]

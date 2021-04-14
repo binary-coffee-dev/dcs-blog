@@ -20,14 +20,14 @@ module.exports = {
       createPost: {
         resolver: 'application::post.post.create',
         policies: [
-          'global::createPost',
-          'canPublishPost'
+          'canPublishPost',
+          'canCreatePost'
         ]
       },
       updatePost: {
         resolver: 'application::post.post.update',
         policies: [
-          'global::canModifyPost',
+          'canModifyPost',
           'canPublishPost'
         ]
       }

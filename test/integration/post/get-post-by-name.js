@@ -59,7 +59,6 @@ describe('Get post by name INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY_GET_POST_BY_NAME)
       .end((err, res) => {
-        console.log(res.body.data.postByName);
         expect(!!res.body.data.postByName).to.be.true;
         expect(res.body.data.postByName.author.id).to.equal(authUserOwner.id);
         expect(res.body.data.postByName.name).to.equal('this-is-a-test-yes');

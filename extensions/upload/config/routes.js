@@ -10,6 +10,15 @@ routes.forEach(route => {
       ]
     };
   }
+  if (route.handler === 'Upload.upload') {
+    route.config = {
+      ...route.config,
+      policies: [
+        ...route.config.policies,
+        'canUpload'
+      ]
+    };
+  }
 });
 
 module.exports = {routes};

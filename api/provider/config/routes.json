@@ -5,7 +5,7 @@
       "path": "/providers",
       "handler": "provider.find",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -13,7 +13,7 @@
       "path": "/providers/count",
       "handler": "provider.count",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -21,7 +21,7 @@
       "path": "/providers/:id",
       "handler": "provider.findOne",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -29,7 +29,7 @@
       "path": "/providers",
       "handler": "provider.create",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -37,7 +37,7 @@
       "path": "/providers/:id",
       "handler": "provider.update",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -45,7 +45,7 @@
       "path": "/providers/:id",
       "handler": "provider.delete",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     }
   ]

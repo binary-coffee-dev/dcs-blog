@@ -69,21 +69,23 @@ module.exports = {
       const postTitle = post.title;
 
       // toDo 11.04.21: refactor this code, see issue #138
-      const date = moment(comment.publishedAt);
-      const msg = '*--- NEW COMMENT ---*\n'
-        + '*Date:* ' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n'
-        + '*Post:* ' + '[' + postTitle + ']' + '(' + postUrl + ')' + '\n'
-        + '*User:* ' + comment.user.username + '\n'
-        + '*Comment:* ' + '`' + comment.body + '`' + '\n\n';
+      if (strapi.config.environment !== 'test') {
+        const date = moment(comment.publishedAt);
+        const msg = '*--- NEW COMMENT ---*\n'
+          + '*Date:* ' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n'
+          + '*Post:* ' + '[' + postTitle + ']' + '(' + postUrl + ')' + '\n'
+          + '*User:* ' + comment.user.username + '\n'
+          + '*Comment:* ' + '`' + comment.body + '`' + '\n\n';
 
-      Request.post({
-        'headers': {'content-type': 'application/json'},
-        'url': 'https://botnotifier.binary-coffee.dev/notify/channel',
-        'body': JSON.stringify({
-          'Message': msg,
-          'ChannelName': 'bcStaffs'
-        })
-      });
+        Request.post({
+          'headers': {'content-type': 'application/json'},
+          'url': 'https://botnotifier.binary-coffee.dev/notify/channel',
+          'body': JSON.stringify({
+            'Message': msg,
+            'ChannelName': 'bcStaffs'
+          })
+        });
+      }
 
       return comment;
     }

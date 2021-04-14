@@ -48,13 +48,12 @@ describe('Get feed by username INTEGRATION', () => {
     await deleteUser(strapi, authUser);
   });
 
-  it('should get the feed by username', (done) => {
-    chai.request(strapi.server)
+  it('should get the feed by username', async () => {
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
       .get(`/posts/feed/${authUser.username}/json1`)
-      .end((err, res) => {
-        expect(!!res.body).to.be.true;
-        expect(res.body.items.length).to.be.equal(5);
-        done();
-      });
+      .end((err, res) => err ? reject(err) : resolve(res)));
+
+    expect(!!res.body).to.be.true;
+    expect(res.body.items.length).to.be.equal(5);
   });
 });

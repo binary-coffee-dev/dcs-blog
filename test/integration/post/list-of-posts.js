@@ -30,6 +30,9 @@ describe('Post list (dashboard list) INTEGRATION', () => {
   let adminUser;
 
   before(async () => {
+
+    await strapi.models.post.deleteMany({});
+
     posts.push(await strapi.models.post.create({
       title: 'TITLE 1',
       name: randomName(),
