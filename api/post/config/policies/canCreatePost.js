@@ -11,7 +11,7 @@ module.exports = async (ctx, next) => {
     const nextDay = strapi.config.functions.dateUtil.getEndDay();
     const postCount = await strapi.models.post.count({
       createdAt: {$gte: startOfDay, $lt: nextDay},
-      author: ctx.request.body.post
+      author: ctx.state.user
     });
     console.log(postCount)
     if (postCount >= MAX_NUMBER_OF_POST) {
