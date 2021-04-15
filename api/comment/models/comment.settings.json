@@ -1,12 +1,15 @@
 {
+  "kind": "collectionType",
   "connection": "default",
   "collectionName": "comments",
   "info": {
-    "name": "Comment"
+    "name": "Comment",
+    "description": ""
   },
   "options": {
     "increments": true,
-    "timestamps": true
+    "timestamps": true,
+    "draftAndPublish": false
   },
   "attributes": {
     "body": {

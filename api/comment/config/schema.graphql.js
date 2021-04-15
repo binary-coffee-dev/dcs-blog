@@ -28,6 +28,10 @@ module.exports = {
       }
     },
     Mutation: {
+      deleteComment: {
+        resolver: 'application::comment.comment.delete',
+        policies: ['canRemove']
+      },
       createComment: {
         resolver: 'application::comment.comment.create',
         policies: ['canComment']
