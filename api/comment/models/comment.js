@@ -11,6 +11,10 @@ module.exports = {
       if (attrs && attrs.post) {
         await strapi.services.post.updateComments(attrs.post.id);
       }
+    },
+    // After comment is created
+    afterCreate: async (model) => {
+      await strapi.services.post.updateComments(model.post);
     }
   }
 };

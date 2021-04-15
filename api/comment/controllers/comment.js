@@ -62,7 +62,6 @@ module.exports = {
     };
     if (obj.body && obj.post && obj.user) {
       const comment = await strapi.services.comment.create(obj);
-      await strapi.services.post.updateComments(comment.post);
 
       const post = await strapi.models.post.findOne({_id: comment.post});
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
