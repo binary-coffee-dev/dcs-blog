@@ -2,7 +2,6 @@
 
 const {sanitizeEntity} = require('strapi-utils');
 const svgCaptcha = require('svg-captcha');
-const Request = require('request');
 const moment = require('moment-timezone');
 moment.locale('es_ES');
 

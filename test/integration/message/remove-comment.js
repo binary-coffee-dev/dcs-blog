@@ -14,13 +14,13 @@ const QUERY_COMMENTS_BY_POST = {
   operationName: null,
   // language=GraphQL
   query: 'query ($postId: ID){\n  commentsConnection(\n    sort: "publishedAt:desc"\n    limit: 100\n    start: 0\n    where: {post: $postId}\n  ){\n    values {\n      id\n      body\n      publishedAt\n      name\n      user {\n        username\n        avatarUrl\n        role { name }\n      }\n    }\n    aggregate {\n      count\n    }\n  }\n}'
-}
+};
 
 const MUTATION_REMOVE_COMMENT = {
   operationName: null,
   // language=GraphQL
   query: 'mutation ($id: ID!){\n  deleteComment(input: {where: {id: $id}}){\n    comment {\n      id\n    }\n  }\n}'
-}
+};
 
 const MUTATION_CREATE_COMMENT = {
   operationName: null,
@@ -83,7 +83,7 @@ describe('Remove comments INTEGRATION', () => {
 
   it('should remove a comment from an admin', async () => {
     const user2 = await createUser({strapi, roleType: 'administrator'});
-    let post2 = await createPost(strapi, {user})
+    let post2 = await createPost(strapi, {user});
     const jwt = generateJwt(strapi, user2);
 
     const res = await new Promise((resolve, reject) => chai.request(strapi.server)

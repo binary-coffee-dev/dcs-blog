@@ -7,7 +7,7 @@
 module.exports = {
   lifecycles: {
     // After destroying a value.
-    afterDelete: async (model, attrs) => {
+    afterDelete: async (model) => {
       await strapi.services.post.updateComments(model.post);
     },
     // After comment is created
