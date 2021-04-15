@@ -30,14 +30,14 @@ describe('Edit comment INTEGRATION', () => {
   it('should edit a comment from the owner', async () => {
     const NEW_BODY = randomName();
     const jwt = generateJwt(strapi, user);
-    await new Promise((resolve, reject) => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_UPDATE_COMMENT, variables: {body: NEW_BODY, id: comment.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    comment = await strapi.models.comment.findOne({_id: comment.id});
+    comment = await strapi.models.comment.findOne({_id: res.body.data.updateComment.comment.id});
     expect(comment.body).to.be.equal(NEW_BODY);
   });
 
@@ -60,14 +60,14 @@ describe('Edit comment INTEGRATION', () => {
     const NEW_BODY = randomName();
     const user2 = await createUser({strapi, roleType: 'staff'});
     const jwt = generateJwt(strapi, user2);
-    await new Promise((resolve, reject) => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_UPDATE_COMMENT, variables: {body: NEW_BODY, id: comment.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    comment = await strapi.models.comment.findOne({_id: comment.id});
+    comment = await strapi.models.comment.findOne({_id: res.body.data.updateComment.comment.id});
     expect(comment.body).to.be.equal(NEW_BODY);
   });
 });
