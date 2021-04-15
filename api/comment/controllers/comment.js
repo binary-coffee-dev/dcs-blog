@@ -2,7 +2,6 @@
 
 const {sanitizeEntity} = require('strapi-utils');
 const svgCaptcha = require('svg-captcha');
-const Request = require('request');
 const moment = require('moment-timezone');
 moment.locale('es_ES');
 
@@ -62,34 +61,32 @@ module.exports = {
     };
     if (obj.body && obj.post && obj.user) {
       const comment = await strapi.services.comment.create(obj);
-      await strapi.services.post.updateComments(comment.post);
 
       const post = await strapi.models.post.findOne({_id: comment.post});
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
       const postTitle = post.title;
 
-      // toDo 11.04.21: refactor this code, see issue #138
       if (strapi.config.environment !== 'test') {
-        const date = moment(comment.publishedAt);
         const msg = '*--- NEW COMMENT ---*\n'
-          + '*Date:* ' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n'
+          + '*Date:* ' + moment(comment.publishedAt).tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n'
           + '*Post:* ' + '[' + postTitle + ']' + '(' + postUrl + ')' + '\n'
           + '*User:* ' + comment.user.username + '\n'
           + '*Comment:* ' + '`' + comment.body + '`' + '\n\n';
 
-        Request.post({
-          'headers': {'content-type': 'application/json'},
-          'url': 'https://botnotifier.binary-coffee.dev/notify/channel',
-          'body': JSON.stringify({
-            'Message': msg,
-            'ChannelName': 'bcStaffs'
-          })
-        });
+        await strapi.config.functions.sendBotNotification(strapi, {message: msg});
       }
 
       return comment;
     }
     return new Error('invalid-data');
+  },
+
+  async update(ctx) {
+    if (ctx.request.body.body && ctx.params.id) {
+      const comment = await strapi.models.comment.update({_id: ctx.params.id}, {body: ctx.request.body.body});
+      return sanitizeEntity(comment, {model: strapi.models.comment});
+    }
+    throw new Error('invalid data');
   },
 
   async recentComments(ctx) {
