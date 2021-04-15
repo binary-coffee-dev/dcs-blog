@@ -83,7 +83,11 @@ module.exports = {
   },
 
   async update(ctx) {
-
+    if (ctx.request.body.body && ctx.params.id) {
+      const comment = await strapi.models.comment.update({_id: ctx.params.id}, {body: ctx.request.body.body});
+      return sanitizeEntity(comment, {model: strapi.models.comment});
+    }
+    throw new Error('invalid data');
   },
 
   async recentComments(ctx) {

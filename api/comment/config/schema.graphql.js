@@ -32,6 +32,10 @@ module.exports = {
         resolver: 'application::comment.comment.create',
         policies: ['canComment']
       },
+      updateComment: {
+        resolver: 'application::comment.comment.update',
+        policies: ['canUpdateComment']
+      },
       createCommentByCaptcha: {
         resolver: 'application::comment.comment.createByCaptcha'
       }
