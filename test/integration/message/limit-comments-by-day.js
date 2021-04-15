@@ -10,7 +10,6 @@ const createComment = require('../../helpers/create-comment');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 
 chai.use(chaiHttp);
-
 const expect = chai.expect;
 
 const MUTATION_CREATE_COMMENT = {

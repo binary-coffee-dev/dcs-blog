@@ -83,6 +83,10 @@ module.exports = {
     return new Error('invalid-data');
   },
 
+  async update(ctx) {
+
+  },
+
   async recentComments(ctx) {
     let limit;
     if (ctx.params && ctx.params._limit) {
