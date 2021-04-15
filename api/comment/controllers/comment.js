@@ -68,23 +68,14 @@ module.exports = {
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
       const postTitle = post.title;
 
-      // toDo 11.04.21: refactor this code, see issue #138
       if (strapi.config.environment !== 'test') {
-        const date = moment(comment.publishedAt);
         const msg = '*--- NEW COMMENT ---*\n'
-          + '*Date:* ' + date.tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n'
+          + '*Date:* ' + moment(comment.publishedAt).tz('America/Havana').format('DD MMMM hh:mm:ss A') + '\n'
           + '*Post:* ' + '[' + postTitle + ']' + '(' + postUrl + ')' + '\n'
           + '*User:* ' + comment.user.username + '\n'
           + '*Comment:* ' + '`' + comment.body + '`' + '\n\n';
 
-        Request.post({
-          'headers': {'content-type': 'application/json'},
-          'url': 'https://botnotifier.binary-coffee.dev/notify/channel',
-          'body': JSON.stringify({
-            'Message': msg,
-            'ChannelName': 'bcStaffs'
-          })
-        });
+        await strapi.config.functions.sendBotNotification(strapi, {message: msg});
       }
 
       return comment;
