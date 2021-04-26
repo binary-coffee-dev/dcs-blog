@@ -5,7 +5,6 @@
       "path": "/ads",
       "handler": "ad.find",
       "config": {
-        "policies": ["global::disable"]
       }
     },
     {
@@ -13,7 +12,6 @@
       "path": "/ads/count",
       "handler": "ad.count",
       "config": {
-        "policies": ["global::disable"]
       }
     },
     {
@@ -21,7 +19,6 @@
       "path": "/ads/:id",
       "handler": "ad.findOne",
       "config": {
-        "policies": ["global::disable"]
       }
     },
     {
@@ -29,7 +26,6 @@
       "path": "/ads",
       "handler": "ad.create",
       "config": {
-        "policies": ["global::disable"]
       }
     },
     {
@@ -37,7 +33,6 @@
       "path": "/ads/:id",
       "handler": "ad.update",
       "config": {
-        "policies": ["global::disable"]
       }
     },
     {
@@ -45,7 +40,6 @@
       "path": "/ads/:id",
       "handler": "ad.delete",
       "config": {
-        "policies": ["global::disable"]
       }
     }
   ]
