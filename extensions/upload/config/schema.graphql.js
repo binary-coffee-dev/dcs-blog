@@ -18,6 +18,12 @@ module.exports = {
       countUploads: {
         resolver: 'plugins::upload.upload.count'
       }
+    },
+    Mutation: {
+      deleteFile: {
+        resolver: 'plugins::upload.upload.destroy',
+        policies: ['canRemoveFile']
+      }
     }
   }
 };

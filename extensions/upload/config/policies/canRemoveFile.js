@@ -5,14 +5,15 @@
  */
 
 module.exports = async (ctx, next) => {
-  if (strapi.services.post.isAdmin(ctx) || strapi.services.post.isStaff(ctx)) {
+  if (strapi.services.post.isAdmin(ctx)) {
     return await next();
   }
   if (ctx.state.user) {
-    const image = await strapi.services.image.findOne({user: ctx.state.user});
+    const image = await strapi.services.image.findOne({user: ctx.state.user, image: [ctx.params.id]});
     if (image) {
       return await next();
     }
   }
-  return ctx.forbidden();
+  ctx.forbidden();
+  throw new Error('Can not remove file');
 };
