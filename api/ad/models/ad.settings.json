@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ads",
+  "info": {
+    "name": "Ad",
+    "description": ""
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "country": {
+      "type": "enumeration",
+      "enum": [
+        "AR",
+        "CO",
+        "CL",
+        "CU",
+        "DE",
+        "ES",
+        "MX",
+        "PE",
+        "US",
+        "EC"
+      ]
+    },
+    "code": {
+      "type": "text"
+    }
+  }
+}
