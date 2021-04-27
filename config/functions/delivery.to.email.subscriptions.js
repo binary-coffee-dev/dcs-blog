@@ -43,6 +43,16 @@ async function getHtmlWithPosts(posts) {
   });
 }
 
+function minifyHtml(html) {
+  return minify(
+    html, 
+    {
+      collapseWhitespace: true, 
+      removeComments: true, 
+      removeTagWhitespace: true
+    });
+}
+
 function sendEmails(verifySubscribers, subject, html) {
   const BCC_COUNT = 50;
   const SUBSCRIBER_RECIPIENT = 'subscribers@binary-coffee.dev';
@@ -65,7 +75,7 @@ module.exports = {
     if (posts.length === 0)
       return;
     let html = await getHtmlWithPosts(posts);
-    html = minify(html, {collapseWhitespace: true, removeComments: true, removeTagWhitespace: true});
+    html = minifyHtml(html);
     const verifySubscribers = await getVerifiedAndEnableSubscribers();
     sendEmails(verifySubscribers, subject, html);
   }
