@@ -1,28 +1,15 @@
-const fs = require('fs');
 const path = require('path');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const createUser = require('../../helpers/create-user');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
+const {createFile, removeFile} = require('../../helpers/fileUtils');
 
 chai.use(chaiHttp);
 const expect = chai.expect;
 
-const FILENAME = 'tmp.png';
-const FILEPATH = path.join(__dirname, FILENAME);
-
-function removeFile() {
-  try {
-    fs.unlinkSync(FILEPATH);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-function createFile() {
-  fs.writeFileSync(FILEPATH, 'temporal data');
-}
+const FILEPATH = path.join(__dirname, 'tmp.png');
 
 describe('Limit uploads per day INTEGRATION', () => {
   let user;
@@ -33,8 +20,8 @@ describe('Limit uploads per day INTEGRATION', () => {
   before(async () => {
     user = await createUser({strapi});
     admin = await createUser({strapi, roleType: 'administrator'});
-    removeFile();
-    createFile();
+    removeFile(FILEPATH);
+    createFile(FILEPATH);
 
     mockProvider = {
       upload: () => Promise.resolve(),
@@ -45,7 +32,7 @@ describe('Limit uploads per day INTEGRATION', () => {
   });
 
   after(async () => {
-    removeFile();
+    removeFile(FILEPATH);
     strapi.plugins.upload.provider = provider;
   });
 
