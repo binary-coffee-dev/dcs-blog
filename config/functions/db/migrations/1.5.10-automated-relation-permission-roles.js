@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  version: '1.5.9',
+  version: '1.5.10',
   description: 'Automated relation between permission and roles (comment model)',
   migrate: async () => {
     const writerRole = await strapi.plugins['users-permissions'].models.role.findOne({type: 'authenticated'});
