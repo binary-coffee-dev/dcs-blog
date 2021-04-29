@@ -42,9 +42,7 @@
       "method": "GET",
       "path": "/posts/feed/:format",
       "handler": "Post.feed",
-      "config": {
-        "policies": []
-      }
+      "config": {}
     },
     {
       "method": "POST",
