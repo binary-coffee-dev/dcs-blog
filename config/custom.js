@@ -6,6 +6,8 @@ module.exports = ({env}) => ({
   apiUrl: env('API_URL', 'https://api.binary-coffee.dev'),
   siteUrl: env('SITE_URL', 'https://binary-coffee.dev'),
 
+  feedArticlesLimit: env.int('FEED_ARTICLES_LIMIT', 15),
+
   googleClientId: env('GOOGLE_CLIENT_ID', ''),
   googleClientSecret: env('GOOGLE_CLIENT_SECRET', ''),
   githubClientId: env('GOOGLE_CLIENT_ID', ''),
