@@ -52,13 +52,13 @@
     ]
   },
   "author": {
-    "name": "A Strapi developer"
+    "name": "binary-coffee"
   },
   "strapi": {
     "uuid": "b06e5cbc-9b4c-4cb3-b08b-d3d7fb24241a"
   },
   "engines": {
-    "node": ">=10.0.0",
+    "node": ">=14.0.0",
     "npm": ">=6.0.0"
   },
   "license": "MIT"
