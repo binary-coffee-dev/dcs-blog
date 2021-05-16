@@ -20,7 +20,7 @@ describe('Get feed INTEGRATION', () => {
   before(async () => {
     authUser = await createUser({strapi});
 
-    PUBLISHED_ARTICLES += strapi.config.custom.feedArticlesLimit
+    PUBLISHED_ARTICLES += strapi.config.custom.feedArticlesLimit;
 
     for (let i = 0; i < PUBLISHED_ARTICLES; i++) {
       posts.push(await strapi.models.post.create({
