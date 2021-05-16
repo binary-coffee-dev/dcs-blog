@@ -14,6 +14,6 @@ module.exports = async (ctx, next) => {
       return await next();
     }
   }
-  ctx.forbidden();
+  ctx.forbidden('Can not remove file');
   throw new Error('Can not remove file');
 };
