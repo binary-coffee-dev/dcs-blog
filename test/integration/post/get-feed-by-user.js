@@ -15,10 +15,12 @@ describe('Get feed by username INTEGRATION', () => {
 
   let authUser;
 
-  const PUBLISHED_ARTICLES = 7;
+  let PUBLISHED_ARTICLES = 7;
 
   before(async () => {
     authUser = await createUser({strapi});
+
+    PUBLISHED_ARTICLES += strapi.config.custom.feedArticlesLimit;
 
     for (let i = 0; i < PUBLISHED_ARTICLES; i++) {
       posts.push(await strapi.models.post.create({
@@ -54,6 +56,6 @@ describe('Get feed by username INTEGRATION', () => {
       .end((err, res) => err ? reject(err) : resolve(res)));
 
     expect(!!res.body).to.be.true;
-    expect(res.body.items.length).to.be.equal(5);
+    expect(res.body.items.length).to.be.equal(strapi.config.custom.feedArticlesLimit);
   });
 });

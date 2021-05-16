@@ -77,6 +77,7 @@ describe('Remove images INTEGRATION', () => {
     const jwt2 = generateJwt(strapi, user2);
     const jwt = generateJwt(strapi, user);
 
+    // upload file
     const res = await new Promise((resolve, reject) => chai.request(strapi.server)
       .post('/upload')
       .set('Authorization', `Bearer ${jwt2}`)
@@ -88,6 +89,7 @@ describe('Remove images INTEGRATION', () => {
     let img = await strapi.models.image.findOne({image: [res.body[0].id]});
     expect(!!img).to.be.true;
 
+    // remove file
     await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')

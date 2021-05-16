@@ -15,10 +15,12 @@ describe('Get feed INTEGRATION', () => {
 
   let authUser;
 
-  const PUBLISHED_ARTICLES = 10;
+  let PUBLISHED_ARTICLES = 10;
 
   before(async () => {
     authUser = await createUser({strapi});
+
+    PUBLISHED_ARTICLES += strapi.config.custom.feedArticlesLimit;
 
     for (let i = 0; i < PUBLISHED_ARTICLES; i++) {
       posts.push(await strapi.models.post.create({
@@ -53,7 +55,7 @@ describe('Get feed INTEGRATION', () => {
       .get('/posts/feed/json1')
       .end((err, res) => {
         expect(!!res.body).to.be.true;
-        expect(res.body.items.length).to.be.equal(5);
+        expect(res.body.items.length).to.be.equal(strapi.config.custom.feedArticlesLimit);
         done();
       });
   });
