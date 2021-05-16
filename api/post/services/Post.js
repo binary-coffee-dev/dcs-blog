@@ -224,7 +224,7 @@ module.exports = {
       id: siteUrl,
       link: siteUrl,
       language: 'es',
-      image: `${strapi.config.custom.siteUrl}/favicon.png`,
+      image: `${strapi.config.custom.apiUrl}/favicon32x32.png`,
       copyright: 'All rights reserved 2019, dcs-community',
     });
   },
