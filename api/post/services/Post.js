@@ -194,7 +194,6 @@ module.exports = {
       title: post.title,
       id: `${siteUrl}/post/${post.name}`,
       link: `${siteUrl}/post/${post.name}`,
-      description: post.description,
       content: marked(post.body),
       author: [
         {

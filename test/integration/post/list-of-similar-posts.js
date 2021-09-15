@@ -13,7 +13,7 @@ const expect = chai.expect;
 const QUERY = {
   operationName: 'similarPosts',
   variables: {'id': '', 'limit': 10},
-  query: 'query similarPosts($id: ID!, $limit: Int) {\n  similarPosts(id: $id, limit: $limit) {\n    title\n    description\n    name\n    banner {\n      url\n      __typename\n    }\n    publishedAt\n    id\n    __typename\n  }\n}\n'
+  query: 'query similarPosts($id: ID!, $limit: Int) {\n  similarPosts(id: $id, limit: $limit) {\n    title\n    name\n    banner {\n      url\n      __typename\n    }\n    publishedAt\n    id\n    __typename\n  }\n}\n'
 };
 
 describe('Post list (dashboard list) INTEGRATION', () => {
@@ -31,7 +31,6 @@ describe('Post list (dashboard list) INTEGRATION', () => {
         title: 'TITLE 1',
         name: randomName(),
         body: 'SOME',
-        description: 'SOME 1',
         enable: true,
         publishedAt: new Date(new Date() - 10),
         author: authUser
@@ -44,7 +43,6 @@ describe('Post list (dashboard list) INTEGRATION', () => {
       title: 'TITLE 4',
       body: 'SOME',
       name: randomName(),
-      description: 'SOME 1',
       enable: true,
       author: authUser
     }));

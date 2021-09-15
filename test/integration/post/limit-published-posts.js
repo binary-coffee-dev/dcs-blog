@@ -14,7 +14,7 @@ const expect = chai.expect;
 
 const MUTATION_CREATE_POST = {
   operationName: null,
-  query: 'mutation ($title: String, $body: String, $description: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, description: $description, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
+  query: 'mutation ($title: String, $body: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
 };
 
 describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
@@ -49,7 +49,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
         .send({
           ...MUTATION_CREATE_POST, variables: {
             body: randomName(100),
-            description: randomName(100),
             title: randomName(15),
             enable: true
           }
@@ -63,7 +62,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
       .send({
         ...MUTATION_CREATE_POST, variables: {
           body: randomName(100),
-          description: randomName(100),
           title: randomName(15),
           enable: true
         }

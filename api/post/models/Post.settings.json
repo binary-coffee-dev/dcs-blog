@@ -23,10 +23,6 @@
       "plugin": "users-permissions",
       "model": "user"
     },
-    "description": {
-      "type": "text",
-      "maxLength": 300
-    },
     "banner": {
       "model": "file",
       "via": "related",
