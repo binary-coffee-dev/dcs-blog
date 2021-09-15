@@ -58,7 +58,7 @@ describe('Get more active users INTEGRATION', () => {
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
-          expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 2]._id.toString());
+          expect(topUsers[topLength - i - 1]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 2]._id.toString());
         }
 
         for (let i = 0; i < topLength; i++) {
@@ -81,7 +81,7 @@ describe('Get more active users INTEGRATION', () => {
         const topLength = topUsers.length;
 
         for (let i = 0; i < topLength; i++) {
-          expect(topUsers[i]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 2]._id.toString());
+          expect(topUsers[topLength - i - 1]._id.toString()).to.be.equal(users[MAX_NUMBER - i - 2]._id.toString());
         }
 
         for (let i = 0; i < topLength; i++) {
