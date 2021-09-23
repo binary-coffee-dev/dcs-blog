@@ -28,6 +28,7 @@
           <td style="background-color:#fff;width: 100%">
             <% for (var i = 0; i < posts.length; i++) {%>
             <div
+              id="__article_item"
               style="flex-direction: row; box-sizing: border-box; display: flex; border-bottom: 1px solid rgba(0, 0, 0, .06); background-color: #fff; width: calc(100% - 48px); padding: 24px; text-decoration: none">
               <div>
                 <a href="<%= siteUrl + '/post/' + posts[i].name %>"
@@ -42,7 +43,7 @@
                 </div>
                 <span
                   style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem">
-                  <%= posts[i].description %>
+                  <%- posts[i].body.substr(0, Math.min(200, posts[i].body.length)) %>...
                 </span>
               </div>
             </div>

@@ -3,13 +3,21 @@
 const _ = require('lodash');
 const ejs = require('ejs');
 const minify = require('html-minifier').minify;
+const marked = require('marked');
 
+function cleanBody(body) {
+  return body.replace( /(<([^>]+)>)/ig, '')
+    .replace(/\r?\n|\r/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 async function getPublicPostsOfLastDays(previousDays) {
-  return await strapi
+  const posts = await strapi
     .services
     .post
     .getPublicPostsOfLastDays(previousDays);
+  return posts.map(post => ({...post, body: cleanBody(marked(post.body))}));
 }
 
 async function getVerifiedAndEnableSubscribers() {
@@ -45,10 +53,10 @@ async function getHtmlWithPosts(posts) {
 
 function minifyHtml(html) {
   return minify(
-    html, 
+    html,
     {
-      collapseWhitespace: true, 
-      removeComments: true, 
+      collapseWhitespace: true,
+      removeComments: true,
       removeTagWhitespace: true
     });
 }
@@ -78,5 +86,7 @@ module.exports = {
     html = minifyHtml(html);
     const verifySubscribers = await getVerifiedAndEnableSubscribers();
     sendEmails(verifySubscribers, subject, html);
-  }
+  },
+
+  cleanBody
 };

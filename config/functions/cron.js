@@ -11,6 +11,7 @@ const deliveryToEmailSubscriptions = require('./delivery.to.email.subscriptions'
  */
 module.exports = {
   '0 18 * * 5': async () => {
+    // Every Friday at 6pm
     await deliveryToEmailSubscriptions.send('Binary Coffee Weekly Posts', 7);
   }
 };
