@@ -80,8 +80,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
     posts.push(adminPost);
 
-    const res = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
-    const post = await getPostById(strapi, res.body.data.updatePost.post.id);
+    const postRes = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
+    const post = await getPostById(strapi, postRes.id);
 
     posts.push(post);
     expect(!!post.publishedAt).to.equal(true);
@@ -93,8 +93,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
     posts.push(adminPost);
 
-    const res = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
-    const post = await getPostById(strapi, res.body.data.updatePost.post.id);
+    const postRes = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
+    const post = await getPostById(strapi, postRes.id);
 
     posts.push(post);
     expect(!!post.publishedAt).to.equal(false);
@@ -106,8 +106,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
     posts.push(adminPost);
 
-    const res = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
-    const post = await getPostById(strapi, res.body.data.updatePost.post.id);
+    const postRes = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
+    const post = await getPostById(strapi, postRes.id);
 
     posts.push(post);
     expect(!!post.publishedAt).to.equal(false);
@@ -153,8 +153,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(!!post.publishedAt).to.equal(true);
 
     // update post without change title
-    let res = await updatePostRequest(strapi, chai, {id: post.id, title: post.title}, jwt);
-    post = await getPostById(strapi, res.body.data.updatePost.post.id);
+    postRes = await updatePostRequest(strapi, chai, {id: post.id, title: post.title}, jwt);
+    post = await getPostById(strapi, postRes.id);
 
     let links = await strapi.models.link.find({post: post.id});
 
@@ -162,8 +162,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(links.length).to.equal(1);
 
     // update with new title
-    res = await updatePostRequest(strapi, chai,{id: post.id, title: 'this is the new title'}, jwt);
-    post = await getPostById(strapi, res.body.data.updatePost.post.id);
+    postRes = await updatePostRequest(strapi, chai,{id: post.id, title: 'this is the new title'}, jwt);
+    post = await getPostById(strapi, postRes.id);
 
     links = await strapi.models.link.find({post: post.id});
 
@@ -171,7 +171,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(links.length).to.equal(2);
 
     // check if post can be requested with an old name
-    res = await new Promise((resolve, reject) => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
