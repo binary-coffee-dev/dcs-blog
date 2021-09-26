@@ -5,7 +5,6 @@ const createUser = require('../../helpers/create-user');
 const deleteUser = require('../../helpers/delete-user');
 const deletePost = require('../../helpers/delete-post');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
-const getPostById = require("../../helpers/get-post-by-id");
 
 chai.use(chaiHttp);
 
@@ -77,7 +76,6 @@ describe('Get post by name INTEGRATION', () => {
 
   it('should get the post by name the owner of the article', async () => {
     const jwt = generateJwt(strapi, authUserOwner);
-    console.log(postName)
     const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')
