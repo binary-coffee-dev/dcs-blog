@@ -25,12 +25,12 @@ describe('Post service', function () {
   });
 
   it('should convert vowels with accent', () => {
-    const name = Post.getNameFromTitle('Thís áis éan óexample ú ñ äëïöü');
+    const name = Post.getNameFromTitle('Thís   áis éan óexample ú ñ äëïöü');
     expect(name.substring(0, name.length - 5)).to.equal('this-ais-ean-oexample-u-n-aeiou');
   });
 
   it('should remove all not letters and numbers', () => {
-    const name = Post.getNameFromTitle('!Que, .pasa 08 )(**&%&*%?');
+    const name = Post.getNameFromTitle('!Que, .pasa    08 )(**&%&*%?');
     expect(name.substring(0, name.length - 5)).to.equal('que-pasa-08');
   });
 
@@ -59,5 +59,11 @@ describe('Post service', function () {
 
   it('should extract summary from article', function () {
     expect(cleanBody(marked(EXAMPLE_BODY))).to.equal(EXPECTED_BODY);
+  });
+
+  it('should test removeExtraSpaces function', function () {
+    expect(Post.removeExtraSpaces('   ')).to.be.equal('');
+    expect(Post.removeExtraSpaces('   some    ')).to.be.equal('some');
+    expect(Post.removeExtraSpaces('   some    some    ')).to.be.equal('some some');
   });
 });

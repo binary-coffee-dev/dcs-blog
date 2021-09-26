@@ -114,6 +114,10 @@ module.exports = {
     ctx.send(postToReturn);
   },
 
+  removeExtraSpaces(text) {
+    return text.replace(/ +/g, ' ').trim();
+  },
+
   getNameFromTitle: (title) => {
     title = title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     title = title.replace(/[^0-9a-z-A-Z ]/g, '').replace(/ +/, ' ');

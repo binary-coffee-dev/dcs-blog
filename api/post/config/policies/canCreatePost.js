@@ -6,6 +6,11 @@ const MAX_NUMBER_OF_POST = 5;
  * `canCreatePost` policy.
  */
 module.exports = async (ctx, next) => {
+  ctx.request.body.title = strapi.services.post.removeExtraSpaces(ctx.request.body.title);
+  if (ctx.request.body.title === '') {
+    ctx.forbidden('Empty title is not allowed');
+    throw new Error('Empty title is not allowed');
+  }
   if (!strapi.services.post.isAdmin(ctx)) {
     const startOfDay = strapi.config.functions.dateUtil.getStartDay();
     const nextDay = strapi.config.functions.dateUtil.getEndDay();

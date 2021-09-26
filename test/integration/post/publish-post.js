@@ -2,21 +2,16 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const createPostRequest = require('../../helpers/create-post-request');
+const updatePostRequest = require('../../helpers/update-post-request');
 const createUser = require('../../helpers/create-user');
 const deleteUser = require('../../helpers/delete-user');
 const deletePost = require('../../helpers/delete-post');
-const randomName = require('../../helpers/random-name');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 const getPostById = require('../../helpers/get-post-by-id');
 
 chai.use(chaiHttp);
 
 const expect = chai.expect;
-
-const MUTATION_UPDATE_POST = {
-  operationName: null,
-  query: 'mutation ($id: ID!, $title: String, $body: String, $enable: Boolean, $banner: ID, $tags: [ID], $publishedAt: DateTime) {\n  updatePost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, tags: $tags}, where: {id: $id}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
-};
 
 const QUERY_GET_POST_BY_NAME = {
   operationName: 'fetchPost',
@@ -85,7 +80,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
     posts.push(adminPost);
 
-    const res = await updatePost({id: adminPost.id}, jwt);
+    const res = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
     const post = await getPostById(strapi, res.body.data.updatePost.post.id);
 
     posts.push(post);
@@ -98,7 +93,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
     posts.push(adminPost);
 
-    const res = await updatePost({id: adminPost.id}, jwt);
+    const res = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
     const post = await getPostById(strapi, res.body.data.updatePost.post.id);
 
     posts.push(post);
@@ -111,11 +106,39 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
     posts.push(adminPost);
 
-    const res = await updatePost({id: adminPost.id}, jwt);
+    const res = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
     const post = await getPostById(strapi, res.body.data.updatePost.post.id);
 
     posts.push(post);
     expect(!!post.publishedAt).to.equal(false);
+  });
+
+  it('should not allow to publish a post with an empty title', async () => {
+    const jwt = generateJwt(strapi, adminUser);
+
+    let fail = false;
+    try {
+      await createPostRequest(strapi, chai, {title: ''}, jwt);
+      fail = true;
+    } catch (ignore) {
+      expect(ignore).to.exist;
+    }
+    expect(fail).to.be.equal(false, 'Expected error didn\'t thrown');
+  });
+
+  it('should not allow to edit a post with an empty title', async () => {
+    const jwt = generateJwt(strapi, adminUser);
+
+    const post = await createPostRequest(strapi, chai, {}, jwt);
+
+    let fail = false;
+    try {
+      await updatePostRequest(strapi, chai,{id: post.id, title: ''}, jwt);
+      fail = true;
+    } catch (ignore) {
+      expect(ignore).to.exist;
+    }
+    expect(fail).to.be.equal(false, 'Expected error didn\'t thrown');
   });
 
   it('should create and then update article and test the created links', async () => {
@@ -130,7 +153,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(!!post.publishedAt).to.equal(true);
 
     // update post without change title
-    let res = await updatePost({id: post.id, title: post.title}, jwt);
+    let res = await updatePostRequest(strapi, chai, {id: post.id, title: post.title}, jwt);
     post = await getPostById(strapi, res.body.data.updatePost.post.id);
 
     let links = await strapi.models.link.find({post: post.id});
@@ -139,7 +162,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(links.length).to.equal(1);
 
     // update with new title
-    res = await updatePost({id: post.id, title: 'this is the new title'}, jwt);
+    res = await updatePostRequest(strapi, chai,{id: post.id, title: 'this is the new title'}, jwt);
     post = await getPostById(strapi, res.body.data.updatePost.post.id);
 
     links = await strapi.models.link.find({post: post.id});
@@ -160,23 +183,3 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(res.body.data.postByName.name).to.equal(post.name);
   });
 });
-
-async function updatePost(variables, jwt) {
-  return new Promise((resolve, reject) => {
-    chai.request(strapi.server)
-      .post('/graphql')
-      .set('Authorization', `Bearer ${jwt}`)
-      .send({
-        ...MUTATION_UPDATE_POST, variables: {
-          enable: true,
-          title: randomName(),
-          body: '# fasdfasd f',
-          publishedAt: new Date(),
-          tags: ['5eb120d1e7134c0012f4d440'],
-          banner: null,
-          ...variables
-        }
-      })
-      .end((err, res) => err ? reject(err) : resolve(res));
-  });
-}
