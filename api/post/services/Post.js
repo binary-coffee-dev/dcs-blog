@@ -69,7 +69,8 @@ module.exports = {
   },
 
   async findOneByName(ctx, name) {
-    const post = await strapi.models.post.findOne({name}).populate(['author', 'banner']);
+    const link = await strapi.models.link.findOne({name});
+    const post = await strapi.models.post.findOne({_id: link.post}).populate(['author', 'banner']);
     if (post) {
       if (
         this.isPublish(post) ||
@@ -125,7 +126,10 @@ module.exports = {
         subVal += title[i];
       }
     }
-    return result + (result && subVal !== '' ? '-' : '') + subVal;
+    const randomTail = [...Array(5).keys()]
+      .map(() => 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 'abcdefghijklmnopqrstuvwxyz'.length)])
+      .reduce((p, v) => p + v, '');
+    return result + (result && subVal !== '' ? '-' : '') + subVal + randomTail;
   },
 
   async updateViews(post) {

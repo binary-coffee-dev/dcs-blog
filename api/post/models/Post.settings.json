@@ -62,6 +62,10 @@
     "opinions": {
       "via": "post",
       "collection": "opinion"
+    },
+    "links": {
+      "via": "post",
+      "collection": "link"
     }
   }
 }
