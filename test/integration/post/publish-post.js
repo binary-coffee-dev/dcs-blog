@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const createPost = require('../../helpers/create-post');
+const createPostRequest = require('../../helpers/create-post-request');
 const createUser = require('../../helpers/create-user');
 const deleteUser = require('../../helpers/delete-user');
 const deletePost = require('../../helpers/delete-post');
@@ -13,14 +13,18 @@ chai.use(chaiHttp);
 
 const expect = chai.expect;
 
-const MUTATION_CREATE_POST = {
-  operationName: null,
-  query: 'mutation ($title: String, $body: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
-};
-
 const MUTATION_UPDATE_POST = {
   operationName: null,
   query: 'mutation ($id: ID!, $title: String, $body: String, $enable: Boolean, $banner: ID, $tags: [ID], $publishedAt: DateTime) {\n  updatePost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, tags: $tags}, where: {id: $id}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
+};
+
+const QUERY_GET_POST_BY_NAME = {
+  operationName: 'fetchPost',
+  variables: {
+    id: 'this-is-a-test-yes'
+  },
+  // language=TEXT
+  query: 'query fetchPost($id: String!) {\n  postByName(name: $id) {\n    id\n    name\n    title\n    body\n    publishedAt\n    views\n    tags {\n      id\n      name\n      __typename\n    }\n    comments\n    banner {\n      url\n      __typename\n    }\n    author {\n      id\n      username\n      email\n      avatarUrl\n      page\n      __typename\n    }\n    tags {\n      name\n      __typename\n    }\n    __typename\n  }\n  likes:countOpinions(where: {post: $id, type: "like"})\n  userLike:countOpinions(where: {post: $id, type: "like", user: "current"})\n}\n'
 };
 
 describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
@@ -47,9 +51,9 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
   it('should create an article with the publishedAt attribute (admin user)', async () => {
     const jwt = generateJwt(strapi, adminUser);
-    const res = await createNewPost({title: 'The good one',}, jwt);
+    const postRes = await createPostRequest(strapi, chai, {title: 'The good one',}, jwt);
 
-    const post = await getPostById(strapi, res.body.data.createPost.post.id);
+    const post = await getPostById(strapi, postRes.id);
 
     posts.push(post);
     expect(!!post.publishedAt).to.equal(true);
@@ -57,9 +61,9 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
   it('should create an article without the publishedAt attribute (staff user)', async () => {
     const jwt = generateJwt(strapi, staffUser);
-    const res = await createNewPost({title: 'not work',}, jwt);
+    const postRes = await createPostRequest(strapi, chai, {title: 'not work',}, jwt);
 
-    const post = await getPostById(strapi, res.body.data.createPost.post.id);
+    const post = await getPostById(strapi, postRes.id);
 
     posts.push(post);
     expect(!!post.publishedAt).to.equal(false);
@@ -67,18 +71,19 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
   it('should create an article without the publishedAt attribute (auth user)', async () => {
     const jwt = generateJwt(strapi, authUser);
-    const res = await createNewPost({title: 'not work two',}, jwt);
+    const postRes = await createPostRequest(strapi, chai, {title: 'not work two',}, jwt);
 
-    const post = await getPostById(strapi, res.body.data.createPost.post.id);
+    const post = await getPostById(strapi, postRes.id);
 
     posts.push(post);
     expect(!!post.publishedAt).to.equal(false);
   });
 
   it('should update an article with the publishedAt attribute (admin user)', async () => {
-    const adminPost = await createPost(strapi, {author: authUser, publishedAt: null});
-    posts.push(adminPost);
     const jwt = generateJwt(strapi, adminUser);
+
+    const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
+    posts.push(adminPost);
 
     const res = await updatePost({id: adminPost.id}, jwt);
     const post = await getPostById(strapi, res.body.data.updatePost.post.id);
@@ -88,9 +93,10 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should update an article without the publishedAt attribute (staff user)', async () => {
-    const adminPost = await createPost(strapi, {author: authUser, publishedAt: null});
-    posts.push(adminPost);
     const jwt = generateJwt(strapi, staffUser);
+
+    const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
+    posts.push(adminPost);
 
     const res = await updatePost({id: adminPost.id}, jwt);
     const post = await getPostById(strapi, res.body.data.updatePost.post.id);
@@ -100,9 +106,10 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should update an article without the publishedAt attribute (auth user)', async () => {
-    const adminPost = await createPost(strapi, {author: authUser, publishedAt: null});
-    posts.push(adminPost);
     const jwt = generateJwt(strapi, authUser);
+
+    const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
+    posts.push(adminPost);
 
     const res = await updatePost({id: adminPost.id}, jwt);
     const post = await getPostById(strapi, res.body.data.updatePost.post.id);
@@ -114,15 +121,16 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   it('should create and then update article and test the created links', async () => {
     // create post
     const jwt = generateJwt(strapi, adminUser);
-    let res = await createNewPost({title: 'The good one',}, jwt);
+    let postRes = await createPostRequest(strapi, chai, {title: 'The good one'}, jwt);
 
-    let post = await getPostById(strapi, res.body.data.createPost.post.id);
+    let post = await getPostById(strapi, postRes.id);
+    const initialName = post.name;
     posts.push(post);
 
     expect(!!post.publishedAt).to.equal(true);
 
     // update post without change title
-    res = await updatePost({id: post.id, title: post.title}, jwt);
+    let res = await updatePost({id: post.id, title: post.title}, jwt);
     post = await getPostById(strapi, res.body.data.updatePost.post.id);
 
     let links = await strapi.models.link.find({post: post.id});
@@ -138,6 +146,18 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     expect(!!post.publishedAt).to.equal(true);
     expect(links.length).to.equal(2);
+
+    // check if post can be requested with an old name
+    res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({...QUERY_GET_POST_BY_NAME, variables: {id: initialName}})
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+
+    expect(!!res.body.data.postByName).to.be.true;
+    expect(res.body.data.postByName.name).to.equal(post.name);
   });
 });
 
@@ -154,24 +174,6 @@ async function updatePost(variables, jwt) {
           publishedAt: new Date(),
           tags: ['5eb120d1e7134c0012f4d440'],
           banner: null,
-          ...variables
-        }
-      })
-      .end((err, res) => err ? reject(err) : resolve(res));
-  });
-}
-
-function createNewPost(variables, jwt) {
-  return new Promise((resolve, reject) => {
-    chai.request(strapi.server)
-      .post('/graphql')
-      .set('Authorization', `Bearer ${jwt}`)
-      .send({
-        ...MUTATION_CREATE_POST, variables: {
-          body: 'safsadf',
-          enable: true,
-          author: '5deee37e98bbd80013a0a844',
-          publishedAt: new Date(),
           ...variables
         }
       })

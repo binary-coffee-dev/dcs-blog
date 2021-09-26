@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http');
 
 const createUser = require('../../helpers/create-user');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
-const createPost = require('../../helpers/create-post');
+const createPostRequest = require('../../helpers/create-post-request');
 
 chai.use(chaiHttp);
 
@@ -36,7 +36,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
 
   it('should count the number of opinions by post', async () => {
     const jwt = generateJwt(strapi, authUser);
-    const post = await createPost(strapi, {author: authUser.id});
+    const post = await createPostRequest(strapi, chai, {author: authUser.id}, jwt);
 
     await strapi.models.opinion.create({user: authUser.id, post: post.id, type: LIKE});
     await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: LIKE});
@@ -55,7 +55,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
 
   it('should count the number of opinions by post', async () => {
     const jwt = generateJwt(strapi, authUser);
-    const post = await createPost(strapi, {author: authUser.id});
+    const post = await createPostRequest(strapi, chai, {author: authUser.id}, jwt);
 
     await strapi.models.opinion.create({user: authUser.id, post: post.id, type: LIKE});
     await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: LIKE});

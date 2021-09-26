@@ -5,7 +5,6 @@ module.exports = async function (strapi, postAttr = {}) {
     title: randomName(),
     name: randomName(),
     body: randomName(),
-    description: randomName(),
     enable: true,
     publishedAt: new Date(new Date() - 10),
     ...postAttr
