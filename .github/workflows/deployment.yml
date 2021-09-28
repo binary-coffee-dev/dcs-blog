@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Deployment CI
 
 on: [push, pull_request]
 
@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         node-version: [12.x]
-        mongodb-version: ['4.0']
+        mongodb-version: [4.0]
 
     steps:
       - uses: actions/checkout@v2
@@ -76,48 +76,50 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
-  # DEPLOY PROJECT
-#  deploy:
-#
-#    needs: [test]
-#    if: github.ref == 'refs/heads/master'
-#
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Install Node.js
-#        uses: actions/setup-node@v1
-#        with:
-#          node-version: '12.x'
-#
-#      - name: Create env variables file
-#        run: ./create-environments.sh
-#        env:
-#          DB_HOST: database
-#          DB_PORT: 27017
-#          DB_NAME: learn_to_code_prod
-#          REDIS_HOST: redis
-#          REDIS_PORT: 6379
-#          RESOURCES_PATH: ./resources
-#          DB_DATA_PATH: /home/guille/learntocode/db-data
-#          RESOURCES_DATA_PATH: /home/guille/learntocode/resources-data
-#
-#      - name: Copy project to the hosting
-#        uses: easingthemes/ssh-deploy@v2.1.5
-#        env:
-#          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-#          ARGS: "-rltgoDzvO"
-#          SOURCE: ""
-#          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-#          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-#          TARGET: ${{ secrets.REMOTE_TARGET }}
-#
-#      - name: Deploy project in docker
-#        uses: garygrossgarten/github-action-ssh@release
-#        with:
-#          command: cd ${{ secrets.REMOTE_TARGET }} && ./deploy.sh
-#          host: ${{ secrets.REMOTE_HOST }}
-#          username: ${{ secrets.REMOTE_USER }}
-#          privateKey: ${{ secrets.SERVER_SSH_KEY}}
+  # DEPLOY PROJECT (DEVELOP)
+  deploy:
+
+    needs: [test]
+    if: github.ref == 'refs/heads/setup-deploy'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create env variables file
+        run: ./create-environments.sh
+        env:
+          NODE_ENV: development
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT__DEV }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST__DEV }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT__DEV }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME__DEV }}
+          CORS: false
+          ORIGINS: *
+          BLOG_RESOURCES: ${{ secrets.BLOG_RESOURCES__DEV }}
+          SITE_URL: https://dev.binary-coffee.dev
+          API_URL: https://api-dev.binary-coffee.dev
+          JWT_SECRET: ${{ secrets.JWT_SECRET__DEV }}
+          ADMIN_JWT_SECRET: ${{ secrets.ADMIN_JWT_SECRET__DEV }}
+          SECRET: ${{ secrets.SECRET__DEV }}
+          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID__DEV }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET__DEV }}
+
+      - name: Copy project to the hosting
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          ARGS: "-rltgoDzvO"
+          SOURCE: ""
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.REMOTE_TARGET__DEV }}
+
+      - name: Deploy project with docker in hosting
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: cd ${{ secrets.REMOTE_TARGET__DEV }} && ./deploy.sh
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          privateKey: ${{ secrets.SERVER_SSH_KEY}}
