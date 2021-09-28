@@ -8,78 +8,78 @@ on: [ push, pull_request ]
 jobs:
 
   # BUILD PROJECT AND DEPENDENCIES
-#  build:
-#
-#    runs-on: ubuntu-latest
-#
-#    strategy:
-#      matrix:
-#        node-version: [ 12.x ]
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Cache project node-modules
-#        uses: actions/cache@v2
-#        with:
-#          path: 'node_modules'
-#          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-#
-#      - name: Use Node.js ${{ matrix.node-version }}
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: ${{ matrix.node-version }}
-#
-#      # pipeline actions
-#      - run: npm ci
-#      - run: npm run build
-#
-#
-#  # RUN TESTS
-#  test:
-#
-#    needs: [ build ]
-#    runs-on: ubuntu-latest
-#
-#    strategy:
-#      matrix:
-#        node-version: [ 12.x ]
-#        mongodb-version: [ 4.0 ]
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Cache project node-modules
-#        uses: actions/cache@v2
-#        with:
-#          path: 'node_modules'
-#          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-#
-#      - name: Use Node.js ${{ matrix.node-version }}
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: ${{ matrix.node-version }}
-#
-#      - name: Start MongoDB (integration tests)
-#        uses: supercharge/mongodb-github-action@1.6.0
-#        with:
-#          mongodb-version: ${{ matrix.mongodb-version }}
-#
-#      - name: Install codecov dependency
-#        run: npm install -g codecov
-#
-#      # pipeline actions
-#      - run: npm run lint
-#      - run: DATABASE_PORT=27017 npm run test:cov
-#      - run: codecov
-#        env:
-#          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 12.x ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache project node-modules
+        uses: actions/cache@v2
+        with:
+          path: 'node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # pipeline actions
+      - run: npm ci
+      - run: npm run build
+
+
+  # RUN TESTS
+  test:
+
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 12.x ]
+        mongodb-version: [ 4.0 ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache project node-modules
+        uses: actions/cache@v2
+        with:
+          path: 'node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Start MongoDB (integration tests)
+        uses: supercharge/mongodb-github-action@1.6.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
+
+      - name: Install codecov dependency
+        run: npm install -g codecov
+
+      # pipeline actions
+      - run: npm run lint
+      - run: DATABASE_PORT=27017 npm run test:cov
+      - run: codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
 
   # DEPLOY PROJECT (DEVELOP)
   deploy-dev:
 
-#    needs: [ test ]
+    needs: [ test ]
     if: github.ref == 'refs/heads/develop'
 
     runs-on: ubuntu-latest
@@ -109,7 +109,7 @@ jobs:
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO"
+          ARGS: "-rltgoDzvO --delete"
           SOURCE: ""
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -127,7 +127,7 @@ jobs:
   # DEPLOY PROJECT (PRODUCTION)
   deploy-prod:
 
-#    needs: [ test ]
+    needs: [ test ]
     if: github.ref == 'refs/heads/master'
 
     runs-on: ubuntu-latest
@@ -157,7 +157,7 @@ jobs:
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO"
+          ARGS: "-rltgoDzvO --delete"
           SOURCE: ""
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
