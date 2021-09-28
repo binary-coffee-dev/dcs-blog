@@ -4,21 +4,11 @@ services:
   blog-backend:
     build:
       context: .
-      args:
-        - DATABASE_HOST=$DATABASE_HOST
-        - DATABASE_PORT=$DATABASE_PORT
-        - NODE_ENV=$NODE_ENV
-        - API_URL=$API_URL
-        - SITE_URL=$SITE_URL
-        - GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
-        - GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
     restart: always
     volumes:
       - $BLOG_RESOURCES:/app/public/uploads
     ports:
       - "127.0.0.1:${BACKEND_PORT}:1337"
-    environment:
-      - JWT_SECRET=$JWT_SECRET
     networks:
       - blogdb
 

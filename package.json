@@ -18,31 +18,33 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "chai-spies": "^1.0.0",
     "mocha": "^7.0.0"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.4",
     "babel-eslint": "^10.0.3",
     "ejs": "^3.0.1",
     "eslint": "^6.8.0",
     "fast-xml-parser": "^3.16.0",
     "feed": "^4.1.0",
     "html-minifier": "^4.0.0",
+    "marked": "^2.0.3",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
     "nyc": "^15.0.0",
     "pre-push": "^0.1.1",
-    "strapi": "3.5.4",
-    "strapi-admin": "3.5.4",
-    "strapi-connector-mongoose": "3.5.4",
-    "strapi-plugin-content-manager": "3.5.4",
-    "strapi-plugin-content-type-builder": "3.5.4",
-    "strapi-plugin-email": "3.5.4",
-    "strapi-plugin-graphql": "3.5.4",
-    "strapi-plugin-upload": "3.5.4",
-    "strapi-plugin-users-permissions": "3.5.4",
+    "strapi": "3.6.8",
+    "strapi-admin": "^3.6.8",
+    "strapi-connector-mongoose": "3.6.8",
+    "strapi-plugin-content-manager": "^3.6.8",
+    "strapi-plugin-content-type-builder": "^3.6.8",
+    "strapi-plugin-email": "3.6.8",
+    "strapi-plugin-graphql": "3.6.8",
+    "strapi-plugin-upload": "^3.6.8",
+    "strapi-plugin-users-permissions": "^3.6.8",
     "strapi-provider-email-nodemailer": "^2.0.0",
-    "strapi-utils": "3.5.4",
+    "strapi-utils": "3.6.8",
     "svg-captcha": "^1.4.0"
   },
   "pre-push": {
@@ -51,13 +53,13 @@
     ]
   },
   "author": {
-    "name": "A Strapi developer"
+    "name": "binary-coffee"
   },
   "strapi": {
     "uuid": "b06e5cbc-9b4c-4cb3-b08b-d3d7fb24241a"
   },
   "engines": {
-    "node": ">=10.0.0",
+    "node": ">=14.0.0",
     "npm": ">=6.0.0"
   },
   "license": "MIT"

@@ -5,7 +5,7 @@
       "path": "/comments",
       "handler": "comment.find",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -13,7 +13,7 @@
       "path": "/comments/count",
       "handler": "comment.count",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -21,6 +21,7 @@
       "path": "/comments/captcha",
       "handler": "comment.captcha",
       "config": {
+        "policies": ["global::disable"]
       }
     },
     {
@@ -28,7 +29,7 @@
       "path": "/comments/recent",
       "handler": "comment.recentComments",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -36,7 +37,7 @@
       "path": "/comments/:id",
       "handler": "comment.findOne",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -44,7 +45,7 @@
       "path": "/comments",
       "handler": "comment.create",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -52,7 +53,7 @@
       "path": "/comments/:id",
       "handler": "comment.update",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     },
     {
@@ -60,7 +61,7 @@
       "path": "/comments/:id",
       "handler": "comment.delete",
       "config": {
-        "policies": []
+        "policies": ["global::disable"]
       }
     }
   ]

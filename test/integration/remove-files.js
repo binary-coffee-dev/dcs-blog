@@ -122,7 +122,7 @@ describe('Remove file/images INTEGRATION', () => {
     const tfile = await strapi.plugins.upload.models.file.findOne({_id: file.id});
     const timage = await strapi.services.image.findOne({_id: image.id});
 
-    expect(res).to.have.status(403);
+    expect(res).to.have.status(500);
     expect(!!tfile).to.be.true;
     expect(!!timage).to.be.true;
   });
