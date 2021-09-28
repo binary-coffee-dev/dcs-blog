@@ -127,7 +127,7 @@ jobs:
   # DEPLOY PROJECT (PRODUCTION)
   deploy-prod:
 
-    needs: [ test ]
+#    needs: [ test ]
     if: github.ref == 'refs/heads/master'
 
     runs-on: ubuntu-latest
