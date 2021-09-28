@@ -10,8 +10,8 @@ module.exports = ({env}) => ({
 
   googleClientId: env('GOOGLE_CLIENT_ID', ''),
   googleClientSecret: env('GOOGLE_CLIENT_SECRET', ''),
-  githubClientId: env('GOOGLE_CLIENT_ID', ''),
-  githubClientSecret: env('GOOGLE_CLIENT_SECRET', ''),
+  githubClientId: env('GITHUB_CLIENT_ID', ''),
+  githubClientSecret: env('GITHUB_CLIENT_SECRET', ''),
 
   botNotifierUrl: env('BOT_NOTIFIER_URL', 'https://botnotifier.binary-coffee.dev/notify/channel')
 });

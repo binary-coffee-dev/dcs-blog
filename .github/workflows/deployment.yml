@@ -1,0 +1,170 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Deployment CI
+
+on: [ push, pull_request ]
+
+jobs:
+
+  # BUILD PROJECT AND DEPENDENCIES
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 12.x ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache project node-modules
+        uses: actions/cache@v2
+        with:
+          path: 'node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # pipeline actions
+      - run: npm ci
+      - run: npm run build
+
+
+  # RUN TESTS
+  test:
+
+    needs: [ build ]
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [ 12.x ]
+        mongodb-version: [ 4.0 ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache project node-modules
+        uses: actions/cache@v2
+        with:
+          path: 'node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Start MongoDB (integration tests)
+        uses: supercharge/mongodb-github-action@1.6.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
+
+      - name: Install codecov dependency
+        run: npm install -g codecov
+
+      # pipeline actions
+      - run: npm run lint
+      - run: DATABASE_PORT=27017 npm run test:cov
+      - run: codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+
+  # DEPLOY PROJECT (DEVELOP)
+  deploy-dev:
+
+    needs: [ test ]
+    if: github.ref == 'refs/heads/develop'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create env variables file
+        run: ./create_env_file.sh
+        env:
+          NODE_ENV: development
+          DATABASE_HOST: ${{ secrets.DEV__DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.DEV__DATABASE_PORT }}
+          DATABASE_NAME: ${{ secrets.DEV__DATABASE_NAME }}
+          CORS: false
+          ORIGINS: '*'
+          BLOG_RESOURCES: ${{ secrets.DEV__BLOG_RESOURCES }}
+          SITE_URL: https://dev.binary-coffee.dev
+          API_URL: https://api-dev.binary-coffee.dev
+          JWT_SECRET: ${{ secrets.DEV__JWT_SECRET }}
+          ADMIN_JWT_SECRET: ${{ secrets.DEV__ADMIN_JWT_SECRET }}
+          SECRET: ${{ secrets.DEV__SECRET }}
+          GITHUB_CLIENT_ID: ${{ secrets.DEV__GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.DEV__GITHUB_CLIENT_SECRET }}
+
+      - name: Copy project to the hosting
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          ARGS: "-rltgoDzvO"
+          SOURCE: ""
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.DEV__REMOTE_TARGET }}
+
+      - name: Deploy project with docker in hosting
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: cd ${{ secrets.DEV__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.DEV__BACKEND_PORT }} ./deploy.sh blog-backend-dev
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          privateKey: ${{ secrets.SERVER_SSH_KEY}}
+
+
+  # DEPLOY PROJECT (PRODUCTION)
+  deploy-prod:
+
+    needs: [ test ]
+    if: github.ref == 'refs/heads/master'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create env variables file
+        run: ./create_env_file.sh
+        env:
+          NODE_ENV: production
+          DATABASE_HOST: ${{ secrets.PROD__DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.PROD__DATABASE_PORT }}
+          DATABASE_NAME: ${{ secrets.PROD__DATABASE_NAME }}
+          BLOG_RESOURCES: ${{ secrets.PROD__BLOG_RESOURCES }}
+          SITE_URL: https://binary-coffee.dev
+          API_URL: https://api.binary-coffee.dev
+          JWT_SECRET: ${{ secrets.PROD__JWT_SECRET }}
+          ADMIN_JWT_SECRET: ${{ secrets.PROD__ADMIN_JWT_SECRET }}
+          SECRET: ${{ secrets.PROD__SECRET }}
+          GITHUB_CLIENT_ID: ${{ secrets.PROD__GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.PROD__GITHUB_CLIENT_SECRET }}
+
+      - name: Copy project to the hosting
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          ARGS: "-rltgoDzvO"
+          SOURCE: ""
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.PROD__REMOTE_TARGET }}
+
+      - name: Deploy project with docker in hosting
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: cd ${{ secrets.PROD__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.PROD__BACKEND_PORT }} ./deploy.sh blog-backend-prod
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          privateKey: ${{ secrets.SERVER_SSH_KEY}}

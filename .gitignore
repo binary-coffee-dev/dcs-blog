@@ -2,7 +2,6 @@
 
 .env
 .nyc_output
-package-lock.json
 
 test/testing-database.db
 
