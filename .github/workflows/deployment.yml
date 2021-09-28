@@ -3,7 +3,7 @@
 
 name: Deployment CI
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
 
@@ -14,7 +14,7 @@ jobs:
 #
 #    strategy:
 #      matrix:
-#        node-version: [12.x]
+#        node-version: [ 12.x ]
 #
 #    steps:
 #      - uses: actions/checkout@v2
@@ -38,13 +38,13 @@ jobs:
 #  # RUN TESTS
 #  test:
 #
-#    needs: [build]
+#    needs: [ build ]
 #    runs-on: ubuntu-latest
 #
 #    strategy:
 #      matrix:
-#        node-version: [12.x]
-#        mongodb-version: [4.0]
+#        node-version: [ 12.x ]
+#        mongodb-version: [ 4.0 ]
 #
 #    steps:
 #      - uses: actions/checkout@v2
@@ -77,10 +77,10 @@ jobs:
 
 
   # DEPLOY PROJECT (DEVELOP)
-  deploy:
+  deploy-dev:
 
-#    needs: [test]
-    if: github.ref == 'refs/heads/setup-deploy'
+#    needs: [ test ]
+#    if: github.ref == 'refs/heads/develop'
 
     runs-on: ubuntu-latest
 
@@ -91,20 +91,19 @@ jobs:
         run: ./create_env_file.sh
         env:
           NODE_ENV: development
-          BACKEND_PORT: ${{ secrets.BACKEND_PORT__DEV }}
-          DATABASE_HOST: ${{ secrets.DATABASE_HOST__DEV }}
-          DATABASE_PORT: ${{ secrets.DATABASE_PORT__DEV }}
-          DATABASE_NAME: ${{ secrets.DATABASE_NAME__DEV }}
+          DATABASE_HOST: ${{ secrets.DEV__DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.DEV__DATABASE_PORT }}
+          DATABASE_NAME: ${{ secrets.DEV__DATABASE_NAME }}
           CORS: false
           ORIGINS: '*'
-          BLOG_RESOURCES: ${{ secrets.BLOG_RESOURCES__DEV }}
+          BLOG_RESOURCES: ${{ secrets.DEV__BLOG_RESOURCES }}
           SITE_URL: https://dev.binary-coffee.dev
           API_URL: https://api-dev.binary-coffee.dev
-          JWT_SECRET: ${{ secrets.JWT_SECRET__DEV }}
-          ADMIN_JWT_SECRET: ${{ secrets.ADMIN_JWT_SECRET__DEV }}
-          SECRET: ${{ secrets.SECRET__DEV }}
-          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID__DEV }}
-          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET__DEV }}
+          JWT_SECRET: ${{ secrets.DEV__JWT_SECRET }}
+          ADMIN_JWT_SECRET: ${{ secrets.DEV__ADMIN_JWT_SECRET }}
+          SECRET: ${{ secrets.DEV__SECRET }}
+          GITHUB_CLIENT_ID: ${{ secrets.DEV__GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.DEV__GITHUB_CLIENT_SECRET }}
 
       - name: Copy project to the hosting
         uses: easingthemes/ssh-deploy@v2.1.5
@@ -114,12 +113,58 @@ jobs:
           SOURCE: ""
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ${{ secrets.REMOTE_TARGET__DEV }}
+          TARGET: ${{ secrets.DEV__REMOTE_TARGET }}
 
       - name: Deploy project with docker in hosting
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: cd ${{ secrets.REMOTE_TARGET__DEV }} && ./deploy.sh blog-backend-dev
+          command: cd ${{ secrets.DEV__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.DEV__BACKEND_PORT }} ./deploy.sh blog-backend-dev
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          privateKey: ${{ secrets.SERVER_SSH_KEY}}
+
+
+  # DEPLOY PROJECT (PRODUCTION)
+  deploy-prod:
+
+    needs: [ test ]
+    if: github.ref == 'refs/heads/master'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Create env variables file
+        run: ./create_env_file.sh
+        env:
+          NODE_ENV: production
+          DATABASE_HOST: ${{ secrets.PROD__DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.PROD__DATABASE_PORT }}
+          DATABASE_NAME: ${{ secrets.PROD__DATABASE_NAME }}
+          BLOG_RESOURCES: ${{ secrets.PROD__BLOG_RESOURCES }}
+          SITE_URL: https://binary-coffee.dev
+          API_URL: https://api.binary-coffee.dev
+          JWT_SECRET: ${{ secrets.PROD__JWT_SECRET }}
+          ADMIN_JWT_SECRET: ${{ secrets.PROD__ADMIN_JWT_SECRET }}
+          SECRET: ${{ secrets.PROD__SECRET }}
+          GITHUB_CLIENT_ID: ${{ secrets.PROD__GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.PROD__GITHUB_CLIENT_SECRET }}
+
+      - name: Copy project to the hosting
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          ARGS: "-rltgoDzvO"
+          SOURCE: ""
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.PROD__REMOTE_TARGET }}
+
+      - name: Deploy project with docker in hosting
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: cd ${{ secrets.PROD__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.PROD__BACKEND_PORT }} ./deploy.sh blog-backend-prod
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           privateKey: ${{ secrets.SERVER_SSH_KEY}}

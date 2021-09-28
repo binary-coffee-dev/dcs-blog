@@ -13,7 +13,6 @@ echo "SITE_URL=$SITE_URL" >> .env
 echo "API_URL=$API_URL" >> .env
 
 # docker configurations
-echo "BACKEND_PORT=$BACKEND_PORT" >> .env
 echo "BLOG_RESOURCES=$BLOG_RESOURCES" >> .env
 
 # secrets
