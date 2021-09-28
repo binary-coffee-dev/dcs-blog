@@ -20,4 +20,4 @@ COPY start.sh ./start.sh
 
 RUN npm run build
 
-CMD ["/bin/bash", "start.sh"]
+CMD ["/bin/sh", "start.sh"]
