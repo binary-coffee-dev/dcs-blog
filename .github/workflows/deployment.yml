@@ -1,0 +1,123 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on: [push, pull_request]
+
+jobs:
+
+  # BUILD PROJECT AND DEPENDENCIES
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache project node-modules
+        uses: actions/cache@v2
+        with:
+          path: 'node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # pipeline actions
+      - run: npm ci
+      - run: npm run build
+
+
+  # RUN TESTS
+  test:
+
+    needs: [build]
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+        mongodb-version: ['4.0']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache project node-modules
+        uses: actions/cache@v2
+        with:
+          path: 'node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Start MongoDB (integration tests)
+        uses: supercharge/mongodb-github-action@1.6.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
+
+      - name: Install codecov dependency
+        run: npm install -g codecov
+
+      # pipeline actions
+      - run: npm run lint
+      - run: DATABASE_PORT=27017 npm run test:cov
+      - run: codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+
+  # DEPLOY PROJECT
+#  deploy:
+#
+#    needs: [test]
+#    if: github.ref == 'refs/heads/master'
+#
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Install Node.js
+#        uses: actions/setup-node@v1
+#        with:
+#          node-version: '12.x'
+#
+#      - name: Create env variables file
+#        run: ./create-environments.sh
+#        env:
+#          DB_HOST: database
+#          DB_PORT: 27017
+#          DB_NAME: learn_to_code_prod
+#          REDIS_HOST: redis
+#          REDIS_PORT: 6379
+#          RESOURCES_PATH: ./resources
+#          DB_DATA_PATH: /home/guille/learntocode/db-data
+#          RESOURCES_DATA_PATH: /home/guille/learntocode/resources-data
+#
+#      - name: Copy project to the hosting
+#        uses: easingthemes/ssh-deploy@v2.1.5
+#        env:
+#          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+#          ARGS: "-rltgoDzvO"
+#          SOURCE: ""
+#          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+#          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+#          TARGET: ${{ secrets.REMOTE_TARGET }}
+#
+#      - name: Deploy project in docker
+#        uses: garygrossgarten/github-action-ssh@release
+#        with:
+#          command: cd ${{ secrets.REMOTE_TARGET }} && ./deploy.sh
+#          host: ${{ secrets.REMOTE_HOST }}
+#          username: ${{ secrets.REMOTE_USER }}
+#          privateKey: ${{ secrets.SERVER_SSH_KEY}}
