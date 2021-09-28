@@ -16,7 +16,8 @@ COPY .eslintignore ./.eslintignore
 COPY .eslintrc ./.eslintrc
 COPY .env ./.env
 COPY favicon.png ./favicon.png
+COPY start.sh ./start.sh
 
 RUN npm run build
 
-CMD ["npm", "start"]
+CMD ["/bin/bash", "start.sh"]
