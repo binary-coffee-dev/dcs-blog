@@ -143,8 +143,8 @@ jobs:
           DATABASE_PORT: ${{ secrets.PROD__DATABASE_PORT }}
           DATABASE_NAME: ${{ secrets.PROD__DATABASE_NAME }}
           BLOG_RESOURCES: ${{ secrets.PROD__BLOG_RESOURCES }}
-          CORS: true
-          ORIGINS: 'https://www.binary-coffee.dev,https://binary-coffee.dev,https://api.binary-coffee.dev'
+          CORS: false
+          ORIGINS: '*'
           SITE_URL: https://binary-coffee.dev
           API_URL: https://api.binary-coffee.dev
           JWT_SECRET: ${{ secrets.PROD__JWT_SECRET }}
