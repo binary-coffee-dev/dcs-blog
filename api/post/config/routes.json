@@ -10,7 +10,7 @@
     },
     {
       "method": "GET",
-      "path": "/post-body-by-name/:name",
+      "path": "/post-body-by-name/:name/download.md",
       "handler": "Post.getPostBodyByName",
       "config": {}
     },

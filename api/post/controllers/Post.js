@@ -50,7 +50,8 @@ module.exports = {
   async getPostBodyByName(ctx) {
     const name = ctx.params.name || ctx.params._name || '';
     const article = await strapi.services.post.findOneByName(ctx, name);
-    ctx.type = 'text/markdown';
-    ctx.send(article.body);
+    ctx.type = 'text/markdown; charset=UTF-8';
+    ctx.body = article.body;
+    return ctx.body;
   }
 };

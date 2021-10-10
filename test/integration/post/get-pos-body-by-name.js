@@ -28,7 +28,7 @@ describe('Get post body by name INTEGRATION', () => {
     const jwt2 = generateJwt(strapi, authUser);
     const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
-        .get(`/post-body-by-name/${post.name}`)
+        .get(`/post-body-by-name/${post.name}/download.md`)
         .set('Authorization', `Bearer ${jwt2}`)
         .end((err, res) => err ? reject(err) : resolve(res));
     });
