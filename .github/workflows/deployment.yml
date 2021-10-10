@@ -109,7 +109,7 @@ jobs:
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO"
+          ARGS: "-rltgoDzvO --delete"
           SOURCE: ""
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
@@ -143,6 +143,8 @@ jobs:
           DATABASE_PORT: ${{ secrets.PROD__DATABASE_PORT }}
           DATABASE_NAME: ${{ secrets.PROD__DATABASE_NAME }}
           BLOG_RESOURCES: ${{ secrets.PROD__BLOG_RESOURCES }}
+          CORS: false
+          ORIGINS: '*'
           SITE_URL: https://binary-coffee.dev
           API_URL: https://api.binary-coffee.dev
           JWT_SECRET: ${{ secrets.PROD__JWT_SECRET }}
@@ -155,7 +157,7 @@ jobs:
         uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          ARGS: "-rltgoDzvO"
+          ARGS: "-rltgoDzvO --delete"
           SOURCE: ""
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}

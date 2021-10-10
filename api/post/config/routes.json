@@ -10,6 +10,12 @@
     },
     {
       "method": "GET",
+      "path": "/post-body-by-name/:name/download.md",
+      "handler": "Post.getPostBodyByName",
+      "config": {}
+    },
+    {
+      "method": "GET",
       "path": "/posts/count",
       "handler": "Post.count",
       "config": {
