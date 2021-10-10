@@ -45,5 +45,12 @@ module.exports = {
   async feed(ctx) {
     const {format} = ctx.params;
     return strapi.services.post.getFeed(ctx, format);
+  },
+
+  async getPostBodyByName(ctx) {
+    const name = ctx.params.name || ctx.params._name || '';
+    const article = await strapi.services.post.findOneByName(ctx, name);
+    ctx.type = 'text/markdown';
+    ctx.send(article.body);
   }
 };
