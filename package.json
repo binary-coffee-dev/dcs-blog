@@ -29,7 +29,7 @@
     "fast-xml-parser": "^3.16.0",
     "feed": "^4.1.0",
     "html-minifier": "^4.0.0",
-    "marked": "^2.0.3",
+    "marked": "^4.0.10",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
     "nyc": "^15.0.0",
