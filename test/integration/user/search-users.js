@@ -23,6 +23,7 @@ const NUMBER_OF_POST = 4;
 describe('Search users INTEGRATION', () => {
   let users = [];
   let userWithArticles;
+  let userWithNoArticles;
   let userWithComments;
 
   before(async () => {
@@ -31,6 +32,7 @@ describe('Search users INTEGRATION', () => {
     }
     userWithArticles = users[0];
     userWithComments = users[1];
+    userWithNoArticles = users[2];
 
     for (let i = 0; i < NUMBER_OF_COMMENTS; i++) {
       await createComment(strapi, {user: userWithComments});
@@ -39,6 +41,7 @@ describe('Search users INTEGRATION', () => {
     for (let i = 0; i < NUMBER_OF_POST; i++) {
       await createPost(strapi, {author: userWithArticles});
     }
+    await createPost(strapi, {author: userWithArticles, enable: false});
   });
 
   after(async () => {
@@ -78,6 +81,17 @@ describe('Search users INTEGRATION', () => {
     });
     const user = res.body.data.users2[0];
     expect(user.posts).to.equal(NUMBER_OF_POST);
+  });
+
+  it('should get the user with no articles', async () => {
+    const res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server)
+        .post('/graphql')
+        .send({...QUERY_SEARCH_USERS, variables: {search: userWithNoArticles.username}})
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    const user = res.body.data.users2[0];
+    expect(user.posts).to.equal(0);
   });
 
   it('should get at least one user in the query response', async () => {

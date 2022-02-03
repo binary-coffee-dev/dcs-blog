@@ -24,7 +24,7 @@ const UserNew = {
     for (let i = 0; i < ctx.body.length; i++) {
       const user = ctx.body[i];
       user.comments = await strapi.models.comment.count({user: user.id});
-      user.posts = await strapi.models.post.count({author: user.id});
+      user.posts = await strapi.models.post.count({author: user.id, publishedAt: {$lte: new Date()}, enable: true});
     }
   },
 
