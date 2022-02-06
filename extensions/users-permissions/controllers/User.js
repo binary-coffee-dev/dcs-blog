@@ -18,6 +18,16 @@ const getUsersById = async (userIds) => {
 const UserNew = {
   ...User,
 
+  async find2(ctx, next, {populate} = {}) {
+    await UserNew.find(ctx, next, {populate});
+
+    for (let i = 0; i < ctx.body.length; i++) {
+      const user = ctx.body[i];
+      user.comments = await strapi.models.comment.count({user: user.id});
+      user.posts = await strapi.models.post.count({author: user.id, publishedAt: {$lte: new Date()}, enable: true});
+    }
+  },
+
   async find(ctx, next, {populate} = {}) {
     if (ctx.query.username) {
       ctx.query.username = new RegExp(ctx.query.username, 'i');
@@ -25,7 +35,9 @@ const UserNew = {
 
     await User.find(ctx, next, {populate});
     if (ctx.body) {
-      ctx.body = ctx.body.filter(v => !!v);
+      ctx.body = ctx.body
+        .filter(v => !!v)
+        .map(v => ({...v, email: ''}));
     }
   },
 

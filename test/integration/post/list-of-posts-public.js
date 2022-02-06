@@ -33,6 +33,8 @@ describe('Post list (public articles) INTEGRATION', () => {
   const PUBLISHED_ARTICLES = 20;
 
   before(async () => {
+    await strapi.models.post.deleteMany();
+
     for (let i = 0; i < PUBLISHED_ARTICLES; i++) {
       posts.push(await strapi.models.post.create({
         title: 'TITLE 1',
