@@ -34,7 +34,7 @@
     "moment-timezone": "^0.5.31",
     "nyc": "^15.0.0",
     "pre-push": "^0.1.1",
-    "strapi": "3.6.8",
+    "strapi": "3.6.10",
     "strapi-admin": "^3.6.8",
     "strapi-connector-mongoose": "3.6.8",
     "strapi-plugin-content-manager": "^3.6.8",
