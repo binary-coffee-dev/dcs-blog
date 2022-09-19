@@ -1,6 +1,6 @@
 module.exports = {
   query: `
-    postByName(name: String!): Post!
+    postByName(name: String!, noUpdate: Boolean): Post!
     countPosts(where: JSON): Int!
     similarPosts(id: ID!, limit: Int): [Post]!
   `,
