@@ -217,7 +217,7 @@ module.exports = {
     };
   },
 
-  readingTime(text) {
+  calculateReadingTime(text) {
     const wordsPerMinute = 200;
     const noOfWords = text.split(/\s/g).length;
     const minutes = noOfWords / wordsPerMinute * 60;
