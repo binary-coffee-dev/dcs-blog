@@ -145,7 +145,7 @@ jobs:
           BLOG_RESOURCES: ${{ secrets.PROD__BLOG_RESOURCES }}
           CORS: false
           ORIGINS: '*'
-          SITE_URL: https://binary-coffee.dev
+          SITE_URL: https://binarycoffee.dev
           API_URL: https://api.binarycoffee.dev
           JWT_SECRET: ${{ secrets.PROD__JWT_SECRET }}
           ADMIN_JWT_SECRET: ${{ secrets.PROD__ADMIN_JWT_SECRET }}
