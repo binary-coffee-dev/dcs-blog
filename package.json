@@ -31,7 +31,7 @@
     "html-minifier": "^4.0.0",
     "marked": "^2.0.3",
     "moment": "^2.26.0",
-    "moment-timezone": "^0.5.31",
+    "moment-timezone": "^0.5.35",
     "nyc": "^15.0.0",
     "pre-push": "^0.1.1",
     "strapi": "3.6.8",
