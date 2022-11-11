@@ -68,7 +68,7 @@ module.exports = {
     }, {});
   },
 
-  async findOneByName(ctx, name) {
+  async findOneByName(ctx, name, noUpdate) {
     const link = await strapi.models.link.findOne({name});
     const post = await strapi.models.post.findOne({_id: link.post}).populate(['author', 'banner']);
     if (post) {
@@ -78,7 +78,9 @@ module.exports = {
         this.isAdmin(ctx) ||
         this.isStaff(ctx)
       ) {
-        await this.updateViews(post);
+        if (!noUpdate) {
+          await this.updateViews(post);
+        }
         return post;
       }
     }
