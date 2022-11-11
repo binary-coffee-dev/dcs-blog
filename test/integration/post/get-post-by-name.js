@@ -85,7 +85,7 @@ describe('Get post by name INTEGRATION', () => {
     }));
     expect(res.body.data.createPost.post.readingTime).to.be.equal(60);
 
-    const newBody = "Dignissimos libero iste id rem qui quibusdam officiis facilis ea recusandae eum est qui minus et velit placeat omnis voluptates autem quasi dolorum nesciunt numquam nemo in deserunt esse maxime neque assumenda et ipsam provident mollitia est maiores distinctio et qui dolores eum ad dolores alias aliquid possimus placeat quos itaque vel quasi esse iure sapiente nesciunt praesentium facilis eaque vel ipsum quia ut sit consequuntur sed nemo in qui placeat et modi ut harum alias magni velit iure soluta sit tenetur sequi occaecati illum dolores suscipit illum ipsam voluptatem pariatur ut nostrum delectus quia officiis vitae doloribus quia laborum.";
+    const newBody = 'Dignissimos libero iste id rem qui quibusdam officiis facilis ea recusandae eum est qui minus et velit placeat omnis voluptates autem quasi dolorum nesciunt numquam nemo in deserunt esse maxime neque assumenda et ipsam provident mollitia est maiores distinctio et qui dolores eum ad dolores alias aliquid possimus placeat quos itaque vel quasi esse iure sapiente nesciunt praesentium facilis eaque vel ipsum quia ut sit consequuntur sed nemo in qui placeat et modi ut harum alias magni velit iure soluta sit tenetur sequi occaecati illum dolores suscipit illum ipsam voluptatem pariatur ut nostrum delectus quia officiis vitae doloribus quia laborum.';
     const res2 = await updatePostRequest(strapi, chai, {id: res.body.data.createPost.post.id, body: newBody}, jwt);
     expect(res2.readingTime).to.be.equal(30);
   });
