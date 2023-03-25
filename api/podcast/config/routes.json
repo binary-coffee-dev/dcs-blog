@@ -1,0 +1,52 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/podcasts",
+      "handler": "podcast.find",
+      "config": {
+        "policies": ["global::disable"]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/podcasts/count",
+      "handler": "podcast.count",
+      "config": {
+        "policies": ["global::disable"]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/podcasts/:id",
+      "handler": "podcast.findOne",
+      "config": {
+        "policies": ["global::disable"]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/podcasts",
+      "handler": "podcast.create",
+      "config": {
+        "policies": ["global::disable"]
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/podcasts/:id",
+      "handler": "podcast.update",
+      "config": {
+        "policies": ["global::disable"]
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/podcasts/:id",
+      "handler": "podcast.delete",
+      "config": {
+        "policies": ["global::disable"]
+      }
+    }
+  ]
+}

@@ -8,6 +8,7 @@ module.exports = {
   lifecycles: {
     async beforeCreate(model) {
       model.name = strapi.services.post.getNameFromTitle(model.title);
+      model.readingTime = strapi.services.post.calculateReadingTime(model.body);
     },
 
     async afterCreate(result) {
@@ -21,6 +22,7 @@ module.exports = {
         if (titleChange) {
           data.name = newName;
         }
+        data.readingTime = strapi.services.post.calculateReadingTime(data.body);
       }
     },
 

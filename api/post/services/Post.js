@@ -217,6 +217,13 @@ module.exports = {
     };
   },
 
+  calculateReadingTime(text) {
+    const wordsPerMinute = 200;
+    const noOfWords = text.split(/\s/g).length;
+    const minutes = noOfWords / wordsPerMinute * 60;
+    return Math.ceil(minutes);
+  },
+
   getAuthorPage(author) {
     const siteUrl = strapi.config.custom.siteUrl;
     if (author && author.username) {

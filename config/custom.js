@@ -13,5 +13,7 @@ module.exports = ({env}) => ({
   githubClientId: env('GITHUB_CLIENT_ID', ''),
   githubClientSecret: env('GITHUB_CLIENT_SECRET', ''),
 
-  botNotifierUrl: env('BOT_NOTIFIER_URL', 'https://botnotifier.binary-coffee.dev/notify/channel')
+  botNotifierUrl: env('BOT_NOTIFIER_URL', 'https://botnotifier.binary-coffee.dev/notify/channel'),
+
+  podcastEspacioBinarioIdentifier: 'espacio-binario'
 });
