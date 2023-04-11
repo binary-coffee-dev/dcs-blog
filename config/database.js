@@ -24,7 +24,7 @@ module.exports = ({env}) => ({
         database: 'blog',
         username: 'api',
         password: 'password',
-        port: 3306,
+        port: 3310,
         host: '127.0.0.1',
       },
       options: {},

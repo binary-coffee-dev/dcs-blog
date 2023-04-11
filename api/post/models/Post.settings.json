@@ -7,10 +7,9 @@
     "description": ""
   },
   "options": {
-    "timestamps": [
-      "createdAt",
-      "updatedAt"
-    ]
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
   },
   "attributes": {
     "title": {
