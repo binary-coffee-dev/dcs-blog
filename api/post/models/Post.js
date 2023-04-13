@@ -12,7 +12,7 @@ module.exports = {
     },
 
     async afterCreate(result) {
-      await strapi.models.link.create({name: result.name, post: result._id});
+      await strapi.services.link.create({name: result.name, post: result._id});
     },
 
     async beforeUpdate(params, data) {

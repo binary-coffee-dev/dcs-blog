@@ -18,16 +18,24 @@ module.exports = ({env}) => ({
     //   },
     // },
     default: {
+      // connector: 'bookshelf',
+      // settings: {
+      //   client: 'mysql',
+      //   database: 'test',
+      //   username: 'api',
+      //   password: 'password',
+      //   port: env.int('DATABASE_PORT', 3306),
+      //   host: 'localhost',
+      // },
       connector: 'bookshelf',
       settings: {
-        client: 'mysql',
-        database: 'blog',
-        username: 'user',
-        password: 'password',
-        port: 3306,
-        host: 'localhost',
+        client: 'sqlite',
+        filename: env('DATABASE_FILENAME', './data/data.db'), // or specify the path to your db file
       },
-      options: {},
+      options: {
+        useNullAsDefault: true,
+      },
+      // options: {},
     }
   }
 });

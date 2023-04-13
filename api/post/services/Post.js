@@ -266,7 +266,8 @@ module.exports = {
   },
 
   isAdmin: (ctx) => {
-    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator';
+    return (ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator') ||
+      (ctx?.state?.user?.roles[0]?.code === 'strapi-super-admin');
   },
 
   isPublish(post) {

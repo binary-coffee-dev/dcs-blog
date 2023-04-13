@@ -2,6 +2,7 @@
 
 .env
 .nyc_output
+data
 
 test/testing-database.db
 

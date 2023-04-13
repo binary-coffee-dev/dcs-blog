@@ -29,7 +29,7 @@ describe('Get podcasts INTEGRATION', () => {
     staffUser = await createUser({strapi, roleType: 'staff'});
     adminUser = await createUser({strapi, roleType: 'administrator'});
 
-    const podcastIns = await strapi.models.podcast.findOne({identifier: 'espacio-binario'});
+    const podcastIns = await strapi.query('podcast').findOne({identifier: 'espacio-binario'});
     for (let i = 0; i < NUMBER_OF_EPISODES; i++) {
       await createEpisode(strapi, podcastIns);
     }

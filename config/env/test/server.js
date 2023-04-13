@@ -5,6 +5,7 @@ module.exports = ({env}) => ({
     enabled: false
   },
   admin: {
-    autoOpen: false
+    autoOpen: false,
+    browser: false
   }
 });

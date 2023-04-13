@@ -12,7 +12,7 @@ describe('Check sitemap functionality INTEGRATION', () => {
   let posts = [];
 
   before(async () => {
-    posts.push(await strapi.models.post.create({
+    posts.push(await strapi.services.post.create({
       title: 'TITLE 1',
       name: randomName(),
       body: 'SOME',
@@ -23,9 +23,7 @@ describe('Check sitemap functionality INTEGRATION', () => {
   });
 
   after(async () => {
-    for (let post of posts) {
-      await deletePost(strapi, post);
-    }
+    await deletePost(strapi);
   });
 
   it('should create an article with the name attribute', (done) => {

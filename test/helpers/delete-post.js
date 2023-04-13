@@ -1,3 +1,4 @@
-module.exports = async (strapi, post) => {
-  await strapi.models.post.deleteOne({_id: post.id});
+module.exports = async (strapi) => {
+  const db = strapi.connections.default;
+  return db.raw('DELETE FROM post;');
 };
