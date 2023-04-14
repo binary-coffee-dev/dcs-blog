@@ -1,5 +1,8 @@
 module.exports = async function (strapi) {
   const fs = require('fs');
   const db = strapi.connections.default;
-  fs.unlinkSync(db.client.config.connection.filename);
+  const filename = db.client.config.connection.filename;
+  if (fs.existsSync(filename)) {
+    fs.unlinkSync(filename);
+  }
 };

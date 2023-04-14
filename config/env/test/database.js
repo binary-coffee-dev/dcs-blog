@@ -31,6 +31,10 @@ module.exports = ({env}) => ({
       settings: {
         client: 'sqlite',
         filename: env('DATABASE_FILENAME', './data/data.db'), // or specify the path to your db file
+        migrations: {
+          directory: './migrations',
+          tableName: 'migrations'
+        }
       },
       options: {
         useNullAsDefault: true,

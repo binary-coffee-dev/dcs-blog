@@ -26,6 +26,10 @@ module.exports = ({env}) => ({
         password: 'password',
         port: env.int('DATABASE_PORT', 3306),
         host: '127.0.0.1',
+        migrations: {
+          directory: './migrations',
+          tableName: 'migrations'
+        }
       },
       options: {},
     }

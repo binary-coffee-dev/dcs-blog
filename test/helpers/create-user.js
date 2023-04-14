@@ -6,7 +6,6 @@ module.exports = async function ({strapi, roleType = 'authenticated', provider =
   // const a = await strapi.plugins['users-permissions'].services.userspermissions.getRole({type: 'authenticated'});
   // console.log()
   const role = await strapi.query('role', 'users-permissions').findOne({type: roleType});
-  console.log()
   return await strapi.query('role', 'users-permissions').create({
     username: randomName(),
     confirmed: true,

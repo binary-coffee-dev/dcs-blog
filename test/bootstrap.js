@@ -2,13 +2,12 @@
 const Strapi = require('strapi');
 
 const dropDB = require('./helpers/dropDB');
-const createDB = require('./helpers/createDB');
 
 before(async function () {
   await Strapi({autoReload: false, dev: true, browser: false}).start();
 
   // Add administration secret
-  strapi.config.server.admin.auth.secret = 'test-admin';
+  // strapi.config.server.admin.auth.secret = 'test-admin';
 
   // create initial admin by default
   strapi.admin.services.user.create({
