@@ -11,11 +11,11 @@ module.exports = {
       where.user = user && user.id || undefined;
     }
     if (where.post) {
-      const link = await strapi.models.link.findOne({name: where.post});
-      const post = await strapi.models.post.findOne({_id: link.post});
+      const link = await strapi.query('link').findOne({name: where.post});
+      const post = await strapi.query('post').findOne({id: link.post});
       if (post) {
-        const query = {...where, post: post.id.toString()};
-        return await strapi.models.opinion.count(query);
+        const query = {...where, post: post.id};
+        return await strapi.query('opinion').count(query);
       }
     }
     return await strapi.models.opinion.count(where);

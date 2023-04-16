@@ -8,6 +8,10 @@ module.exports = ({env}) => ({
 
   feedArticlesLimit: env.int('FEED_ARTICLES_LIMIT', 15),
 
+  maxPostRequestLimit: 20,
+  maxSimilarPostRequestLimit: 20,
+  maxNumberOfArticlesPerDay: 5,
+
   googleClientId: env('GOOGLE_CLIENT_ID', ''),
   googleClientSecret: env('GOOGLE_CLIENT_SECRET', ''),
   githubClientId: env('GITHUB_CLIENT_ID', ''),

@@ -1,3 +1,3 @@
 module.exports = async (strapi, user) => {
-  await strapi.plugins['users-permissions'].models.user.deleteOne({_id: user.id});
+  await strapi.query('user', 'users-permissions').delete({id: user.id});
 };

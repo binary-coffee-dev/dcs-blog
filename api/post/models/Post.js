@@ -12,13 +12,13 @@ module.exports = {
     },
 
     async afterCreate(result) {
-      await strapi.services.link.create({name: result.name, post: result._id});
+      await strapi.query('link').create({name: result.name, post: result.id});
     },
 
     async beforeUpdate(params, data) {
-      if (params._id && data.title) {
+      if (params.id && data.title) {
         const newName = strapi.services.post.getNameFromTitle(data.title);
-        const titleChange = !(await strapi.services.link.existLinkInPost(newName, params._id));
+        const titleChange = !(await strapi.services.link.existLinkInPost(newName, params.id));
         if (titleChange) {
           data.name = newName;
         }
@@ -27,11 +27,11 @@ module.exports = {
     },
 
     async afterUpdate(result, params, data) {
-      if (params._id && data.title) {
+      if (params.id && data.title) {
         const newName = strapi.services.post.getNameFromTitle(result.title);
-        const titleChange = !(await strapi.services.link.existLinkInPost(newName, params._id));
+        const titleChange = !(await strapi.services.link.existLinkInPost(newName, params.id));
         if (titleChange) {
-          await strapi.models.link.create({name: result.name, post: result._id});
+          await strapi.query('link').create({name: result.name, post: result.id});
         }
       }
     },

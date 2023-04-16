@@ -18,6 +18,7 @@ module.exports = {
       }
     };
 
+    // toDo 16.04.23, guille, update this query
     const res = await strapi.query('post').model.query(qb => {
       qb.orderBy('publishedAt', 'ASC');
       qb.whereRaw('publishedAt < ? AND enable = 1', [new Date().toISOString().slice(0, 19).replace('T', ' ')]);

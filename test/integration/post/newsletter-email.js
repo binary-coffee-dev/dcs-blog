@@ -5,10 +5,8 @@ const spies = require('chai-spies');
 const deliveryToEmailSubscriptions = require('../../../config/functions/delivery.to.email.subscriptions');
 
 const createUser = require('../../helpers/create-user');
-const deleteUser = require('../../helpers/delete-user');
-const deletePost = require('../../helpers/delete-post');
-const randomName = require('../../helpers/random-name');
 const checkHtmlEmail = require('../../helpers/check-html-email');
+const createPost = require("../../helpers/create-post");
 
 chai.use(chaiHttp);
 chai.use(spies);
@@ -27,31 +25,24 @@ Todos los creadores del blog somos Ingenieros de Software y la mayoría particip
 `;
 
 describe('NewsLetter post list INTEGRATION', () => {
-  let posts = [];
+  const NOMBER_OF_ARTICLES = 10;
   let authUser;
   let message;
 
   let savedFunction;
 
   before(async () => {
-
-    // clean the post table
-    await strapi.models.post.deleteMany({});
-
     authUser = await createUser({strapi});
-    for (let i = 0; i < 10; i++) {
-      posts.push(await strapi.models.post.create({
-        title: 'TITLE 2',
+    for (let i = 0; i < NOMBER_OF_ARTICLES; i++) {
+      await createPost(strapi, {
+        author: authUser.id,
         body: EXAMPLE_BODY,
-        name: randomName(),
-        enable: true,
-        author: authUser,
-        publishedAt: new Date(new Date() - (10 + Math.round(Math.random() * 100)))
-      }));
+        published_at: new Date(new Date() - (10 + Math.round(Math.random() * 100)))
+      });
     }
 
     for (let i = 0; i < 60; i++) {
-      await strapi.services.subscription.create({verified: true, enable: true, email: 'some@test.com'});
+      await strapi.query('subscription').create({verified: true, enable: true, email: 'some@test.com'});
     }
 
     savedFunction = strapi.plugins['email'].services.email.send;
@@ -62,10 +53,9 @@ describe('NewsLetter post list INTEGRATION', () => {
   });
 
   after(async () => {
-    for (let post of posts) {
-      await deletePost(strapi, post);
-    }
-    await deleteUser(strapi, authUser);
+    await strapi.query('post').delete({});
+    await strapi.query('subscription').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
     strapi.plugins['email'].services.email.send = savedFunction;
   });
 
@@ -73,6 +63,6 @@ describe('NewsLetter post list INTEGRATION', () => {
     await deliveryToEmailSubscriptions.send('Binary Coffee Weekly Posts', 7);
 
     expect(strapi.plugins['email'].services.email.send).to.have.been.called.exactly(2);
-    expect(checkHtmlEmail(message.html)).to.be.equal(posts.length);
+    expect(checkHtmlEmail(message.html)).to.be.equal(NOMBER_OF_ARTICLES);
   });
 });

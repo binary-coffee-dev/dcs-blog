@@ -4,8 +4,8 @@ module.exports = ({env}) => ({
   cron: {
     enabled: false
   },
-  // admin: {
-  //   autoOpen: false,
-  //   browser: false
-  // }
+  admin: {
+    autoOpen: false,
+    browser: false
+  }
 });

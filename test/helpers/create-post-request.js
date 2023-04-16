@@ -2,10 +2,10 @@ const randomName = require('./random-name');
 
 const MUTATION_CREATE_POST = {
   operationName: null,
-  query: 'mutation ($title: String, $body: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
+  query: 'mutation ($title: String, $body: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {published_at: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      readingTime\n      name\n      __typename\n    }\n    __typename\n  }\n}\n'
 };
 
-module.exports = async function(strapi, chai, variables, jwt) {
+async function createPostRequest(strapi, chai, variables, jwt) {
   const res = await new Promise((resolve, reject) => {
     chai.request(strapi.server)
       .post('/graphql')
@@ -22,4 +22,8 @@ module.exports = async function(strapi, chai, variables, jwt) {
       .end((err, res) => err ? reject(err) : resolve(res));
   });
   return res.body.data.createPost.post;
-};
+}
+
+createPostRequest.MUTATION_CREATE_POST = MUTATION_CREATE_POST;
+
+module.exports = createPostRequest;

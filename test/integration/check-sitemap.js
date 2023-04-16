@@ -12,7 +12,7 @@ describe('Check sitemap functionality INTEGRATION', () => {
   let posts = [];
 
   before(async () => {
-    posts.push(await strapi.services.post.create({
+    posts.push(await strapi.query('post').create({
       title: 'TITLE 1',
       name: randomName(),
       body: 'SOME',
@@ -26,12 +26,12 @@ describe('Check sitemap functionality INTEGRATION', () => {
     await deletePost(strapi);
   });
 
-  it('should create an article with the name attribute', (done) => {
-    chai.request(strapi.server)
-      .get('/sitemap')
-      .end((err, res) => {
-        expect(res.type).to.be.equal('application/xml');
-        done();
-      });
+  it('should get the sitemap of the site', async () => {
+    const res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server)
+        .get('/sitemap')
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    expect(res.type).to.be.equal('application/xml');
   });
 });

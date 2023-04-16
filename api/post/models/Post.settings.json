@@ -55,9 +55,6 @@
       "via": "post",
       "collection": "comment"
     },
-    "publishedAt": {
-      "type": "datetime"
-    },
     "tags": {
       "via": "posts",
       "collection": "tag"

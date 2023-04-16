@@ -29,25 +29,20 @@ describe('Get podcasts INTEGRATION', () => {
     staffUser = await createUser({strapi, roleType: 'staff'});
     adminUser = await createUser({strapi, roleType: 'administrator'});
 
-    const podcastIns = await strapi.query('podcast').findOne({identifier: 'espacio-binario'});
+    const podcastIns = await strapi
+      .query('podcast').create({identifier: 'espacio-binario', name: 'Espacio Binario'});
     for (let i = 0; i < NUMBER_OF_EPISODES; i++) {
       await createEpisode(strapi, podcastIns);
     }
   });
 
   after(async () => {
-    await deleteUser(strapi, authUser);
-    await deleteUser(strapi, staffUser);
-    await deleteUser(strapi, adminUser);
-
-    const episodes = await strapi.models.episode.find();
-    for (let e of episodes) {
-      await deleteEpisode(strapi, e);
-    }
+    strapi.query('podcast').delete({});
+    strapi.query('episode').delete({});
+    strapi.query('user', 'users-permissions').delete({});
   });
 
   it('should get the podcast and the list of episodes (public user)', async () => {
-    console.log()
     await astestRequestPodcast();
   });
 
@@ -67,7 +62,6 @@ describe('Get podcasts INTEGRATION', () => {
   });
 
   async function astestRequestPodcast(jwt) {
-    console.log();
     const res = await new Promise((resolve, reject) => {
       const req = chai.request(strapi.server).post('/graphql');
       if (jwt) {

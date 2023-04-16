@@ -2,8 +2,6 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const createUser = require('../../helpers/create-user');
-const deleteUser = require('../../helpers/delete-user');
-const deletePost = require('../../helpers/delete-post');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 const getPostById = require('../../helpers/get-post-by-id');
 
@@ -17,8 +15,6 @@ const MUTATION_CREATE_POST = {
 };
 
 describe('Check auto-generation of the post\'s name in create/update actions INTEGRATION', () => {
-  let posts = [];
-
   let authUser;
 
   before(async () => {
@@ -26,10 +22,8 @@ describe('Check auto-generation of the post\'s name in create/update actions INT
   });
 
   after(async () => {
-    for (let post of posts) {
-      await deletePost(strapi, post);
-    }
-    await deleteUser(strapi, authUser);
+    await strapi.query('post').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
   it('should create an article with the name attribute', async () => {
@@ -51,7 +45,6 @@ describe('Check auto-generation of the post\'s name in create/update actions INT
 
     const post = await getPostById(strapi, res.body.data.createPost.post.id);
 
-    posts.push(post);
     expect(post.name.substring(0, post.name.length - 5)).to.equal('this-is-an-example-of-title');
   });
 });
