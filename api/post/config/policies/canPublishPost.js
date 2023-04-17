@@ -6,7 +6,7 @@
 
 module.exports = async (ctx, next) => {
   if (!strapi.services.post.isAdmin(ctx)) {
-    delete ctx.request.body.published_at;
+    ctx.request.body.published_at = null;
   }
   return await next();
 };

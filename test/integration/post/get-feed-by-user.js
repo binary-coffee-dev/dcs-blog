@@ -21,7 +21,7 @@ describe('Get feed by username INTEGRATION', () => {
     for (let i = 0; i < PUBLISHED_ARTICLES; i++) {
       await createPost(strapi, {author: authUser});
     }
-    await createPost(strapi, {author: authUser, publishedAt: null});
+    await createPost(strapi, {author: authUser, published_at: null});
   });
 
   after(async () => {

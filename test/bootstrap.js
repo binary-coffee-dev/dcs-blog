@@ -6,12 +6,11 @@ const dropDB = require('./helpers/dropDB');
 before(async function () {
   this.timeout(60000);
 
-  // await Strapi({autoReload: false, dev: true, browser: false}).start();
+  // await Strapi({autoReload: false, browser: false}).start();
   await Strapi().load();
-  // await strapi.server.mount();
-
-  // Add administration secret
-  // strapi.config.server.admin.auth.secret = 'test-admin';
+  strapi.app
+    .use(strapi.router.routes())
+    .use(strapi.router.allowedMethods());
 
   // create initial admin by default
   await strapi.admin.services.user.create({
@@ -23,8 +22,6 @@ before(async function () {
 });
 
 after(async () => {
-  // await strapi.server.httpServer.close();
-  // await strapi.db.connection.destroy();
   await dropDB(strapi);
   await strapi.stop(0);
 });

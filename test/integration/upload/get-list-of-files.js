@@ -12,7 +12,7 @@ const expect = chai.expect;
 const QUERY_LIST_OF_FILES = {
   operationName: null,
   // language=GraphQL
-  query: '\nquery ($limit: Int!, $start: Int!, $where: JSON) {\n  imagesConnection(sort: "createdAt:desc",limit: $limit, start: $start, where: $where){\n    values {\n      id\n      image {\n        id\n        name\n        url\n        mime\n      }\n    }\n    aggregate {\n      count\n      totalCount\n    }\n  }\n}'
+  query: '\nquery ($limit: Int!, $start: Int!, $where: JSON) {\n  imagesConnection(sort: "created_at:DESC",limit: $limit, start: $start, where: $where){\n    values {\n      id\n      image {\n        id\n        name\n        url\n        mime\n      }\n    }\n    aggregate {\n      count\n      totalCount\n    }\n  }\n}'
 };
 
 describe('Get list of upload files INTEGRATION', () => {
@@ -29,6 +29,12 @@ describe('Get list of upload files INTEGRATION', () => {
         await createFile(strapi, user2);
       }
     }
+  });
+
+  after(async () => {
+    await strapi.query('image').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
+    await strapi.query('file', 'upload').delete({});
   });
 
   it('should get the list of images', async () => {

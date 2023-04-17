@@ -10,7 +10,6 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 const LIKE = 'like';
-const DISLIKE = 'dislike';
 const QUERY_COUNT_OPINION = {
   operationName: null,
   query: 'query ($where: JSON!){\n  countOpinions(where: $where)\n}'
@@ -26,21 +25,20 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.models.post.deleteMany({});
-    await strapi.plugins['users-permissions'].models.user.deleteMany({});
+    await strapi.query('post').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
   afterEach(async () => {
-    await strapi.models.opinion.deleteMany({});
+    await strapi.query('opinion').delete({});
   });
 
   it('should count the number of opinions by post', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPostRequest(strapi, chai, {author: authUser.id}, jwt);
 
-    await strapi.models.opinion.create({user: authUser.id, post: post.id, type: LIKE});
-    await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: LIKE});
-    await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: DISLIKE});
+    await strapi.query('opinion').create({user: authUser.id, post: post.id, type: LIKE});
+    await strapi.query('opinion').create({user: staffUser.id, post: post.id, type: LIKE});
 
     const res = await new Promise(resolve => {
       chai.request(strapi.server)
@@ -57,9 +55,8 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPostRequest(strapi, chai, {author: authUser.id}, jwt);
 
-    await strapi.models.opinion.create({user: authUser.id, post: post.id, type: LIKE});
-    await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: LIKE});
-    await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: DISLIKE});
+    await strapi.query('opinion').create({user: authUser.id, post: post.id, type: LIKE});
+    await strapi.query('opinion').create({user: staffUser.id, post: post.id, type: LIKE});
 
     const res = await new Promise(resolve => {
       chai.request(strapi.server)

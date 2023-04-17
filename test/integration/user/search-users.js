@@ -2,7 +2,6 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const createUser = require('../../helpers/create-user');
-const deleteUser = require('../../helpers/delete-user');
 const createComment = require('../../helpers/create-comment');
 const createPost = require('../../helpers/create-post');
 
@@ -14,25 +13,20 @@ const QUERY_SEARCH_USERS = {
   operationName: null,
   variables: {search: ''},
   // language=GraphQL
-  query: 'query ($search: String!){\n  users2(sort: "asc", limit: 10, start: 0, where: {username: $search}) {\n    id\n    username\n    avatarUrl\n    name\n    comments\n    posts\n  }\n}'
+  query: 'query ($search: String!){\n  users2(sort: "created_at:ASC", limit: 10, start: 0, where: {username: $search}) {\n    id\n    username\n    avatarUrl\n    name\n    comments\n    posts\n  }\n}'
 };
-const MAX_NUMBER = 20;
 const NUMBER_OF_COMMENTS = 10;
 const NUMBER_OF_POST = 4;
 
 describe('Search users INTEGRATION', () => {
-  let users = [];
   let userWithArticles;
   let userWithNoArticles;
   let userWithComments;
 
   before(async () => {
-    for (let i = 0; i < MAX_NUMBER; i++) {
-      users.push(await createUser({strapi}));
-    }
-    userWithArticles = users[0];
-    userWithComments = users[1];
-    userWithNoArticles = users[2];
+    userWithArticles = await createUser({strapi});
+    userWithComments = await createUser({strapi});
+    userWithNoArticles = await createUser({strapi});
 
     for (let i = 0; i < NUMBER_OF_COMMENTS; i++) {
       await createComment(strapi, {user: userWithComments});
@@ -45,16 +39,16 @@ describe('Search users INTEGRATION', () => {
   });
 
   after(async () => {
-    for (let user of users) {
-      await deleteUser(strapi, user);
-    }
+    await strapi.query('post').delete({});
+    await strapi.query('comment').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
   it('should filter one user from the list', async () => {
     const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')
-        .send({...QUERY_SEARCH_USERS, variables: {search: users[0].username}})
+        .send({...QUERY_SEARCH_USERS, variables: {search: userWithArticles.username}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
     console.log(res.body);
@@ -98,7 +92,7 @@ describe('Search users INTEGRATION', () => {
     const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
         .post('/graphql')
-        .send({...QUERY_SEARCH_USERS, variables: {search: users[0].username.substr(2, 6)}})
+        .send({...QUERY_SEARCH_USERS, variables: {search: userWithArticles.username.substr(2, 6)}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
     expect(res.body.data.users2.length).to.be.greaterThan(0);

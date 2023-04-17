@@ -11,6 +11,8 @@ module.exports = ({env}) => ({
   maxPostRequestLimit: 20,
   maxSimilarPostRequestLimit: 20,
   maxNumberOfArticlesPerDay: 5,
+  maxNumberOfCommentsPerDay: 20,
+  maxNumberOfUploadsPerDay: 10,
 
   googleClientId: env('GOOGLE_CLIENT_ID', ''),
   googleClientSecret: env('GOOGLE_CLIENT_SECRET', ''),

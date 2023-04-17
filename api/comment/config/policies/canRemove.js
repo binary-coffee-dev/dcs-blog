@@ -5,8 +5,8 @@
  */
 module.exports = async (ctx, next) => {
   if (!strapi.services.post.isAdmin(ctx) && !strapi.services.post.isStaff(ctx)) {
-    const comment = await strapi.models.comment.findOne({_id: ctx.params.id}).populate('user');
-    if (comment.user.id.toString() !== ctx.state.user.id.toString()) {
+    const comment = await strapi.query('comment').findOne({id: ctx.params.id});
+    if (+comment.user.id !== +ctx.state.user.id) {
       ctx.forbidden('Can not remove the comment');
       throw new Error('Can not remove the comment');
     }

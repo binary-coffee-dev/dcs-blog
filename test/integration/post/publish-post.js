@@ -51,7 +51,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).not.null;
+    expect(post.published_at).to.be.null;
   });
 
   it('should create an article without the publishedAt attribute (auth user)', async () => {
@@ -60,7 +60,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).not.null;
+    expect(post.published_at).to.be.null;
   });
 
   it('should update an article with the publishedAt attribute (admin user)', async () => {
@@ -68,7 +68,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
 
-    expect(adminPost.published_at).to.be.undefined;
+    expect(adminPost.published_at).to.be.null;
 
     const postRes = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
@@ -79,14 +79,14 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   it('should update an article without the publishedAt attribute (staff user)', async () => {
     const jwt = generateJwt(strapi, staffUser);
 
-    const authPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
+    const staffPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
 
-    expect(authPost.published_at).to.be.undefined;
+    expect(staffPost.published_at).to.be.null;
 
-    const postRes = await updatePostRequest(strapi, chai, {id: authPost.id}, jwt);
+    const postRes = await updatePostRequest(strapi, chai, {id: staffPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).not.null;
+    expect(post.published_at).to.be.null;
   });
 
   it('should update an article without the publishedAt attribute (auth user)', async () => {
@@ -94,12 +94,12 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     const authPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
 
-    expect(authPost.published_at).to.be.undefined;
+    expect(authPost.published_at).to.be.null;
 
     const postRes = await updatePostRequest(strapi, chai, {id: authPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).to.be.undefined;
+    expect(post.published_at).to.be.null;
   });
 
   it('should not allow to publish a post with an empty title', async () => {

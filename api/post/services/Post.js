@@ -134,8 +134,8 @@ module.exports = {
   },
 
   async updateComments(postId) {
-    const countOfComments = await strapi.services.comment.count({post: postId});
-    await strapi.services.post.update({id: postId}, {comments: countOfComments});
+    const countOfComments = await strapi.query('comment').count({post: postId});
+    await strapi.query('post').update({id: postId}, {comments: countOfComments});
   },
 
   async getPublicPostsOfLastDays(days) {
@@ -264,6 +264,6 @@ module.exports = {
   },
 
   isPublish(post) {
-    return post && post.enable && post.publishedAt && new Date(post.published_at).getTime() <= new Date().getTime();
+    return post && post.enable && post.published_at && new Date(post.published_at).getTime() <= new Date().getTime();
   }
 };

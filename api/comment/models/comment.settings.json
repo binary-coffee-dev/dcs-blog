@@ -15,9 +15,6 @@
     "body": {
       "type": "richtext"
     },
-    "publishedAt": {
-      "type": "datetime"
-    },
     "email": {
       "type": "email"
     },

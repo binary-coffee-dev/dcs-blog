@@ -2,9 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const createUser = require('../../helpers/create-user');
-const deleteUser = require('../../helpers/delete-user');
 const createEpisode = require('../../helpers/create-episode');
-const deleteEpisode = require('../../helpers/delete-episode');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 
 chai.use(chaiHttp);

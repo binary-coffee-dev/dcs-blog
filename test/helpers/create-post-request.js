@@ -2,7 +2,7 @@ const randomName = require('./random-name');
 
 const MUTATION_CREATE_POST = {
   operationName: null,
-  query: 'mutation ($title: String, $body: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {published_at: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      readingTime\n      name\n      __typename\n    }\n    __typename\n  }\n}\n'
+  query: 'mutation ($title: String, $body: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {published_at: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      readingTime\n      published_at\n      name\n      __typename\n    }\n    __typename\n  }\n}\n'
 };
 
 async function createPostRequest(strapi, chai, variables, jwt) {

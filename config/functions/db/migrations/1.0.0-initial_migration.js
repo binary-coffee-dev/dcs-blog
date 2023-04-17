@@ -43,6 +43,13 @@ module.exports = {
         type: 'application'
       },
       {
+        roles: [authRole, publicRole, staffRole, adminRole],
+        controller: 'episode',
+        actions: ['count', 'find', 'findone'],
+        enabled: true,
+        type: 'application'
+      },
+      {
         roles: [authRole, staffRole, adminRole],
         controller: 'post',
         actions: ['create', 'update'],
@@ -58,11 +65,60 @@ module.exports = {
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
+        controller: 'upload',
+        actions: ['count', 'find', 'findone', 'findconnection', 'search'],
+        enabled: true,
+        type: 'upload'
+      },
+      {
+        roles: [authRole, staffRole, adminRole],
+        controller: 'upload',
+        actions: ['upload', 'destroy'],
+        enabled: true,
+        type: 'upload'
+      },
+      {
+        roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'opinion',
         actions: ['count', 'find', 'findone'],
         enabled: true,
         type: 'application'
-      }
+      },
+      {
+        roles: [authRole, staffRole, adminRole],
+        controller: 'opinion',
+        actions: ['create', 'delete'],
+        enabled: true,
+        type: 'application'
+      },
+      {
+        roles: [publicRole, authRole, staffRole, adminRole],
+        controller: 'user',
+        actions: ['toppopularusers', 'topactiveusers', 'find', 'findone', 'find2'],
+        enabled: true,
+        type: 'users-permissions'
+      },
+      {
+        roles: [authRole, publicRole, staffRole, adminRole],
+        controller: 'comment',
+        actions: ['count', 'find', 'findone', 'recentcomments'],
+        enabled: true,
+        type: 'application'
+      },
+      {
+        roles: [authRole, staffRole, adminRole],
+        controller: 'comment',
+        actions: ['create', 'update', 'delete'],
+        enabled: true,
+        type: 'application'
+      },
+      {
+        roles: [authRole, publicRole, staffRole, adminRole],
+        controller: 'image',
+        actions: ['find', 'findone', 'findextra', 'count'],
+        enabled: true,
+        type: 'application'
+      },
     ];
 
     for (let controller of controllers) {

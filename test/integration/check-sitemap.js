@@ -1,7 +1,6 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const deletePost = require('../helpers/delete-post');
 const randomName = require('../helpers/random-name');
 
 chai.use(chaiHttp);
@@ -23,7 +22,8 @@ describe('Check sitemap functionality INTEGRATION', () => {
   });
 
   after(async () => {
-    await deletePost(strapi);
+    await strapi.query('post').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
   it('should get the sitemap of the site', async () => {

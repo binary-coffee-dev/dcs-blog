@@ -1,10 +1,9 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const createUser = require('../helpers/create-user');
-const deleteUser = require('../helpers/delete-user');
-const generateJwt = require('../helpers/generate-jwt-by-user');
-const createFile = require('../helpers/create-file');
+const createUser = require('../../helpers/create-user');
+const generateJwt = require('../../helpers/generate-jwt-by-user');
+const createFile = require('../../helpers/create-file');
 
 chai.use(chaiHttp);
 
@@ -28,16 +27,9 @@ describe('Remove file/images INTEGRATION', () => {
   });
 
   after(async () => {
-    for (let file of files) {
-      await strapi.plugins.upload.models.file.deleteOne({_id: file.id});
-    }
-    for (let image of images) {
-      await strapi.models.image.deleteOne({_id: image.id});
-    }
-
-    await deleteUser(strapi, authUser);
-    await deleteUser(strapi, staffUser);
-    await deleteUser(strapi, adminUser);
+    await strapi.query('image').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
+    await strapi.query('file', 'upload').delete({});
   });
 
   it('should remove the file (admin)', async () => {
@@ -54,11 +46,11 @@ describe('Remove file/images INTEGRATION', () => {
         });
     });
 
-    const tfile = await strapi.plugins.upload.models.file.findOne({_id: file.id});
-    const timage = await strapi.services.image.findOne({_id: image.id});
+    const tfile = await strapi.query('file', 'upload').findOne({id: file.id});
+    const timage = await strapi.query('image').findOne({id: image.id});
 
-    expect(!!tfile).to.be.false;
-    expect(!!timage).to.be.false;
+    expect(tfile).to.be.null;
+    expect(timage).to.be.null;
   });
 
   it('should remove the file (staff)', async () => {
@@ -75,11 +67,11 @@ describe('Remove file/images INTEGRATION', () => {
         });
     });
 
-    const tfile = await strapi.plugins.upload.models.file.findOne({_id: file.id});
-    const timage = await strapi.services.image.findOne({_id: image.id});
+    const tfile = await strapi.query('file', 'upload').findOne({id: file.id});
+    const timage = await strapi.query('image').findOne({id: image.id});
 
-    expect(!!tfile).to.be.false;
-    expect(!!timage).to.be.false;
+    expect(tfile).to.be.null;
+    expect(timage).to.be.null;
   });
 
   it('should remove the file (auth)', async () => {
@@ -96,11 +88,11 @@ describe('Remove file/images INTEGRATION', () => {
         });
     });
 
-    const tfile = await strapi.plugins.upload.models.file.findOne({_id: file.id});
-    const timage = await strapi.services.image.findOne({_id: image.id});
+    const tfile = await strapi.query('file', 'upload').findOne({id: file.id});
+    const timage = await strapi.query('image').findOne({id: image.id});
 
-    expect(!!tfile).to.be.false;
-    expect(!!timage).to.be.false;
+    expect(tfile).to.be.null;
+    expect(timage).to.be.null;
   });
 
   it('should not be able to remove the file (public)', async () => {
@@ -119,12 +111,12 @@ describe('Remove file/images INTEGRATION', () => {
         });
     });
 
-    const tfile = await strapi.plugins.upload.models.file.findOne({_id: file.id});
-    const timage = await strapi.services.image.findOne({_id: image.id});
+    const tfile = await strapi.query('file', 'upload').findOne({id: file.id});
+    const timage = await strapi.query('image').findOne({id: image.id});
 
     expect(res).to.have.status(500);
-    expect(!!tfile).to.be.true;
-    expect(!!timage).to.be.true;
+    expect(tfile).not.null;
+    expect(timage).not.null;
   });
 
   it('should not be able to remove the file (auth)', async () => {
@@ -140,11 +132,11 @@ describe('Remove file/images INTEGRATION', () => {
         });
     });
 
-    const tfile = await strapi.plugins.upload.models.file.findOne({_id: file.id});
-    const timage = await strapi.services.image.findOne({_id: image.id});
+    const tfile = await strapi.query('file', 'upload').findOne({id: file.id});
+    const timage = await strapi.query('image').findOne({id: image.id});
 
     expect(res).to.have.status(403);
-    expect(!!tfile).to.be.true;
-    expect(!!timage).to.be.true;
+    expect(tfile).not.null;
+    expect(timage).not.null;
   });
 });

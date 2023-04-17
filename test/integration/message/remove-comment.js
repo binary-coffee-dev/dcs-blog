@@ -13,7 +13,7 @@ const expect = chai.expect;
 const QUERY_COMMENTS_BY_POST = {
   operationName: null,
   // language=GraphQL
-  query: 'query ($postId: ID){\n  commentsConnection(\n    sort: "publishedAt:desc"\n    limit: 100\n    start: 0\n    where: {post: $postId}\n  ){\n    values {\n      id\n      body\n      publishedAt\n      name\n      user {\n        username\n        avatarUrl\n        role { name }\n      }\n    }\n    aggregate {\n      count\n    }\n  }\n}'
+  query: 'query ($postId: ID){\n  commentsConnection(\n    sort: "published_at:DESC"\n    limit: 100\n    start: 0\n    where: {post: $postId}\n  ){\n    values {\n      id\n      body\n      published_at\n      name\n      user {\n        username\n        avatarUrl\n        role { name }\n      }\n    }\n    aggregate {\n      count\n    }\n  }\n}'
 };
 
 const MUTATION_REMOVE_COMMENT = {
@@ -25,7 +25,7 @@ const MUTATION_REMOVE_COMMENT = {
 const MUTATION_CREATE_COMMENT = {
   operationName: null,
   // language=GraphQL
-  query: 'mutation create(\n  $body: String\n  $post: ID\n) {\n  createComment(input: {data: {body: $body, post: $post}}){\n    comment {\n      id\n      body\n      publishedAt\n      name\n      user {\n        username\n        avatar {\n          url\n        }\n      }\n    }\n  }\n}'
+  query: 'mutation create(\n  $body: String\n  $post: ID\n) {\n  createComment(input: {data: {body: $body, post: $post}}){\n    comment {\n      id\n      body\n      published_at\n      name\n      user {\n        username\n        avatar {\n          url\n        }\n      }\n    }\n  }\n}'
 };
 
 describe('Remove comments INTEGRATION', () => {
@@ -37,7 +37,13 @@ describe('Remove comments INTEGRATION', () => {
     post = await createPost(strapi, {author: user});
   });
 
-  it('should not return the removed comments', async () => {
+  after(async () => {
+    await strapi.query('post').delete({});
+    await strapi.query('comment').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
+  });
+
+  it('should return the list of comments', async () => {
     const comments = [];
     for (let i = 0; i < 20; i++) {
       const comment = await createComment(strapi, {user, post});
@@ -62,7 +68,7 @@ describe('Remove comments INTEGRATION', () => {
       .send({...MUTATION_REMOVE_COMMENT, variables: {id: comment.id}})
       .end((err, res) => err ? reject(err) : resolve(res)));
 
-    comment = await strapi.models.comment.findOne({_id: comment.id});
+    comment = await strapi.query('comment').findOne({id: comment.id});
     expect(!!comment).to.be.false;
   });
 
@@ -77,7 +83,7 @@ describe('Remove comments INTEGRATION', () => {
       .send({...MUTATION_REMOVE_COMMENT, variables: {id: comment.id}})
       .end((err, res) => err ? reject(err) : resolve(res)));
 
-    comment = await strapi.models.comment.findOne({_id: comment.id});
+    comment = await strapi.query('comment').findOne({id: comment.id});
     expect(!!comment).to.be.true;
   });
 
@@ -91,8 +97,8 @@ describe('Remove comments INTEGRATION', () => {
       .set('Authorization', `Bearer ${jwt}`)
       .send({...MUTATION_CREATE_COMMENT, variables: {body: randomName(), post: post2.id}})
       .end((err, res) => err ? reject(err) : resolve(res)));
-    post2 = await strapi.models.post.findOne({_id: post2.id});
-    expect(post2.comments.toNumber()).to.be.equal(1);
+    post2 = await strapi.query('post').findOne({id: post2.id});
+    expect(+post2.comments).to.be.equal(1);
 
     let comment = res.body.data.createComment.comment;
 
@@ -102,10 +108,10 @@ describe('Remove comments INTEGRATION', () => {
       .send({...MUTATION_REMOVE_COMMENT, variables: {id: comment.id}})
       .end((err, res) => err ? reject(err) : resolve(res)));
 
-    comment = await strapi.models.comment.findOne({_id: comment.id});
+    comment = await strapi.query('comment').findOne({id: comment.id});
     expect(!!comment).to.be.false;
 
-    post2 = await strapi.models.post.findOne({_id: post2.id});
-    expect(post2.comments.toNumber()).to.be.equal(0);
+    post2 = await strapi.query('post').findOne({id: post2.id});
+    expect(+post2.comments).to.be.equal(0);
   });
 });
