@@ -99,6 +99,13 @@ module.exports = {
         type: 'users-permissions'
       },
       {
+        roles: [publicRole, authRole, staffRole, adminRole],
+        controller: 'auth',
+        actions: ['loginwithprovider'],
+        enabled: true,
+        type: 'users-permissions'
+      },
+      {
         roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'comment',
         actions: ['count', 'find', 'findone', 'recentcomments'],

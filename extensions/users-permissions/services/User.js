@@ -4,15 +4,15 @@ module.exports = {
     const usersQuery = await strapi.connections.default
       .raw('SELECT u.id, (SELECT COUNT(id) FROM post WHERE author=u.id AND enable=1 AND published_at<=?) AS counter FROM `users-permissions_user` AS u ORDER BY counter DESC limit ?;',
         [new Date(), limit]);
-    return this.getTopUserFormatted(usersQuery);
+    return this.getTopUserFormatted(usersQuery[0]);
   },
 
   async topPopularUsers() {
     const limit = strapi.config.custom.maxNumberOfTopUsers;
     const usersQuery = await strapi.connections.default
-      .raw('SELECT u.id, (SELECT likes FROM post WHERE author=u.id AND enable=1 AND published_at<=?) AS counter FROM `users-permissions_user` AS u ORDER BY counter DESC limit ?;',
+      .raw('SELECT u.id, (SELECT SUM(likes) FROM post WHERE author=u.id AND enable=1 AND published_at<=?) AS counter FROM `users-permissions_user` AS u ORDER BY counter DESC limit ?;',
         [new Date(), limit]);
-    return this.getTopUserFormatted(usersQuery);
+    return this.getTopUserFormatted(usersQuery[0]);
   },
 
   async getTopUserFormatted(usersQuery) {
@@ -20,11 +20,11 @@ module.exports = {
       id_in: usersQuery.map(u => u.id)
     });
     const ma = usersQuery.reduce((p, v) => {
-      p.set(v.id, v.counter);
+      p.set(v.id, +v.counter);
       return p;
     }, new Map());
     users = users.sort((a, b) => ma.get(b.id) - ma.get(a.id));
-    const values = usersQuery.map(v => v.counter);
+    const values = usersQuery.map(v => +v.counter);
     return {users, values};
   }
 };
