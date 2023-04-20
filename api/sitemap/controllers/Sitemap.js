@@ -18,16 +18,15 @@ module.exports = {
       }
     };
 
-    // toDo 16.04.23, guille, update this query
-    const res = await strapi.query('post').model.query(qb => {
-      qb.orderBy('publishedAt', 'ASC');
-      qb.whereRaw('publishedAt < ? AND enable = 1', [new Date().toISOString().slice(0, 19).replace('T', ' ')]);
-    }).fetchAll();
-    const posts = res.models;
+    const posts = await strapi.query('post').find({
+      enable: true,
+      published_at_lte: new Date(),
+      _sort: 'published_at:ASC'
+    });
 
     posts.forEach(post => mapsite.urlset.url.push({
-      loc: `${siteUrl}/post/${post.get('name')}`,
-      lastmod: new Date(post.get('publishedAt')).toISOString(),
+      loc: `${siteUrl}/post/${post['name']}`,
+      lastmod: new Date(post['published_at']).toISOString(),
       changefreq: 'monthly',
       priority: 0.5
     }));

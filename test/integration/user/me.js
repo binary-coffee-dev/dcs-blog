@@ -29,5 +29,9 @@ describe('Get me user INTEGRATION', () => {
       .end((err, res) => err ? reject(err) : resolve(res)));
 
     expect(res.body.data.myData).not.null;
+    expect(+res.body.data.myData.id).to.be.equal(+user.id);
+    expect(res.body.data.myData.username).to.be.equal(user.username);
+    expect(res.body.data.myData.avatarUrl).to.be.equal(user.avatarUrl);
+    expect(res.body.data.myData.role.type).to.be.equal(user.role.type);
   });
 });

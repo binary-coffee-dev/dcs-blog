@@ -51,7 +51,7 @@ const UserNew = {
     await User.me(ctx);
     if (!ctx.body.avatar) {
       const FIRST_PROVIDER = 0;
-      const providers = await strapi.query('provider').find({'users-permissions_user_id': ctx.body.id});
+      const providers = await strapi.query('provider').find({'user': ctx.body.id});
       const provider = providers[FIRST_PROVIDER];
       ctx.body.avatar = {
         url: provider.avatar

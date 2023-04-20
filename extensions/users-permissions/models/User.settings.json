@@ -75,6 +75,7 @@
       "type": "string"
     },
     "providers": {
+      "via": "user",
       "collection": "provider"
     },
     "images": {

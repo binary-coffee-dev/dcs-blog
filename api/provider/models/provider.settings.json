@@ -30,6 +30,11 @@
     "token": {
       "private": true,
       "type": "string"
+    },
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user",
+      "via": "providers"
     }
   }
 }

@@ -43,7 +43,7 @@ describe('Post service', function () {
     const where = {author: '123ouhvsodflknl', title: 'sondflksdflkasjdf', not: 'asdf'};
     expect(Post.convertToLikeQuery(where)).to.deep.equal({
       author: '123ouhvsodflknl',
-      title: /sondflksdflkasjdf/i,
+      title_contains: 'sondflksdflkasjdf',
       not: 'asdf'
     });
   });

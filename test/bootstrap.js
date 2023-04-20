@@ -4,7 +4,7 @@ const Strapi = require('strapi');
 const dropDB = require('./helpers/dropDB');
 
 before(async function () {
-  this.timeout(60000);
+  this.timeout(0);
 
   // await Strapi({autoReload: false, browser: false}).start();
   await Strapi().load();

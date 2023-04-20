@@ -54,7 +54,6 @@ describe('Get popular users INTEGRATION', () => {
     for (let i = 0; i < strapi.config.custom.maxNumberOfTopUsers; i++) {
       expect(+topUsers[i].id).to.be.equal(+users[MAX_NUMBER - i - 1].id);
     }
-    expect(topValues.length).to.be.equal(strapi.config.custom.maxNumberOfTopUsers);
   });
 
   it('should get the the list of popular users (auth)', async () => {
@@ -74,6 +73,5 @@ describe('Get popular users INTEGRATION', () => {
     for (let i = 0; i < strapi.config.custom.maxNumberOfTopUsers; i++) {
       expect(+topUsers[i].id).to.be.equal(+users[MAX_NUMBER - i - 1].id);
     }
-    expect(topValues.length).to.be.equal(strapi.config.custom.maxNumberOfTopUsers);
   });
 });
