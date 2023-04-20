@@ -70,44 +70,21 @@ const UserNew = {
   },
 
   async topPopularUsers(ctx) {
-    const topUsersIds = await strapi.models.post.aggregate([
-      {$match: {'author': {$exists: true}}},
-      {
-        $group: {
-          '_id': '$author',
-          'likesCount': {$sum: '$likes'}
-        }
-      },
-      {$sort: {'likesCount': -1}},
-      {$limit: 5}
-    ]);
-    const users = await getUsersById(topUsersIds);
-    ctx.send({users, values: topUsersIds.map(v => v.likesCount)});
+    const {users, values} = await strapi.plugins['users-permissions'].services.user.topPopularUsers();
+
+    ctx.send({
+      users: users.map(u => sanitizeEntity(u || {}, {model: strapi.plugins['users-permissions'].models.user})),
+      values
+    });
   },
 
   async topActiveUsers(ctx) {
-    try {
-      const limit = 5
-      const usersQuery = await strapi.connections.default
-        .raw('SELECT u.id, (SELECT COUNT(id) FROM post WHERE author=u.id) AS articles FROM `users-permissions_user` AS u WHERE enable=1 AND published_at<=? ORDER BY articles DESC limit ?;',
-          [new Date(), limit]);
-      let users = await strapi.query('user', 'users-permissions').find({
-        id_in: usersQuery.map(u => u.id)
-      });
-      const ma = usersQuery.reduce((p, v) => {
-        p.set(v.id, v.articles);
-        return p;
-      }, new Map());
-      users = users.sort((a, b) => ma.get(b.id) - ma.get(a.id));
-      ;
-      const values = usersQuery.map(v => v.articles);
-      ctx.send({
-        users: users.map(u => sanitizeEntity(u || {}, {model: strapi.plugins['users-permissions'].models.user})),
-        values
-      });
-    } catch (e) {
-      console.log(e)
-    }
+    const {users, values} = await strapi.plugins['users-permissions'].services.user.topActiveUsers();
+
+    ctx.send({
+      users: users.map(u => sanitizeEntity(u || {}, {model: strapi.plugins['users-permissions'].models.user})),
+      values
+    });
   }
 };
 

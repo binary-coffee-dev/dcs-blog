@@ -13,6 +13,7 @@ module.exports = ({env}) => ({
   maxNumberOfArticlesPerDay: 5,
   maxNumberOfCommentsPerDay: 20,
   maxNumberOfUploadsPerDay: 10,
+  maxNumberOfTopUsers: 5,
 
   googleClientId: env('GOOGLE_CLIENT_ID', ''),
   googleClientSecret: env('GOOGLE_CLIENT_SECRET', ''),
