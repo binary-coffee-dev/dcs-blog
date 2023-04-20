@@ -86,42 +86,28 @@ const UserNew = {
   },
 
   async topActiveUsers(ctx) {
-    let users;
     try {
-      // users = await strapi.query('user', 'users-permissions').model.query(qb => {
-      //   qb.select('articles', this.db.raw('(select count(id) from post where author=`users-permissions_user`.id) as count'));
-      //   // qb.limit(5);
-      // }).fetchAll();
-      users = await strapi.connections.default.raw('select u.*, (select count(id) from post where author=u.id) as articles from `users-permissions_user` as u order by articles DESC limit 5;');
+      const limit = 5
+      const usersQuery = await strapi.connections.default
+        .raw('SELECT u.id, (SELECT COUNT(id) FROM post WHERE author=u.id) AS articles FROM `users-permissions_user` AS u WHERE enable=1 AND published_at<=? ORDER BY articles DESC limit ?;',
+          [new Date(), limit]);
+      let users = await strapi.query('user', 'users-permissions').find({
+        id_in: usersQuery.map(u => u.id)
+      });
+      const ma = usersQuery.reduce((p, v) => {
+        p.set(v.id, v.articles);
+        return p;
+      }, new Map());
+      users = users.sort((a, b) => ma.get(b.id) - ma.get(a.id));
+      ;
+      const values = usersQuery.map(v => v.articles);
+      ctx.send({
+        users: users.map(u => sanitizeEntity(u || {}, {model: strapi.plugins['users-permissions'].models.user})),
+        values
+      });
     } catch (e) {
-      console.error(e);
+      console.log(e)
     }
-    // .populate({
-    //   path: 'articles',
-    //   populate: {
-    //     path: '_count'
-    //   }
-    // });
-    console.log()
-    //   await strapi.models.post.aggregate([
-    //   {$match: {'author': {$exists: true}, publishedAt: {$lte: new Date()}, enable: true}},
-    //   {
-    //     $group: {
-    //       '_id': '$author',
-    //       'postCount': {$sum: 1}
-    //     }
-    //   },
-    //   {$sort: {'postCount': -1}},
-    //   {$limit: 5}
-    // ]);
-    // const users = await getUsersById(topUsersIds);
-    const values = users.map(v => v.articles);
-    users = users.map(u => {
-      u = sanitizeEntity(u || {}, {model: strapi.plugins['users-permissions'].models.user});
-      delete u.articles;
-      return u;
-    });
-    ctx.send({users, values});
   }
 };
 

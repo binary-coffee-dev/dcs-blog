@@ -54,7 +54,7 @@ describe('Get more active users INTEGRATION', () => {
     const topLength = topUsers.length;
 
     for (let i = 0; i < topLength; i++) {
-      expect(topUsers[topLength - i - 1].id).to.be.equal(users[MAX_NUMBER - i - 2].id);
+      expect(+topUsers[topLength - i - 1].id).to.be.equal(users[MAX_NUMBER - i - 2].id);
     }
 
     for (let i = 0; i < topLength; i++) {
