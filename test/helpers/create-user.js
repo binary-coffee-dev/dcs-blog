@@ -8,6 +8,6 @@ module.exports = async function ({strapi, roleType = 'authenticated', provider =
     role: role,
     name: randomName(),
     avatarUrl: '/some/eso.jpg',
-    providers: [provider]
+    providers: [provider.id]
   });
 };

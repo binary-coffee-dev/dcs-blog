@@ -61,7 +61,7 @@ describe('Get more active users INTEGRATION', () => {
     }
   });
 
-  it('should get the the list of mroe active users (auth)', async () => {
+  it('should get the the list of more active users (auth)', async () => {
     const jwt = generateJwt(strapi, users[0]);
     const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
