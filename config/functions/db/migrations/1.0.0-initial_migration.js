@@ -126,6 +126,13 @@ module.exports = {
         enabled: true,
         type: 'application'
       },
+      {
+        roles: [authRole, publicRole, staffRole, adminRole],
+        controller: 'tag',
+        actions: ['find', 'findone', 'count'],
+        enabled: true,
+        type: 'application'
+      },
     ];
 
     for (let controller of controllers) {
