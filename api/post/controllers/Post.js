@@ -23,7 +23,7 @@ module.exports = {
       (ctx.params.where && ctx.params.where.enable) || false;
     const where = ctx.params._where || ctx.params.where || {};
 
-    return strapi.services.post.count(ctx, publicOnly, where);
+    return await strapi.services.post.count(ctx, publicOnly, where);
   },
 
   async findOneByName(ctx) {
@@ -34,8 +34,10 @@ module.exports = {
   },
 
   async findSimilarPosts(ctx) {
-    let {id, limit = 10} = ctx.params;
-    return strapi.services.post.findSimilarPosts(ctx, id, limit);
+    const id = ctx.params.id;
+    const limit = (ctx.params.limit || ctx.params._limit);
+    const articles = await strapi.services.post.findSimilarPosts(ctx, id, limit);
+    return articles.map(article => sanitizeEntity(article, {model: strapi.models.post}));
   },
 
   async feedByUsername(ctx) {

@@ -12,7 +12,7 @@ const expect = chai.expect;
 const MUTATION_CREATE_COMMENT = {
   operationName: null,
   // language=GraphQL
-  query: 'mutation create(\n  $body: String\n  $post: ID\n) {\n  createComment(input: {data: {body: $body, post: $post}}){\n    comment {\n      id\n      body\n      publishedAt\n      name\n      user {\n        username\n        avatar {\n          url\n        }\n      }\n    }\n  }\n}'
+  query: 'mutation create(\n  $body: String\n  $post: ID\n) {\n  createComment(input: {data: {body: $body, post: $post}}){\n    comment {\n      id\n      body\n      published_at\n      name\n      user {\n        username\n        avatar {\n          url\n        }\n      }\n    }\n  }\n}'
 };
 
 describe('Update comments count in post INTEGRATION', () => {
@@ -22,6 +22,12 @@ describe('Update comments count in post INTEGRATION', () => {
   before(async () => {
     user = await createUser({strapi, roleType: 'administrator'});
     post = await createPost(strapi, {author: user});
+  });
+
+  after(async () => {
+    await strapi.query('post').delete({});
+    await strapi.query('comment').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
   it('should increment the count of comments in the post', async () => {
@@ -35,8 +41,8 @@ describe('Update comments count in post INTEGRATION', () => {
           .send({...MUTATION_CREATE_COMMENT, variables: {body: randomName(100), post: post.id}})
           .end((err, res) => err ? reject(err) : resolve(res));
       });
-      post = await strapi.models.post.findOne({_id: post._id});
-      expect(post.comments.toNumber()).to.be.equal(i + 1);
+      post = await strapi.query('post').findOne({id: post.id});
+      expect(+post.comments).to.be.equal(i + 1);
     }
   });
 });

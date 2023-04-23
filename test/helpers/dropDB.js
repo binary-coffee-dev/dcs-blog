@@ -1,3 +1,8 @@
 module.exports = async function (strapi) {
-  await strapi.connections.default.connections[0].db.dropDatabase();
+  const fs = require('fs');
+  const db = strapi.connections.default;
+  const filename = db.client.config.connection.filename;
+  if (fs.existsSync(filename)) {
+    fs.unlinkSync(filename);
+  }
 };

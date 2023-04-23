@@ -8,12 +8,20 @@
 module.exports = {
   lifecycles: {
     afterCreate: async (result) => {
-      const post = await strapi.services.post.findOne({id: result.post});
-      await strapi.models.post.update({_id: post._id}, {$set: {likes: post.likes.toNumber() + 1}});
+      const post = await strapi.query('post').findOne({id: result.post.id});
+      await strapi.query('post').update({id: post.id}, {likes: (+post.likes) + 1});
     },
     afterDelete: async (result) => {
-      const post = await strapi.services.post.findOne({id: result.post});
-      await strapi.models.post.update({_id: post._id}, {$set: {likes: post.likes.toNumber() - 1}});
+      const posts = [];
+      if (Array.isArray(result)) {
+        result.forEach(r => r.post && posts.push(r.post.id));
+      } else {
+        posts.push(result.post.id);
+      }
+      for (const id of posts) {
+        const post = await strapi.query('post').findOne({id});
+        await strapi.query('post').update({id}, {likes: (+post.likes) - 1});
+      }
     }
   }
 };

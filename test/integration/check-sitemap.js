@@ -1,7 +1,6 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 
-const deletePost = require('../helpers/delete-post');
 const randomName = require('../helpers/random-name');
 
 chai.use(chaiHttp);
@@ -12,7 +11,7 @@ describe('Check sitemap functionality INTEGRATION', () => {
   let posts = [];
 
   before(async () => {
-    posts.push(await strapi.models.post.create({
+    posts.push(await strapi.query('post').create({
       title: 'TITLE 1',
       name: randomName(),
       body: 'SOME',
@@ -23,17 +22,16 @@ describe('Check sitemap functionality INTEGRATION', () => {
   });
 
   after(async () => {
-    for (let post of posts) {
-      await deletePost(strapi, post);
-    }
+    await strapi.query('post').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
-  it('should create an article with the name attribute', (done) => {
-    chai.request(strapi.server)
-      .get('/sitemap')
-      .end((err, res) => {
-        expect(res.type).to.be.equal('application/xml');
-        done();
-      });
+  it('should get the sitemap of the site', async () => {
+    const res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server)
+        .get('/sitemap')
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    expect(res.type).to.be.equal('application/xml');
   });
 });

@@ -2,9 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const createUser = require('../../helpers/create-user');
-const deleteUser = require('../../helpers/delete-user');
-const deletePost = require('../../helpers/delete-post');
-const randomName = require('../../helpers/random-name');
+const createPost = require('../../helpers/create-post');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 
 chai.use(chaiHttp);
@@ -17,110 +15,64 @@ const QUERY = {
     limit: 10,
     start: 0,
     where: {},
-    sort: 'createdAt:desc',
+    sort: 'created_at:DESC',
   },
-  query: 'query pageQuery($limit: Int\u0021, $start: Int\u0021, $where: JSON\u0021, $sort: String\u0021) {\n  postsConnection(sort: $sort, limit: $limit, start: $start, where: $where) {\n    values {\n      id\n      name\n      title\n      enable\n      body\n      comments\n      publishedAt\n      views\n      banner {\n        name\n        url\n        __typename\n      }\n      author {\n        id\n        username\n        email\n        page\n        __typename\n      }\n      tags {\n        name\n        __typename\n      }\n      __typename\n    }\n    aggregate {\n      count\n      __typename\n    }\n    __typename\n  }\n  countPosts(where: $where)\n}\n'
+  query: 'query pageQuery($limit: Int\u0021, $start: Int\u0021, $where: JSON\u0021, $sort: String\u0021) {\n  postsConnection(sort: $sort, limit: $limit, start: $start, where: $where) {\n    values {\n      id\n      name\n      title\n      enable\n      body\n      comments\n      published_at\n      views\n      banner {\n        name\n        url\n        __typename\n      }\n      author {\n        id\n        username\n        email\n        page\n        __typename\n      }\n      tags {\n        name\n        __typename\n      }\n      __typename\n    }\n    aggregate {\n      count\n      __typename\n    }\n    __typename\n  }\n  countPosts(where: $where)\n}\n'
 };
 
 describe('Post list (dashboard list) INTEGRATION', () => {
-  let posts = [];
 
   let authUser;
   let staffUser;
   let adminUser;
 
   before(async () => {
-
-    await strapi.models.post.deleteMany({});
-
-    posts.push(await strapi.models.post.create({
-      title: 'TITLE 1',
-      name: randomName(),
-      body: 'SOME',
-      enable: true,
-      publishedAt: new Date(new Date() - 10)
-    }));
+    await createPost(strapi);
 
     authUser = await createUser({strapi});
-    posts.push(await strapi.models.post.create({
-      title: 'TITLE 2',
-      body: 'SOME',
-      name: randomName(),
-      enable: true,
-      author: authUser
-    }));
+    await createPost(strapi, {author: authUser, published_at: null});
 
     staffUser = await createUser({strapi, roleType: 'staff'});
-    posts.push(await strapi.models.post.create({
-      title: 'TITLE 3',
-      body: 'SOME',
-      name: randomName(),
-      enable: true,
-      author: staffUser
-    }));
+    await createPost(strapi, {author: staffUser, published_at: null});
 
     adminUser = await createUser({strapi, roleType: 'administrator'});
-    posts.push(await strapi.models.post.create({
-      title: 'TITLE 4',
-      body: 'SOME',
-      name: randomName(),
-      enable: true,
-      author: adminUser
-    }));
+    await createPost(strapi, {author: adminUser, published_at: null});
   });
 
   after(async () => {
-    for (let post of posts) {
-      await deletePost(strapi, post);
-    }
-    await deleteUser(strapi, authUser);
-    await deleteUser(strapi, staffUser);
-    await deleteUser(strapi, adminUser);
+    await strapi.query('post').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
-  it('should get the not published articles for the not authenticated users', (done) => {
-    chai.request(strapi.server)
-      .get('/graphql')
-      .send(QUERY)
-      .end((err, res) => {
-        expect(res.body).to.deep.equal({});
-        done();
-      });
+  it('should get the not published articles for the not authenticated users', async () => {
+    await requestArticles(null, 1);
   });
 
-  it('should get the articles of the current auth user', (done) => {
+  it('should get the articles of the current auth user', async () => {
     const jwt = generateJwt(strapi, authUser);
-    chai.request(strapi.server)
-      .post('/graphql')
-      .set('Authorization', `Bearer ${jwt}`)
-      .send(QUERY)
-      .end((err, res) => {
-        expect(res.body.data.countPosts).to.equal(2);
-        done();
-      });
+    await requestArticles(jwt, 2);
   });
 
-  it('should get the articles of the current staff user', (done) => {
+  it('should get the articles of the current staff user', async () => {
     const jwt = generateJwt(strapi, staffUser);
-    chai.request(strapi.server)
-      .post('/graphql')
-      .set('Authorization', `Bearer ${jwt}`)
-      .send(QUERY)
-      .end((err, res) => {
-        expect(res.body.data.countPosts).to.equal(4);
-        done();
-      });
+    await requestArticles(jwt, 4);
   });
 
-  it('should get the articles of the current admin user', (done) => {
+  it('should get the articles of the current admin user', async () => {
     const jwt = generateJwt(strapi, adminUser);
-    chai.request(strapi.server)
-      .post('/graphql')
-      .set('Authorization', `Bearer ${jwt}`)
-      .send(QUERY)
-      .end((err, res) => {
-        expect(res.body.data.countPosts).to.equal(4);
-        done();
-      });
+    await requestArticles(jwt, 4);
   });
+
+  async function requestArticles(jwt, expectedValue) {
+    const res = await new Promise((resolve, reject) => {
+      const action = chai.request(strapi.server).post('/graphql');
+      if (jwt) {
+        action.set('Authorization', `Bearer ${jwt}`);
+      }
+      action.send(QUERY)
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    expect(res.body.data.countPosts).to.equal(expectedValue);
+    expect(res.body.data.postsConnection.values.length).to.equal(expectedValue);
+  }
 });

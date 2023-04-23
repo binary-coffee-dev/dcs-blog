@@ -3,16 +3,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const Mongoose = require('mongoose');
-
-let MigrationVersion;
+const migrationTableName = 'migrations';
 
 const MigrationCore = {
   run: async () => {
-    const versions = (await MigrationCore.getVersions()).reduce((set, version) => {
-      set.add(version.version);
-      return set;
-    }, new Set());
+    const versionsQuery = await MigrationCore.getVersions();
+    const versions = new Set();
+    for (let entity of versionsQuery) {
+      versions.add(entity.version);
+    }
 
     const migrationsPath = path.join(__dirname, 'migrations');
     const dirs = fs.readdirSync(migrationsPath) || [];
@@ -36,65 +35,25 @@ const MigrationCore = {
   },
 
   saveNewMigrations: async (migrations) => {
+    const db = strapi.connections.default;
     migrations = migrations || [];
-    await MigrationCore.connect(strapi.config.connections.default);
-    const model = MigrationCore.getMigrationModel();
-    await model.create(migrations);
-    MigrationCore.disconnect();
+    for(let migration of migrations) {
+      await db.raw(
+        `INSERT INTO ${migrationTableName} (version, description) VALUES (?,?);`,
+        [migration.version, migration.description]);
+    }
   },
 
   getVersions: async () => {
-    await MigrationCore.connect(strapi.config.connections.default);
-    const model = MigrationCore.getMigrationModel();
-    const versions = await model.find();
-    MigrationCore.disconnect();
-    return versions;
-  },
-
-  getMigrationModel: () => {
-    if (!MigrationVersion) {
-      const migrationVersionSchema = new Mongoose.Schema({
-        version: String,
-        description: String
-      });
-      MigrationVersion = Mongoose.model('migration_version', migrationVersionSchema);
+    const db = strapi.connections.default;
+    if (process.env.NODE_ENV === 'test') {
+      await db.raw(`CREATE TABLE IF NOT EXISTS ${migrationTableName} (id INTEGER NOT NULL, version VARCHAR(255) UNIQUE, description VARCHAR(255), PRIMARY KEY(id AUTOINCREMENT));`);
+      return await db.raw(`SELECT * FROM ${migrationTableName};`);
+    } else {
+      await db.raw(`CREATE TABLE IF NOT EXISTS ${migrationTableName} (id INTEGER NOT NULL AUTO_INCREMENT, version VARCHAR(255) UNIQUE, description VARCHAR(255), PRIMARY KEY(id));`);
+      const res = await db.raw(`SELECT * FROM ${migrationTableName};`);
+      return res[0];
     }
-    return MigrationVersion;
-  },
-
-  connect: async (connection) => {
-    const {username, password, srv} = connection.settings;
-    const {authenticationDatabase, ssl, useUnifiedTopology} = connection.options;
-
-    const connectOptions = {};
-
-    if (username) {
-      connectOptions.user = username;
-
-      if (password) {
-        connectOptions.pass = password;
-      }
-    }
-
-    if (authenticationDatabase) {
-      connectOptions.authSource = authenticationDatabase;
-    }
-
-    connectOptions.ssl = !!ssl;
-    connectOptions.useNewUrlParser = true;
-    connectOptions.dbName = connection.settings.database;
-    connectOptions.useUnifiedTopology = useUnifiedTopology;
-
-    return Mongoose.connect(
-      `mongodb${srv ? '+srv' : ''}://${connection.settings.host}${
-        !srv ? `:${connection.settings.port}` : ''
-      }/`,
-      connectOptions
-    );
-  },
-
-  disconnect: () => {
-    Mongoose.connection.close();
   }
 };
 

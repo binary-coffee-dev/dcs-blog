@@ -1,10 +1,14 @@
-module.exports = ({env}) => ({
-  host: env('HOST', '0.0.0.0'),
+module.exports = () => ({
+  host: '0.0.0.0',
   port: 3021,
   cron: {
     enabled: false
   },
   admin: {
-    autoOpen: false
+    autoOpen: false,
+    browser: false,
+    auth: {
+      secret: '6V#j7xt3ZHBg'
+    }
   }
 });

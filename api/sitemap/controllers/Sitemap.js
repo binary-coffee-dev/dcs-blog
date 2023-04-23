@@ -18,15 +18,15 @@ module.exports = {
       }
     };
 
-    const sort = {'publishedAt': -1};
-    const query = {publishedAt: {$lte: new Date()}, enable: true};
-    const posts = await strapi.models.post.find(query)
-      .skip(0)
-      .sort(sort);
+    const posts = await strapi.query('post').find({
+      enable: true,
+      published_at_lte: new Date(),
+      _sort: 'published_at:ASC'
+    });
 
     posts.forEach(post => mapsite.urlset.url.push({
-      loc: `${siteUrl}/post/${post.name}`,
-      lastmod: post.publishedAt.toISOString(),
+      loc: `${siteUrl}/post/${post['name']}`,
+      lastmod: new Date(post['published_at']).toISOString(),
       changefreq: 'monthly',
       priority: 0.5
     }));

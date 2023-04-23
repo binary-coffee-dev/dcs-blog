@@ -1,12 +1,12 @@
 const randomName = require('./random-name');
 
 module.exports = async function (strapi, postAttr = {}) {
-  return strapi.models.post.create({
+  return strapi.query('post').create({
     title: randomName(),
     name: randomName(),
     body: randomName(),
     enable: true,
-    publishedAt: new Date(new Date() - 10),
+    published_at: new Date(new Date() - 10),
     ...postAttr
   });
 };

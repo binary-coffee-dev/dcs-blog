@@ -42,7 +42,7 @@ module.exports = {
         email: ctx.request.body.input.email,
         name: ctx.request.body.input.name,
         post: ctx.request.body.input.post,
-        publishedAt: new Date()
+        published_at: new Date()
       };
 
       const response = await strapi.services.comment.create(comment);
@@ -57,12 +57,12 @@ module.exports = {
       body: ctx.request.body.body,
       post: ctx.request.body.post,
       user: ctx.state.user.id,
-      publishedAt: new Date()
+      published_at: new Date()
     };
     if (obj.body && obj.post && obj.user) {
-      const comment = await strapi.services.comment.create(obj);
+      const comment = await strapi.query('comment').create(obj);
 
-      const post = await strapi.models.post.findOne({_id: comment.post});
+      const post = await strapi.query('post').findOne({id: comment.post.id});
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
       const postTitle = post.title;
 
@@ -83,8 +83,8 @@ module.exports = {
 
   async update(ctx) {
     if (ctx.request.body.body && ctx.params.id) {
-      await strapi.models.comment.update({_id: ctx.params.id}, {body: ctx.request.body.body});
-      const comment = await strapi.models.comment.findOne({_id: ctx.params.id});
+      await strapi.query('comment').update({id: ctx.params.id}, {body: ctx.request.body.body});
+      const comment = await strapi.query('comment').findOne({id: ctx.params.id});
       return sanitizeEntity(comment, {model: strapi.models.comment});
     }
     throw new Error('invalid data');

@@ -19,6 +19,11 @@ describe('Get post body by name INTEGRATION', () => {
     adminUser = await createUser({strapi, roleType: 'administrator'});
   });
 
+  after(async () => {
+    await strapi.query('post').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
+  });
+
   it('should get a post body by the name throw the api rest', async () => {
     const jwt = generateJwt(strapi, adminUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'The good one',}, jwt);

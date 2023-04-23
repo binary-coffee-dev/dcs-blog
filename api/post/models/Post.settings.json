@@ -7,10 +7,9 @@
     "description": ""
   },
   "options": {
-    "timestamps": [
-      "createdAt",
-      "updatedAt"
-    ]
+    "increments": true,
+    "timestamps": true,
+    "draftAndPublish": true
   },
   "attributes": {
     "title": {
@@ -55,9 +54,6 @@
     "commentsList": {
       "via": "post",
       "collection": "comment"
-    },
-    "publishedAt": {
-      "type": "datetime"
     },
     "tags": {
       "via": "posts",

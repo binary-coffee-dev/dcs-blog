@@ -3,23 +3,14 @@ const chaiHttp = require('chai-http');
 
 const randomName = require('../../helpers/random-name');
 const createUser = require('../../helpers/create-user');
-const createPost = require('../../helpers/create-post');
-const deleteUser = require('../../helpers/delete-user');
-const deletePost = require('../../helpers/delete-post');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
+const createPostRequest = require('../../helpers/create-post-request');
 
 chai.use(chaiHttp);
 
 const expect = chai.expect;
 
-const MUTATION_CREATE_POST = {
-  operationName: null,
-  query: 'mutation ($title: String, $body: String, $enable: Boolean, $banner: ID, $author: ID, $tags: [ID], $publishedAt: DateTime) {\n  createPost(input: {data: {publishedAt: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, author: $author, tags: $tags}}) {\n    post {\n      id\n      __typename\n    }\n    __typename\n  }\n}\n'
-};
-
 describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
-  let posts = [];
-
   let authUser;
   let admin;
 
@@ -29,38 +20,28 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   after(async () => {
-    for (let post of posts) {
-      await deletePost(strapi, post);
-    }
-    await deleteUser(strapi, authUser);
+    await strapi.query('post').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
   it('should limit the number of post by user in the same day', async () => {
+    // create a post 2 days before the new ones are created
     const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const post = await createPost(strapi, {createdAt: yesterday, author: authUser});
-    posts.push(post);
+    yesterday.setDate(yesterday.getDate() - 2);
+    const sql = 'INSERT INTO post (title, name, body, enable, published_at, created_at, author) VALUES (?,?,?,?,?,?,?);';
+    await strapi.connections.default.raw(sql,
+      [randomName(), randomName(), randomName(), true, new Date(new Date() - 10), yesterday, authUser.id]);
 
     const jwt = generateJwt(strapi, authUser);
-    for (let i = 0; i < 5; i++) {
-      const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({
-          ...MUTATION_CREATE_POST, variables: {
-            body: randomName(100),
-            title: randomName(15),
-            enable: true
-          }
-        })
-        .end((err, res) => err ? reject(err) : resolve(res)));
-      expect(!!res.body.errors).to.be.false;
+    for (let i = 0; i < strapi.config.custom.maxNumberOfArticlesPerDay; i++) {
+      const res = await createPostRequest(strapi, chai, {enable: true}, jwt);
+      expect(!!res).to.be.true;
     }
     const res = await new Promise((resolve, reject) => chai.request(strapi.server)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
       .send({
-        ...MUTATION_CREATE_POST, variables: {
+        ...(createPostRequest.MUTATION_CREATE_POST), variables: {
           body: randomName(100),
           title: randomName(15),
           enable: true
@@ -73,19 +54,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   it('should not limit post for admins', async () => {
     const jwt = generateJwt(strapi, admin);
     for (let i = 0; i < 10; i++) {
-      const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({
-          ...MUTATION_CREATE_POST, variables: {
-            body: randomName(100),
-            description: randomName(100),
-            title: randomName(15),
-            enable: true
-          }
-        })
-        .end((err, res) => err ? reject(err) : resolve(res)));
-      expect(!!res.body.errors).to.be.false;
+      const post = await createPostRequest(strapi, chai, {enable: true}, jwt);
+      expect(!!post).to.be.true;
     }
   });
 });

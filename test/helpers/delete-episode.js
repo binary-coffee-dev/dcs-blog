@@ -1,3 +1,3 @@
 module.exports = async function (strapi, episode) {
-  await strapi.models.episode.deleteOne({_id: episode.id});
+  await strapi.query('episode').delete({id: episode.id});
 };

@@ -2,10 +2,14 @@
 
 echo "Creating environment file"
 
-# application environments
+# database environments
 echo "DATABASE_HOST=$DATABASE_HOST" > .env
 echo "DATABASE_PORT=$DATABASE_PORT" >> .env
 echo "DATABASE_NAME=$DATABASE_NAME" >> .env
+echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
+echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> .env
+
+# application environments
 echo "CORS=$CORS" >> .env
 echo "ORIGINS=$ORIGINS" >> .env
 echo "NODE_ENV=$NODE_ENV" >> .env

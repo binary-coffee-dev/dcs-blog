@@ -1,7 +1,5 @@
 'use strict';
 
-const MAX_NUMBER_OF_POST = 5;
-
 /**
  * `canCreatePost` policy.
  */
@@ -14,11 +12,12 @@ module.exports = async (ctx, next) => {
   if (!strapi.services.post.isAdmin(ctx)) {
     const startOfDay = strapi.config.functions.dateUtil.getStartDay();
     const nextDay = strapi.config.functions.dateUtil.getEndDay();
-    const postCount = await strapi.models.post.count({
-      createdAt: {$gte: startOfDay, $lt: nextDay},
-      author: ctx.state.user.id
+    const postCount = await strapi.query('post').count({
+      author_eq: ctx.state.user.id,
+      created_at_lte: nextDay,
+      created_at_gte: startOfDay
     });
-    if (postCount >= MAX_NUMBER_OF_POST) {
+    if (postCount >= strapi.config.custom.maxNumberOfArticlesPerDay) {
       ctx.forbidden('Limit of posts by user');
       throw new Error('Limit of posts by user');
     }
