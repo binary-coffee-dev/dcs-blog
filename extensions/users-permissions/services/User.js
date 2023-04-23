@@ -4,7 +4,11 @@ module.exports = {
     const usersQuery = await strapi.connections.default
       .raw('SELECT u.id, (SELECT COUNT(id) FROM post WHERE author=u.id AND enable=1 AND published_at<=?) AS counter FROM `users-permissions_user` AS u ORDER BY counter DESC limit ?;',
         [new Date(), limit]);
-    return this.getTopUserFormatted(usersQuery[0]);
+    if (process.env.NODE_ENV === 'test') {
+      return this.getTopUserFormatted(usersQuery);
+    } else {
+      return this.getTopUserFormatted(usersQuery[0]);
+    }
   },
 
   async topPopularUsers() {
@@ -12,7 +16,11 @@ module.exports = {
     const usersQuery = await strapi.connections.default
       .raw('SELECT u.id, (SELECT SUM(likes) FROM post WHERE author=u.id AND enable=1 AND published_at<=?) AS counter FROM `users-permissions_user` AS u ORDER BY counter DESC limit ?;',
         [new Date(), limit]);
-    return this.getTopUserFormatted(usersQuery[0]);
+    if (process.env.NODE_ENV === 'test') {
+      return this.getTopUserFormatted(usersQuery);
+    } else {
+      return this.getTopUserFormatted(usersQuery[0]);
+    }
   },
 
   async getTopUserFormatted(usersQuery) {

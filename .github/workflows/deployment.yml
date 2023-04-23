@@ -43,8 +43,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 12.x ]
-        mongodb-version: [ 4.0 ]
+        node-version: [ 16.x ]
 
     steps:
       - uses: actions/checkout@v2
@@ -60,17 +59,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Start MongoDB (integration tests)
-        uses: supercharge/mongodb-github-action@1.6.0
-        with:
-          mongodb-version: ${{ matrix.mongodb-version }}
-
       - name: Install codecov dependency
         run: npm install -g codecov
 
       # pipeline actions
       - run: npm run lint
-      - run: DATABASE_PORT=27017 npm run test:cov
+      - run: npm run test:cov
       - run: codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

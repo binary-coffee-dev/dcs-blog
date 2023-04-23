@@ -9,7 +9,7 @@ const MigrationCore = {
   run: async () => {
     const versionsQuery = await MigrationCore.getVersions();
     const versions = new Set();
-    for (let entity of versionsQuery[0]) {
+    for (let entity of versionsQuery) {
       versions.add(entity.version);
     }
 
@@ -46,9 +46,14 @@ const MigrationCore = {
 
   getVersions: async () => {
     const db = strapi.connections.default;
-    await db.raw(`CREATE TABLE IF NOT EXISTS ${migrationTableName} (id INTEGER NOT NULL AUTO_INCREMENT, version VARCHAR(255) UNIQUE, description VARCHAR(255), PRIMARY KEY(id));`);
-    // await db.raw(`CREATE TABLE IF NOT EXISTS ${migrationTableName} (id INTEGER NOT NULL, version VARCHAR(255) UNIQUE, description VARCHAR(255), PRIMARY KEY(id AUTOINCREMENT));`);
-    return await db.raw(`SELECT * FROM ${migrationTableName};`);
+    if (process.env.NODE_ENV === 'test') {
+      await db.raw(`CREATE TABLE IF NOT EXISTS ${migrationTableName} (id INTEGER NOT NULL, version VARCHAR(255) UNIQUE, description VARCHAR(255), PRIMARY KEY(id AUTOINCREMENT));`);
+      return await db.raw(`SELECT * FROM ${migrationTableName};`);
+    } else {
+      await db.raw(`CREATE TABLE IF NOT EXISTS ${migrationTableName} (id INTEGER NOT NULL AUTO_INCREMENT, version VARCHAR(255) UNIQUE, description VARCHAR(255), PRIMARY KEY(id));`);
+      const res = await db.raw(`SELECT * FROM ${migrationTableName};`);
+      return res[0];
+    }
   }
 };
 
