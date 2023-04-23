@@ -6,7 +6,7 @@ const deliveryToEmailSubscriptions = require('../../../config/functions/delivery
 
 const createUser = require('../../helpers/create-user');
 const checkHtmlEmail = require('../../helpers/check-html-email');
-const createPost = require("../../helpers/create-post");
+const createPost = require('../../helpers/create-post');
 
 chai.use(chaiHttp);
 chai.use(spies);

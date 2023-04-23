@@ -1,20 +1,7 @@
 'use strict';
 
 const User = require('strapi-plugin-users-permissions/controllers/User');
-const {sanitizeEntity} = require("strapi-utils");
-
-// toDo 04.04.21: in the future, add this method to the service file
-const getUsersById = async (userIds) => {
-  const users = await strapi.plugins['users-permissions'].models.user.find({
-    _id: {
-      $in: userIds.filter(v => v._id).map(v => v._id)
-    }
-  });
-  const positions = new Map();
-  userIds.forEach((u, i) => positions.set(u._id.toString(), i));
-  users.sort((u1, u2) => positions.get(u1._id.toString()) > positions.get(u2._id.toString()));
-  return users;
-};
+const {sanitizeEntity} = require('strapi-utils');
 
 const UserNew = {
   ...User,
