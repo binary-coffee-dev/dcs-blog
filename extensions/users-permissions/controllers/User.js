@@ -64,7 +64,7 @@ const UserNew = {
     const user = await strapi.query('user', 'users-permissions').findOne({id: ctx.params.id});
     if (user.avatar) {
       user.avatarUrl = user.avatar.url;
-      await user.save();
+      await strapi.query('user', 'users-permissions').update({id: user.id}, user);
     }
     ctx.send(user);
   },
