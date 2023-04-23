@@ -11,7 +11,10 @@ module.exports = {
       'kotlin', 'linux', 'markdown', 'math', 'microsoft', 'mongodb', 'nodejs', 'php', 'python', 'qt', 'react', 'rss',
       'ruby', 'shell', 'telegram', 'typescript', 'vue', 'windows'];
     for (let name of tags) {
-      await strapi.query('tag').create({name});
+      const t = await strapi.query('tag').findOne({name});
+      if (t === null) {
+        await strapi.query('tag').create({name});
+      }
     }
   }
 };
