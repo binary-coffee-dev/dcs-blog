@@ -15,7 +15,7 @@ module.exports = {
       published_at: new Date()
     });
 
-    if (strapi.config.environment !== 'test') {
+    if (strapi.config.environment !== 'test' && strapi.config.custom.enableBotNotifications) {
       const post = await strapi.query('post').findOne({id: postId});
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
       const postTitle = post.title;

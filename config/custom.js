@@ -7,6 +7,7 @@ module.exports = ({env}) => ({
   siteUrl: env('SITE_URL', 'https://binary-coffee.dev'),
 
   feedArticlesLimit: env.int('FEED_ARTICLES_LIMIT', 15),
+  enableBotNotifications: false,
 
   maxPostRequestLimit: 20,
   maxSimilarPostRequestLimit: 20,
