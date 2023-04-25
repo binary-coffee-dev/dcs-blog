@@ -18,14 +18,6 @@
     },
     {
       "method": "GET",
-      "path": "/comments/captcha",
-      "handler": "comment.captcha",
-      "config": {
-        "policies": ["global::disable"]
-      }
-    },
-    {
-      "method": "GET",
       "path": "/comments/recent",
       "handler": "comment.recentComments",
       "config": {

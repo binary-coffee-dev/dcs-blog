@@ -12,6 +12,7 @@ module.exports = ({env}) => ({
   maxSimilarPostRequestLimit: 20,
   maxNumberOfArticlesPerDay: 5,
   maxNumberOfCommentsPerDay: 20,
+  maxRecentComments: 15,
   maxNumberOfUploadsPerDay: 10,
   maxNumberOfTopUsers: 5,
 

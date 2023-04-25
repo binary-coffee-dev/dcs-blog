@@ -61,7 +61,7 @@ describe('Get recent comments INTEGRATION', () => {
     });
 
     const comments = res.body.data.recentComments;
-    expect(comments.length).to.be.equal(15);
+    expect(comments.length).to.be.equal(strapi.config.custom.maxRecentComments);
     expect(+comments[0].user.id).to.be.equal(+user.id);
     expect(+comments[0].post.id).to.be.equal(+post.id);
   });
