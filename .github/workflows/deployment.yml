@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 12.x ]
+        node-version: [ 16.x ]
 
     steps:
       - uses: actions/checkout@v2
@@ -43,8 +43,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 12.x ]
-        mongodb-version: [ 4.0 ]
+        node-version: [ 16.x ]
 
     steps:
       - uses: actions/checkout@v2
@@ -60,17 +59,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Start MongoDB (integration tests)
-        uses: supercharge/mongodb-github-action@1.6.0
-        with:
-          mongodb-version: ${{ matrix.mongodb-version }}
-
       - name: Install codecov dependency
         run: npm install -g codecov
 
       # pipeline actions
       - run: npm run lint
-      - run: DATABASE_PORT=27017 npm run test:cov
+      - run: npm run test:cov
       - run: codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -94,6 +88,8 @@ jobs:
           DATABASE_HOST: ${{ secrets.DEV__DATABASE_HOST }}
           DATABASE_PORT: ${{ secrets.DEV__DATABASE_PORT }}
           DATABASE_NAME: ${{ secrets.DEV__DATABASE_NAME }}
+          DATABASE_USERNAME: ${{ secrets.DEV__DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DEV__DATABASE_PASSWORD }}
           CORS: false
           ORIGINS: '*'
           BLOG_RESOURCES: ${{ secrets.DEV__BLOG_RESOURCES }}
@@ -118,7 +114,7 @@ jobs:
       - name: Deploy project with docker in hosting
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: cd ${{ secrets.DEV__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.DEV__BACKEND_PORT }} ./deploy.sh blog-backend-dev
+          command: cd ${{ secrets.DEV__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.DEV__BACKEND_PORT }} ./deploy.sh blog-api-dev
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           privateKey: ${{ secrets.SERVER_SSH_KEY}}
@@ -142,9 +138,11 @@ jobs:
           DATABASE_HOST: ${{ secrets.PROD__DATABASE_HOST }}
           DATABASE_PORT: ${{ secrets.PROD__DATABASE_PORT }}
           DATABASE_NAME: ${{ secrets.PROD__DATABASE_NAME }}
-          BLOG_RESOURCES: ${{ secrets.PROD__BLOG_RESOURCES }}
+          DATABASE_USERNAME: ${{ secrets.PROD__DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.PROD__DATABASE_PASSWORD }}
           CORS: false
           ORIGINS: '*'
+          BLOG_RESOURCES: ${{ secrets.PROD__BLOG_RESOURCES }}
           SITE_URL: https://binarycoffee.dev
           API_URL: https://api.binarycoffee.dev
           JWT_SECRET: ${{ secrets.PROD__JWT_SECRET }}
@@ -166,7 +164,7 @@ jobs:
       - name: Deploy project with docker in hosting
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: cd ${{ secrets.PROD__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.PROD__BACKEND_PORT }} ./deploy.sh blog-backend-prod
+          command: cd ${{ secrets.PROD__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.PROD__BACKEND_PORT }} ./deploy.sh blog-api-prod
           host: ${{ secrets.PROD__REMOTE_HOST }}
           username: ${{ secrets.PROD__REMOTE_USER }}
           privateKey: ${{ secrets.PROD__SERVER_SSH_KEY}}

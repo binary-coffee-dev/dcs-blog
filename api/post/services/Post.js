@@ -6,57 +6,59 @@ const marked = require('marked');
 /**
  * Read the documentation () to implement custom service functions
  */
-
-const MAX_POST_LIMIT = 20;
-const MIN_POST_START = 0;
-const SORT_ATTR_NAME = 0;
-const SORT_ATTR_VALUE = 1;
-
 module.exports = {
   async find(ctx, publicOnly, limit, start, where) {
-    let sort = {};
-    const sortFromRequest = (ctx.query.sort || ctx.query._sort);
-    const sortQuery = sortFromRequest && sortFromRequest.split(':');
-    if (sortQuery && sortQuery.length === 2) {
-      sort[sortQuery[SORT_ATTR_NAME]] = sortQuery[SORT_ATTR_VALUE].toLowerCase() === 'asc' ? 1 : -1;
-    }
+    const sort = (ctx.query.sort || ctx.query._sort);
 
     const query = this.createQueryObject(ctx, publicOnly, where);
-    return await strapi.models.post.find(query)
-      .populate(['author', 'banner'])
-      .limit(Math.min(limit, MAX_POST_LIMIT))
-      .skip(Math.max(start, MIN_POST_START))
-      .sort(sort);
+    return await strapi.query('post').find({
+      ...query,
+      _sort: sort,
+      _limit: Math.min(limit, strapi.config.custom.maxPostRequestLimit),
+      _start: Math.max(start, 0)
+    });
   },
 
   async count(ctx, publicOnly, where) {
     const query = this.createQueryObject(ctx, publicOnly, where);
-    return await strapi.models.post.count(query);
+    return await strapi.query('post').count(query);
   },
 
   createQueryObject(ctx, publicOnly, where = {}) {
     where = this.cleanWhere(where);
     where = this.convertToLikeQuery(where);
     if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
-      return {...where, $or: [{publishedAt: {$lte: new Date()}, enable: true}, {author: ctx.state.user.id}]};
+      return {...where, _or: [{published_at_lte: new Date(), enable: true}, {author: ctx.state.user.id}]};
     } else if ((!strapi.services.post.isAdmin(ctx) && !strapi.services.post.isStaff(ctx)) || publicOnly) {
       // public user
-      return {...where, publishedAt: {$lte: new Date()}, enable: true};
+      return {...where, published_at_lte: new Date(), enable: true};
     }
     return where;
   },
 
+  /**
+   * Modify the matched keys and add the suffix *_like* at the end.
+   * @param where any
+   * @param attributes string[]
+   */
   convertToLikeQuery(where = {}, attributes = ['title']) {
     const mark = new Set();
     attributes.forEach(attr => mark.add(attr));
-    Object.keys(where).forEach(attr => {
-      if (mark.has(attr)) {
-        where[attr] = new RegExp(where[attr], 'i');
+    return Object.keys(where).reduce((p, k) => {
+      if (mark.has(k)) {
+        p[k + '_contains'] = where[k];
+      } else {
+        p[k] = where[k];
       }
-    });
-    return where;
+      return p;
+    }, {});
   },
 
+  /**
+   * This method remove all the queries that are different from the defined in the **allowedAttributes** array.
+   * @param allowedAttributes string[]
+   * @param where any
+   */
   cleanWhere(where = {}, allowedAttributes = ['title', 'author']) {
     const mark = new Set();
     allowedAttributes.forEach(attr => mark.add(attr));
@@ -69,12 +71,12 @@ module.exports = {
   },
 
   async findOneByName(ctx, name, noUpdate) {
-    const link = await strapi.models.link.findOne({name});
-    const post = await strapi.models.post.findOne({_id: link.post}).populate(['author', 'banner']);
+    const link = await strapi.query('link').findOne({name});
+    const post = await strapi.query('post').findOne({id: link.post.id});
     if (post) {
       if (
         this.isPublish(post) ||
-        (post.author && post.author._id.toString() === ctx.state.user.id.toString()) ||
+        (post.author && post.author.id === ctx.state.user.id) ||
         this.isAdmin(ctx) ||
         this.isStaff(ctx)
       ) {
@@ -88,32 +90,20 @@ module.exports = {
     return {};
   },
 
-  async findSimilarPosts(ctx, id, limit) {
-    limit = Math.max(Math.min(limit, 20), 0);
+  async findSimilarPosts(ctx, id, limit = 10) {
+    limit = Math.max(Math.min(limit, strapi.config.custom.maxSimilarPostRequestLimit), 0);
 
-    let postToReturn = [];
-    const post = await strapi.models.post.findOne({_id: id}).populate(['tags']);
+    const post = await strapi.query('post').findOne({id});
     const tags = post.tags || [];
-    const markTags = new Set();
 
-    tags.forEach(tag => markTags.add(tag.id));
-
-    const posts = (await strapi.models.post
-      .find({publishedAt: {$lte: new Date()}, enable: true, _id: {$ne: id}})
-      .sort({views: 'desc'})
-      .populate(['tags'])) || [];
-
-    posts
-      .filter(post => (post.tags || []).reduce((p, v) => p || markTags.has(v.id), false))
-      .forEach(post => {
-        postToReturn.push(post);
-      });
-
-    if (postToReturn.length > limit) {
-      postToReturn = postToReturn.slice(0, limit);
-    }
-
-    ctx.send(postToReturn);
+    return await strapi.query('post').find({
+      published_at_lte: new Date(),
+      enable: true,
+      id_ne: id,
+      tags_in: tags.map(t => t.id),
+      _sort: 'views:DESC',
+      _limit: limit
+    });
   },
 
   removeExtraSpaces(text) {
@@ -140,19 +130,19 @@ module.exports = {
 
   async updateViews(post) {
     const views = `${parseInt(post.views || 0) + 1}`;
-    await strapi.models.post.update({_id: post._id}, {$set: {views}});
+    await strapi.query('post').update({id: post.id}, {views});
   },
 
   async updateComments(postId) {
-    const countOfComments = await strapi.services.comment.count({post: postId});
-    await strapi.services.post.update({id: postId}, {comments: countOfComments});
+    const countOfComments = await strapi.query('comment').count({post: postId});
+    await strapi.query('post').update({id: postId}, {comments: countOfComments});
   },
 
   async getPublicPostsOfLastDays(days) {
     const date = new Date();
     date.setDate(date.getDate() - days);
     return await strapi.query('post').find({
-      publishedAt_gt: date,
+      published_at_gt: date,
       enable_eq: true
     });
   },
@@ -160,11 +150,12 @@ module.exports = {
   async getFeed(ctx, format) {
     const feed = this.createFeedInstance();
 
-    const posts = await strapi.models.post
-      .find({publishedAt: {$lte: new Date()}, enable: true})
-      .populate('author')
-      .sort({publishedAt: 'desc'})
-      .limit(strapi.config.custom.feedArticlesLimit);
+    const posts = await strapi.query('post').find({
+      enable_eq: true,
+      published_at_lte: new Date(),
+      _limit: strapi.config.custom.feedArticlesLimit,
+      _sort: 'published_at:DESC'
+    });
 
     if (posts) {
       posts.forEach(post => feed.addItem(this.createFeedItem(post)));
@@ -176,16 +167,18 @@ module.exports = {
   },
 
   async getFeedByUsername(ctx, username, format) {
-    const user = await strapi.plugins['users-permissions'].models.user.findOne({username});
+    const user = await strapi.query('user', 'users-permissions').findOne({username});
 
     const feed = this.createFeedInstance();
 
     if (user) {
-      const posts = await strapi.models.post
-        .find({author: user.id, publishedAt: {$lte: new Date()}, enable: true})
-        .populate('author')
-        .sort({publishedAt: 'desc'})
-        .limit(strapi.config.custom.feedArticlesLimit);
+      const posts = await strapi.query('post').find({
+        enable_eq: true,
+        author_eq: user.id,
+        published_at_lte: new Date(),
+        _limit: strapi.config.custom.feedArticlesLimit,
+        _sort: 'published_at:DESC'
+      });
 
       if (posts) {
         posts.forEach(post => feed.addItem(this.createFeedItem(post)));
@@ -212,7 +205,7 @@ module.exports = {
           link: this.getAuthorPage(post.author)
         }
       ],
-      date: post.publishedAt,
+      date: new Date(post.published_at),
       image: post.banner ? `${apiUrl}${post.banner.url}` : undefined
     };
   },
@@ -266,10 +259,11 @@ module.exports = {
   },
 
   isAdmin: (ctx) => {
-    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator';
+    return (ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator') ||
+      (ctx.state.user && ctx.state.user.roles && ctx.state.user.roles[0].code === 'strapi-super-admin');
   },
 
   isPublish(post) {
-    return post && post.enable && post.publishedAt && post.publishedAt.getTime() <= new Date().getTime();
+    return post && post.enable && post.published_at && new Date(post.published_at).getTime() <= new Date().getTime();
   }
 };

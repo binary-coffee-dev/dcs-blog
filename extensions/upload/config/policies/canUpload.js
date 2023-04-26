@@ -1,7 +1,5 @@
 'use strict';
 
-const MAX_UPLOAD_PER_DAY = 10;
-
 /**
  * `canUpload` policy.
  */
@@ -9,11 +7,12 @@ module.exports = async (ctx, next) => {
   if (!strapi.services.post.isAdmin(ctx) && !strapi.services.post.isStaff(ctx)) {
     const startOfDay = strapi.config.functions.dateUtil.getStartDay();
     const nextDay = strapi.config.functions.dateUtil.getEndDay();
-    const imageCount = await strapi.models.image.count({
-      createdAt: {$gte: startOfDay, $lt: nextDay},
-      user: ctx.state.user
+    const imageCount = await strapi.query('image').count({
+      created_at_lte: nextDay,
+      created_at_gte: startOfDay,
+      user: ctx.state.user.id
     });
-    if (imageCount >= MAX_UPLOAD_PER_DAY) {
+    if (imageCount >= strapi.config.custom.maxNumberOfUploadsPerDay) {
       return ctx.forbidden();
     }
   }

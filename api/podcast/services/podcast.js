@@ -7,6 +7,7 @@
 
 module.exports = {
   async findOneByIdentifier(identifier) {
-    return await strapi.models.podcast.findOne({identifier}).populate(['episodes']);
+    // return await strapi.models.podcast.findOne({identifier}).populate(['episodes']);
+    return await strapi.query('podcast').findOne({identifier});
   },
 };

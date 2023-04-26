@@ -9,14 +9,11 @@
   "options": {
     "increments": true,
     "timestamps": true,
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
   "attributes": {
     "body": {
       "type": "richtext"
-    },
-    "publishedAt": {
-      "type": "datetime"
     },
     "email": {
       "type": "email"

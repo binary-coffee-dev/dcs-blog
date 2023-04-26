@@ -1,8 +1,8 @@
 module.exports = {
   findOrCreateProvide: async ({username, provider, scope, avatar, html_url, name, token}) => {
-    let provide = await strapi.services.provider.findOne({username, provider});
+    let provide = await strapi.query('provider').findOne({username, provider});
     if (!provide) {
-      provide = await strapi.services.provider.create({username, provider, scope, avatar, url: html_url, name, token});
+      provide = await strapi.query('provider').create({username, provider, scope, avatar, url: html_url, name, token});
     }
     return provide;
   },
@@ -10,13 +10,13 @@ module.exports = {
   createUserByProvider: async (provider) => {
     let user, username = provider.username, count = 1;
     do {
-      user = await strapi.plugins['users-permissions'].models.user.findOne({username});
+      user = await strapi.query('user', 'users-permissions').findOne({username});
       if (user) {
         username = provider.username + (count++);
       }
     } while (user);
-    const authenticatedRole = await strapi.plugins['users-permissions'].models.role.findOne({type: 'authenticated'});
-    return await strapi.plugins['users-permissions'].models.user.create({
+    const authenticatedRole = await strapi.query('role', 'users-permissions').findOne({type: 'authenticated'});
+    return await strapi.query('user', 'users-permissions').create({
       username,
       confirmed: true,
       blocked: false,

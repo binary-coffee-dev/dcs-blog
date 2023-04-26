@@ -3,14 +3,13 @@
 /**
  * `canRemoveFile` policy.
  */
-
 module.exports = async (ctx, next) => {
   if (strapi.services.post.isAdmin(ctx)) {
     return await next();
   }
   if (ctx.state.user) {
-    const image = await strapi.services.image.findOne({user: ctx.state.user, image: [ctx.params.id]});
-    if (image) {
+    const uploadFile = await strapi.query('file', 'upload').findOne({id: ctx.params.id});
+    if (uploadFile && uploadFile.related.length && uploadFile.related[0].user === ctx.state.user.id) {
       return await next();
     }
   }

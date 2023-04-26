@@ -30,12 +30,12 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.models.post.deleteMany({});
-    await strapi.plugins['users-permissions'].models.user.deleteMany({});
+    await strapi.query('post').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
   afterEach(async () => {
-    await strapi.models.opinion.deleteMany({});
+    await strapi.query('opinion').delete({});
   });
 
   it('should not create a new opinion if the user is not the same of the opinion (auth)', async () => {
@@ -64,18 +64,18 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     });
 
     const id = res.body.data.createOpinion.opinion.id;
-    const opinion = await strapi.models.opinion.findOne({_id: id});
-    const postUpdated = await getPostById(strapi, post._id);
+    const opinion = await strapi.query('opinion').findOne({id});
+    const postUpdated = await getPostById(strapi, post.id);
 
     expect(!!res.body.data.createOpinion.opinion).to.be.true;
     expect(!!opinion).to.be.true;
-    expect(postUpdated.likes.toNumber()).to.be.equal(post.likes.toNumber() + 1);
+    expect(+postUpdated.likes).to.be.equal((+post.likes) + 1);
   });
 
   it('should not remove the opinion of other user (auth)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: authUser.id});
-    const opi = await strapi.models.opinion.create({user: staffUser.id, post: post.id, type: LIKE});
+    const opi = await strapi.query('opinion').create({user: staffUser.id, post: post.id, type: LIKE});
     await new Promise(resolve => {
       chai.request(strapi.server)
         .post('/graphql')
@@ -84,9 +84,9 @@ describe('create/edit/remove opinion INTEGRATION', () => {
         .end((err, res) => resolve(res));
     });
 
-    const opinion = await strapi.models.opinion.findOne({_id: opi.id});
+    const opinion = await strapi.query('opinion').findOne({id: opi.id});
 
-    expect(!!opinion).to.be.true;
+    expect(opinion).not.null;
   });
 
   it('the user be able to remove one of his own opinions (auth)', async () => {
@@ -108,11 +108,11 @@ describe('create/edit/remove opinion INTEGRATION', () => {
         .end((err, res) => resolve(res));
     });
 
-    const postUpdated = await getPostById(strapi, post._id);
-    const opinions = await strapi.models.opinion.find({post: post._id, user: authUser._id});
+    const postUpdated = await getPostById(strapi, post.id);
+    const opinions = await strapi.query('opinion').find({post: post.id, user: authUser.id});
 
     expect(opinions.length).to.be.equal(0);
-    expect(postUpdated.likes.toNumber()).to.be.equal(0);
+    expect(+postUpdated.likes).to.be.equal(0);
   });
 
   it('should not create more than one opinion by user in a post (staff)', async () => {
@@ -133,11 +133,11 @@ describe('create/edit/remove opinion INTEGRATION', () => {
         .end((err, res) => resolve(res));
     });
 
-    const opinions = await strapi.models.opinion.find({post: post._id, user: staffUser._id});
-    const postUpdated = await getPostById(strapi, post._id);
+    const opinions = await strapi.query('opinion').find({post: post.id, user: staffUser.id});
+    const postUpdated = await getPostById(strapi, post.id);
 
     expect(opinions.length).to.be.equal(1);
-    expect(postUpdated.likes.toNumber()).to.be.equal(1);
+    expect(+postUpdated.likes).to.be.equal(1);
   });
 
   it('should not create a new opinion (public)', async () => {

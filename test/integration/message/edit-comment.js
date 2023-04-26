@@ -13,7 +13,7 @@ const expect = chai.expect;
 const MUTATION_UPDATE_COMMENT = {
   operationName: null,
   // language=GraphQL
-  query: 'mutation ($id: ID!, $body: String){\n  updateComment(input: {where: {id: $id} data: {body: $body}}){\n    comment {\n      id\n      body\n      publishedAt\n      user {\n        id\n        username\n      }\n    }\n  }\n}'
+  query: 'mutation ($id: ID!, $body: String){\n  updateComment(input: {where: {id: $id} data: {body: $body}}){\n    comment {\n      id\n      body\n      published_at\n      user {\n        id\n        username\n      }\n    }\n  }\n}'
 };
 
 describe('Edit comment INTEGRATION', () => {
@@ -23,8 +23,14 @@ describe('Edit comment INTEGRATION', () => {
 
   before(async () => {
     user = await createUser({strapi, roleType: 'administrator'});
-    post = await createPost(strapi, {author: user});
-    comment = await createComment(strapi, {user, post});
+    post = await createPost(strapi, {author: user.id});
+    comment = await createComment(strapi, {user: user.id, post: post.id});
+  });
+
+  after(async () => {
+    await strapi.query('post').delete({});
+    await strapi.query('comment').delete({});
+    await strapi.query('user', 'users-permissions').delete({});
   });
 
   it('should edit a comment from the owner', async () => {
@@ -37,7 +43,7 @@ describe('Edit comment INTEGRATION', () => {
         .send({...MUTATION_UPDATE_COMMENT, variables: {body: NEW_BODY, id: comment.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    comment = await strapi.models.comment.findOne({_id: res.body.data.updateComment.comment.id});
+    comment = await strapi.query('comment').findOne({id: res.body.data.updateComment.comment.id});
     expect(comment.body).to.be.equal(NEW_BODY);
   });
 
@@ -52,7 +58,7 @@ describe('Edit comment INTEGRATION', () => {
         .send({...MUTATION_UPDATE_COMMENT, variables: {body: NEW_BODY, id: comment.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    comment = await strapi.models.comment.findOne({_id: comment.id});
+    comment = await strapi.query('comment').findOne({id: comment.id});
     expect(comment.body).to.not.be.equal(NEW_BODY);
   });
 
@@ -67,7 +73,7 @@ describe('Edit comment INTEGRATION', () => {
         .send({...MUTATION_UPDATE_COMMENT, variables: {body: NEW_BODY, id: comment.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    comment = await strapi.models.comment.findOne({_id: res.body.data.updateComment.comment.id});
+    comment = await strapi.query('comment').findOne({id: res.body.data.updateComment.comment.id});
     expect(comment.body).to.be.equal(NEW_BODY);
   });
 });

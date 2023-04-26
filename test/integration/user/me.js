@@ -15,11 +15,10 @@ const QUERY_MY_USER = {
 
 describe('Get me user INTEGRATION', () => {
 
-  before(async () => {
-  });
+  before(async () => {});
 
   it('should get my user data', async () => {
-    const provider = await strapi.models.provider.create({provider: 'github'});
+    const provider = await strapi.query('provider').create({provider: 'github'});
     let user = await createUser({strapi, provider});
 
     const jwt = generateJwt(strapi, user);
@@ -29,6 +28,10 @@ describe('Get me user INTEGRATION', () => {
       .send(QUERY_MY_USER)
       .end((err, res) => err ? reject(err) : resolve(res)));
 
-    expect(!!res.body.data.myData).to.be.true;
+    expect(res.body.data.myData).not.null;
+    expect(+res.body.data.myData.id).to.be.equal(+user.id);
+    expect(res.body.data.myData.username).to.be.equal(user.username);
+    expect(res.body.data.myData.avatarUrl).to.be.equal(user.avatarUrl);
+    expect(res.body.data.myData.role.type).to.be.equal(user.role.type);
   });
 });

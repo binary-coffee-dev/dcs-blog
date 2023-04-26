@@ -2,9 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 
 const createUser = require('../../helpers/create-user');
-const deleteUser = require('../../helpers/delete-user');
 const createEpisode = require('../../helpers/create-episode');
-const deleteEpisode = require('../../helpers/delete-episode');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 
 chai.use(chaiHttp);
@@ -29,21 +27,17 @@ describe('Get podcasts INTEGRATION', () => {
     staffUser = await createUser({strapi, roleType: 'staff'});
     adminUser = await createUser({strapi, roleType: 'administrator'});
 
-    const podcastIns = await strapi.models.podcast.findOne({identifier: 'espacio-binario'});
+    const podcastIns = await strapi
+      .query('podcast').create({identifier: 'espacio-binario', name: 'Espacio Binario'});
     for (let i = 0; i < NUMBER_OF_EPISODES; i++) {
       await createEpisode(strapi, podcastIns);
     }
   });
 
   after(async () => {
-    await deleteUser(strapi, authUser);
-    await deleteUser(strapi, staffUser);
-    await deleteUser(strapi, adminUser);
-
-    const episodes = await strapi.models.episode.find();
-    for (let e of episodes) {
-      await deleteEpisode(strapi, e);
-    }
+    strapi.query('podcast').delete({});
+    strapi.query('episode').delete({});
+    strapi.query('user', 'users-permissions').delete({});
   });
 
   it('should get the podcast and the list of episodes (public user)', async () => {

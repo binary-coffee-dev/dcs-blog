@@ -1,3 +1,3 @@
 module.exports = async (strapi, id) => {
-  return await strapi.models.post.findOne({_id: id});
+  return await strapi.query('post').findOne({id});
 };

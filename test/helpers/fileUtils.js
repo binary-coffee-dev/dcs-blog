@@ -2,10 +2,8 @@ const fs = require('fs');
 
 module.exports = {
   removeFile(path) {
-    try {
+    if (fs.existsSync(path)) {
       fs.unlinkSync(path);
-    } catch (err) {
-      console.log(err);
     }
   },
 
