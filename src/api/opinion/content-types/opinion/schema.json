@@ -8,17 +8,21 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": false,
+    "timestamps": true
   },
   "attributes": {
     "post": {
-      "model": "post",
-      "via": "opinions"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::post.post",
+      "inversedBy": "opinions"
     },
     "user": {
-      "plugin": "users-permissions",
-      "model": "user",
-      "via": "opinions"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "opinions"
     },
     "type": {
       "type": "string"

@@ -1,3 +1,7 @@
+const canRemove = require('../policies/canRemove');
+const canComment = require('../policies/canComment');
+const canUpdateComment = require('../policies/canUpdateComment');
+
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
@@ -24,13 +28,13 @@ module.exports = (strapi) => {
   extensionService.use(() => ({
     resolversConfig: {
       'Mutation.deleteComment': {
-        policies: ['comment::canRemove']
+        policies: [canRemove]
       },
       'Mutation.createComment': {
-        policies: ['comment::canComment']
+        policies: [canComment]
       },
       'Mutation.updateComment': {
-        policies: ['comment::canUpdateComment']
+        policies: [canUpdateComment]
       }
     }
   }));

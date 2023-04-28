@@ -3,7 +3,7 @@
 const deliveryToEmailSubscriptions = require('./delivery.to.email.subscriptions');
 
 /**
- * Cron config that gives you an opportunity
+ * Cron routes that gives you an opportunity
  * to run scheduled jobs.
  *
  * The cron format consists of:

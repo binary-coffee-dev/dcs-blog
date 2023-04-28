@@ -8,15 +8,18 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": false,
+    "timestamps": true
   },
   "attributes": {
     "name": {
       "type": "string"
     },
     "post": {
-      "model": "post",
-      "via": "links"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::post.post",
+      "inversedBy": "links"
     }
   }
 }

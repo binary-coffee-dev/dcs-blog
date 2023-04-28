@@ -8,18 +8,20 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": false,
+    "timestamps": true
   },
   "attributes": {
     "image": {
-      "collection": "file",
-      "via": "related",
-      "plugin": "upload",
+      "type": "media",
+      "multiple": false,
       "required": false
     },
     "user": {
-      "plugin": "users-permissions",
-      "model": "user"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "images"
     }
   }
 }

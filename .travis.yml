@@ -9,7 +9,7 @@ before_install:
 script:
   - npm run build
   - npm run lint
-  - npm run test
+  - npm run tests
 
 after_success:
   - codecov --file coverage/lcov.info --disable search

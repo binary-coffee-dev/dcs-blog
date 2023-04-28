@@ -7,7 +7,7 @@ module.exports = createCoreController('api::opinion.opinion', ({strapi}) => ({
     const where = ctx.params._where || ctx.params.where || null;
     const user = ctx.state && ctx.state.user;
     if (where) {
-      return await strapi.services.opinion.count(where, user);
+      return await strapi.service('api::opinion.opinion').count(where, user);
     }
     return 0;
   },

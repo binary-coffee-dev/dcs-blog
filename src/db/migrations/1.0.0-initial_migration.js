@@ -1,22 +1,20 @@
 'use strict';
 
 async function createRoleIfNotExist(type, name, description) {
-  let role = await strapi.query('role', 'users-permissions').findOne({type});
+  let role = await strapi.query('plugin::users-permissions.role').findOne({where: {type}});
   if (!role) {
-    role = await strapi.query('role', 'users-permissions').create({name, description, type});
+    role = await strapi.query('plugin::users-permissions.role').create({data: {name, description, type}});
   }
   return role;
 }
 
-async function updateOrCreateRolePermissions(role, controller, action, enabled, type) {
-  const permission = await strapi.query('permission', 'users-permissions')
-    .find({role: role.id, controller, action});
-  if (permission.length) {
-    await strapi.query('permission', 'users-permissions')
-      .update({role: role.id, controller, action}, {enabled});
-  } else {
-    await strapi.query('permission', 'users-permissions')
-      .create({role: role.id, controller, action, enabled, type});
+async function updateOrCreateRolePermissions(role, type, controller, action) {
+  const searchAction = `${type}::${controller}.${action}`;
+  let permission = await strapi.query('plugin::users-permissions.permission')
+    .findOne({where: {action: searchAction, role: role.id}});
+  if (!permission) {
+    await strapi.query('plugin::users-permissions.permission')
+      .create({data: {action: searchAction, role: role.id}});
   }
 }
 
@@ -37,108 +35,94 @@ module.exports = {
     const controllers = [
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'podcast',
+        controller: 'podcast.podcast',
         actions: ['count', 'find', 'findone', 'podcastbyidentifier'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'episode',
+        controller: 'episode.episode',
         actions: ['count', 'find', 'findone'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [authRole, staffRole, adminRole],
-        controller: 'post',
+        controller: 'post.post',
         actions: ['create', 'update'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'post',
+        controller: 'post.post',
         actions: ['count', 'find', 'findone', 'feedbyusername', 'findonebyname', 'findsimilarposts', 'getpostbodybyname', 'feed'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'upload',
+        controller: 'upload.upload',
         actions: ['count', 'find', 'findone', 'findconnection', 'search'],
-        enabled: true,
-        type: 'upload'
+        type: 'plugin'
       },
       {
         roles: [authRole, staffRole, adminRole],
-        controller: 'upload',
+        controller: 'upload.upload',
         actions: ['upload', 'destroy'],
-        enabled: true,
-        type: 'upload'
+        type: 'plugin'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'opinion',
+        controller: 'opinion.opinion',
         actions: ['count', 'find', 'findone'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [authRole, staffRole, adminRole],
-        controller: 'opinion',
+        controller: 'opinion.opinion',
         actions: ['create', 'delete'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [publicRole, authRole, staffRole, adminRole],
-        controller: 'user',
+        controller: 'users-permissions.user',
         actions: ['toppopularusers', 'topactiveusers', 'find', 'findone', 'find2', 'update'],
-        enabled: true,
-        type: 'users-permissions'
+        type: 'plugin'
       },
       {
         roles: [publicRole, authRole, staffRole, adminRole],
-        controller: 'auth',
+        controller: 'users-permissions.auth',
         actions: ['loginwithprovider'],
-        enabled: true,
-        type: 'users-permissions'
+        type: 'plugin'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'comment',
+        controller: 'comment.comment',
         actions: ['count', 'find', 'findone', 'recentcomments'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [authRole, staffRole, adminRole],
-        controller: 'comment',
+        controller: 'comment.comment',
         actions: ['create', 'update', 'delete'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'image',
+        controller: 'image.image',
         actions: ['find', 'findone', 'findextra', 'count'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'tag',
+        controller: 'tag.tag',
         actions: ['find', 'findone', 'count'],
-        enabled: true,
-        type: 'application'
+        type: 'api'
       },
     ];
 
     for (let controller of controllers) {
       for (let action of controller.actions) {
         for (let role of controller.roles) {
-          await updateOrCreateRolePermissions(role, controller.controller, action, controller.enabled, controller.type);
+          await updateOrCreateRolePermissions(role, controller.type, controller.controller, action);
         }
       }
     }

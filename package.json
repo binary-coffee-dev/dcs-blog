@@ -8,9 +8,9 @@
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi",
-    "test": "nyc --reporter=lcov --reporter=html mocha --ui bdd test/unit/**/*.js",
-    "test:cov": "NODE_ENV=test nyc --reporter=lcov --reporter=html mocha --ui bdd test/bootstrap.js test/integration/**/*.js test/unit/**/*.js",
-    "test:int": "NODE_ENV=test nyc --reporter=lcov --reporter=html mocha --ui bdd test/bootstrap.js test/integration/**/*.js",
+    "test": "nyc --reporter=lcov --reporter=html mocha --ui bdd tests/unit/**/*.js",
+    "test:cov": "NODE_ENV=test nyc --reporter=lcov --reporter=html mocha --ui bdd tests/bootstrap.js tests/integration/**/*.js tests/unit/**/*.js",
+    "test:int": "NODE_ENV=test nyc --reporter=lcov --reporter=html mocha --ui bdd tests/bootstrap.js tests/integration/**/*.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check": "npm run test && npm run lint && npm run build"
@@ -24,10 +24,10 @@
     "sqlite3": "^5.1.6"
   },
   "dependencies": {
-    "@strapi/strapi": "4.1.2",
     "@strapi/plugin-graphql": "4.1.2",
     "@strapi/plugin-users-permissions": "4.1.2",
     "@strapi/provider-email-nodemailer": "4.1.2",
+    "@strapi/strapi": "4.1.2",
     "axios": "^0.21.4",
     "ejs": "^3.0.1",
     "eslint": "^6.8.0",

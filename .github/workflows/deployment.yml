@@ -64,7 +64,7 @@ jobs:
 
       # pipeline actions
       - run: npm run lint
-      - run: npm run test:cov
+      - run: npm run tests:cov
       - run: codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -73,7 +73,7 @@ jobs:
   # DEPLOY PROJECT (DEVELOP)
   deploy-dev:
 
-    needs: [ test ]
+    needs: [ tests ]
     if: github.ref == 'refs/heads/develop'
 
     runs-on: ubuntu-latest
@@ -123,7 +123,7 @@ jobs:
   # DEPLOY PROJECT (PRODUCTION)
   deploy-prod:
 
-    needs: [ test ]
+    needs: [ tests ]
     if: github.ref == 'refs/heads/master'
 
     runs-on: ubuntu-latest

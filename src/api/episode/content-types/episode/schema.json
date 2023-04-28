@@ -1,6 +1,6 @@
 {
   "kind": "collectionType",
-  "collectionName": "episode",
+  "collectionName": "episodes",
   "info": {
     "singularName": "episode",
     "pluralName": "episodes",
@@ -8,7 +8,8 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": false,
+    "timestamps": true
   },
   "attributes": {
     "title": {
@@ -23,8 +24,10 @@
       "type": "text"
     },
     "podcast": {
-      "via": "episodes",
-      "model": "podcast"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::podcast.podcast",
+      "inversedBy": "episodes"
     },
     "banner": {
       "type": "string",

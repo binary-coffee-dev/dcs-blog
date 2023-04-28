@@ -1,17 +1,18 @@
 'use strict';
 
+const {createCoreController} = require('@strapi/strapi').factories;
+
 const ejs = require('ejs');
 const minify = require('html-minifier').minify;
 
-const FIRST_ELEMENT = 0;
-
-module.exports = {
+module.exports = createCoreController('api::subscription.subscription', ({strapi}) => ({
   async subscribe(ctx) {
+    const FIRST_ELEMENT = 0;
     const email = ctx.request.body.email;
-    const value = await strapi.services.subscription.find({email});
+    const value = await strapi.service('api::subscription.subscription').find({email});
     if (value.length === 0 || (value.length > 0 && !value[FIRST_ELEMENT].verified)) {
-      const token = strapi.services.subscription.generateToken(100);
-      const subscription = value.length === 0 ? await strapi.services.subscription.create({
+      const token = strapi.service('api::subscription.subscription').generateToken(100);
+      const subscription = value.length === 0 ? await strapi.service('api::subscription.subscription').create({
         email,
         token
       }) : value[FIRST_ELEMENT];
@@ -19,7 +20,7 @@ module.exports = {
 
       let html = await new Promise((resolve, reject) => {
         ejs.renderFile(
-          './api/subscription/controllers/subscription-email-template.html',
+          './public/subscription-email-template.html',
           {verifyLink},
           {},
           function (err, str) {
@@ -45,10 +46,10 @@ module.exports = {
 
   async verify(ctx) {
     const token = ctx.request.body.token;
-    const subscriptions = await strapi.services.subscription.find({token});
+    const subscriptions = await strapi.service('api::subscription.subscription').find({token});
     if (subscriptions.length > 0) {
       const subscription = subscriptions[0];
-      const subsUpdated = await strapi.services.subscription.update({id: subscription.id}, {
+      const subsUpdated = await strapi.service('api::subscription.subscription').update({id: subscription.id}, {
         enable: true,
         verified: true
       });
@@ -56,4 +57,4 @@ module.exports = {
     }
     return null;
   }
-};
+}));

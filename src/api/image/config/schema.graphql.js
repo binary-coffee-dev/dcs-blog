@@ -4,7 +4,7 @@ module.exports = () => {
   extensionService.use(() => ({
     resolversConfig: {
       'Query.imagesConnection': {
-        policies: ['comment::findExtra']
+        policies: ['findExtra']
       }
     }
   }));

@@ -35,7 +35,7 @@ const MigrationCore = {
   },
 
   saveNewMigrations: async (migrations) => {
-    const db = strapi.connections.default;
+    const db = strapi.db.connection;
     migrations = migrations || [];
     for(let migration of migrations) {
       await db.raw(
@@ -45,7 +45,7 @@ const MigrationCore = {
   },
 
   getVersions: async () => {
-    const db = strapi.connections.default;
+    const db = strapi.db.connection;
     if (process.env.NODE_ENV === 'test') {
       await db.raw(`CREATE TABLE IF NOT EXISTS ${migrationTableName} (id INTEGER NOT NULL, version VARCHAR(255) UNIQUE, description VARCHAR(255), PRIMARY KEY(id AUTOINCREMENT));`);
       return await db.raw(`SELECT * FROM ${migrationTableName};`);

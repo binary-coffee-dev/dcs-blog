@@ -7,7 +7,7 @@ module.exports = (strapi) => {
       definition(t) {
         t.field('podcastByIdentifier', {
           type: nexus.nonNull('Podcast'),
-          args: { identifier: 'String!' },
+          args: { identifier: nexus.nonNull('String') },
 
           resolve(parent, args, context) {
             return strapi.service('api::podcast.podcast').podcastByIdentifier(context);

@@ -1,0 +1,79 @@
+{
+  "kind": "collectionType",
+  "collectionName": "posts",
+  "info": {
+    "singularName": "post",
+    "pluralName": "posts",
+    "displayName": "Post",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "richtext"
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "banner": {
+      "type": "media",
+      "multiple": false,
+      "required": false
+    },
+    "enable": {
+      "type": "boolean"
+    },
+    "name": {
+      "unique": true,
+      "type": "string"
+    },
+    "views": {
+      "type": "biginteger",
+      "default": "0"
+    },
+    "readingTime": {
+      "type": "biginteger",
+      "default": "0"
+    },
+    "comments": {
+      "type": "biginteger",
+      "default": "0"
+    },
+    "likes": {
+      "type": "biginteger",
+      "default": "0"
+    },
+    "commentsList": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::comment.comment",
+      "mappedBy": "post"
+    },
+    "tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::tag.tag",
+      "inversedBy": "posts"
+    },
+    "opinions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::opinion.opinion",
+      "mappedBy": "post"
+    },
+    "links": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::link.link",
+      "mappedBy": "post"
+    }
+  }
+}

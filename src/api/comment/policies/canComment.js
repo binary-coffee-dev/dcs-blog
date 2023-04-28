@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = async (ctx, config, { strapi }) => {
-  if (!strapi.services.post.isAdmin(ctx)) {
+  if (!strapi.service('api::post.post').isAdmin(ctx)) {
     const startOfDay = strapi.config.functions.dateUtil.getStartDay();
     const nextDay = strapi.config.functions.dateUtil.getEndDay();
     const commentsCount = await strapi.query('comment').count({

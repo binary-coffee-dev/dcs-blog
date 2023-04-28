@@ -1,17 +1,14 @@
 'use strict';
 
-/**
- * Read the documentation (https://strapi.io/documentation/3.0.0-beta.x/concepts/services.html#core-services)
- * to customize this service
- */
+const { createCoreService } = require('@strapi/strapi').factories;
 
-module.exports = {
+module.exports = createCoreService('api::provider.provider', ({strapi}) => ({
   async getProviderAvatar(providers) {
     for (let provider of providers) {
-      const prov = await strapi.services.provider.findOne({id: provider});
+      const prov = await strapi.query('provider').findOne({id: provider.id});
       if (prov.avatar) {
         return prov.avatar;
       }
     }
   }
-};
+}));

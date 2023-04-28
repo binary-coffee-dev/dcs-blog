@@ -1,17 +1,16 @@
 'use strict';
 
+const {createCoreService} = require('@strapi/strapi').factories;
+
 const {Feed} = require('feed');
 const marked = require('marked');
 
-/**
- * Read the documentation () to implement custom service functions
- */
-module.exports = {
+module.exports = createCoreService('api::post.post', ({strapi}) => ({
   async find(ctx, publicOnly, limit, start, where) {
     const sort = (ctx.query.sort || ctx.query._sort);
 
     const query = this.createQueryObject(ctx, publicOnly, where);
-    return await strapi.query('post').find({
+    return await strapi.query('api::post.post').find({
       ...query,
       _sort: sort,
       _limit: Math.min(limit, strapi.config.custom.maxPostRequestLimit),
@@ -21,15 +20,15 @@ module.exports = {
 
   async count(ctx, publicOnly, where) {
     const query = this.createQueryObject(ctx, publicOnly, where);
-    return await strapi.query('post').count(query);
+    return await strapi.query('api::post.post').count(query);
   },
 
   createQueryObject(ctx, publicOnly, where = {}) {
     where = this.cleanWhere(where);
     where = this.convertToLikeQuery(where);
-    if (strapi.services.post.isAuthenticated(ctx) && !publicOnly) {
+    if (strapi.service('api::post.post').isAuthenticated(ctx) && !publicOnly) {
       return {...where, _or: [{published_at_lte: new Date(), enable: true}, {author: ctx.state.user.id}]};
-    } else if ((!strapi.services.post.isAdmin(ctx) && !strapi.services.post.isStaff(ctx)) || publicOnly) {
+    } else if ((!strapi.service('api::post.post').isAdmin(ctx) && !strapi.service('api::post.post').isStaff(ctx)) || publicOnly) {
       // public user
       return {...where, published_at_lte: new Date(), enable: true};
     }
@@ -71,8 +70,8 @@ module.exports = {
   },
 
   async findOneByName(ctx, name, noUpdate) {
-    const link = await strapi.query('link').findOne({name});
-    const post = await strapi.query('post').findOne({id: link.post.id});
+    const link = await strapi.query('api::link.link').findOne({name});
+    const post = await strapi.query('api::post.post').findOne({id: link.post.id});
     if (post) {
       if (
         this.isPublish(post) ||
@@ -93,10 +92,10 @@ module.exports = {
   async findSimilarPosts(ctx, id, limit = 10) {
     limit = Math.max(Math.min(limit, strapi.config.custom.maxSimilarPostRequestLimit), 0);
 
-    const post = await strapi.query('post').findOne({id});
+    const post = await strapi.query('api::post.post').findOne({id});
     const tags = post.tags || [];
 
-    return await strapi.query('post').find({
+    return await strapi.query('api::post.post').find({
       published_at_lte: new Date(),
       enable: true,
       id_ne: id,
@@ -130,18 +129,18 @@ module.exports = {
 
   async updateViews(post) {
     const views = `${parseInt(post.views || 0) + 1}`;
-    await strapi.query('post').update({id: post.id}, {views});
+    await strapi.query('api::post.post').update({id: post.id}, {views});
   },
 
   async updateComments(postId) {
     const countOfComments = await strapi.query('comment').count({post: postId});
-    await strapi.query('post').update({id: postId}, {comments: countOfComments});
+    await strapi.query('api::post.post').update({id: postId}, {comments: countOfComments});
   },
 
   async getPublicPostsOfLastDays(days) {
     const date = new Date();
     date.setDate(date.getDate() - days);
-    return await strapi.query('post').find({
+    return await strapi.query('api::post.post').find({
       published_at_gt: date,
       enable_eq: true
     });
@@ -150,7 +149,7 @@ module.exports = {
   async getFeed(ctx, format) {
     const feed = this.createFeedInstance();
 
-    const posts = await strapi.query('post').find({
+    const posts = await strapi.query('api::post.post').find({
       enable_eq: true,
       published_at_lte: new Date(),
       _limit: strapi.config.custom.feedArticlesLimit,
@@ -167,12 +166,12 @@ module.exports = {
   },
 
   async getFeedByUsername(ctx, username, format) {
-    const user = await strapi.query('user', 'users-permissions').findOne({username});
+    const user = await strapi.query('plugin::users-permissions.user').findOne({username});
 
     const feed = this.createFeedInstance();
 
     if (user) {
-      const posts = await strapi.query('post').find({
+      const posts = await strapi.query('api::post.post').find({
         enable_eq: true,
         author_eq: user.id,
         published_at_lte: new Date(),
@@ -266,4 +265,4 @@ module.exports = {
   isPublish(post) {
     return post && post.enable && post.published_at && new Date(post.published_at).getTime() <= new Date().getTime();
   }
-};
+}));

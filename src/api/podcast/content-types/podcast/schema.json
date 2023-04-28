@@ -1,6 +1,6 @@
 {
   "kind": "collectionType",
-  "collectionName": "podcast",
+  "collectionName": "podcasts",
   "info": {
     "singularName": "podcast",
     "pluralName": "podcasts",
@@ -8,7 +8,8 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": false,
+    "timestamps": true
   },
   "attributes": {
     "name": {
@@ -17,8 +18,10 @@
       "unique": false
     },
     "episodes": {
-      "via": "podcast",
-      "collection": "episode"
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::episode.episode",
+      "mappedBy": "podcast"
     },
     "identifier": {
       "type": "string",

@@ -1,11 +1,8 @@
 'use strict';
 
-/**
- * Read the documentation (https://strapi.io/documentation/3.0.0-beta.x/concepts/services.html#core-services)
- * to customize this service
- */
+const { createCoreService } = require('@strapi/strapi').factories;
 
-module.exports = {
+module.exports = createCoreService('api::subscription.subscription', ({strapi}) => ({
   generateToken (size = 12) {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
     return new Array(size)
@@ -13,4 +10,4 @@ module.exports = {
       .map(() => characters[Math.floor(Math.random() * characters.length)])
       .reduce((prev, ch) => prev + ch, '');
   }
-};
+}));

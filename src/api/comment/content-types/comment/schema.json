@@ -8,9 +8,9 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": true,
+    "timestamps": true
   },
-  "pluginOptions": {},
   "attributes": {
     "body": {
       "type": "richtext"
@@ -22,13 +22,16 @@
       "type": "string"
     },
     "post": {
-      "model": "post",
-      "via": "commentsList"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::post.post",
+      "inversedBy": "commentsList"
     },
     "user": {
-      "plugin": "users-permissions",
-      "model": "user",
-      "via": "comments"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "comments"
     }
   }
 }

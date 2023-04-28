@@ -14,7 +14,7 @@ module.exports = createCoreService('api::comment.comment', ({strapi}) => ({
     });
 
     if (strapi.config.environment !== 'test' && strapi.config.custom.enableBotNotifications) {
-      const post = await strapi.query('post').findOne({id: postId});
+      const post = await strapi.query('api::post.post').findOne({id: postId});
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
       const postTitle = post.title;
 
@@ -44,7 +44,7 @@ module.exports = createCoreService('api::comment.comment', ({strapi}) => ({
     });
 
     return comments.filter(comment => {
-      return strapi.services.post.isPublish(comment.post);
+      return strapi.service('api::post.post').isPublish(comment.post);
     });
   }
 }));

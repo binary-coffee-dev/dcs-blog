@@ -6,5 +6,8 @@ module.exports = ({env}) => ({
   cron: {
     enabled: true,
     tasks: cronTasks
+  },
+  app: {
+    keys: [env('SECRET1', 'mySecretKey1'), env('SECRET2', 'mySecretKey2')]
   }
 });

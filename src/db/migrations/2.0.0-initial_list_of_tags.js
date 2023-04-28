@@ -11,9 +11,9 @@ module.exports = {
       'kotlin', 'linux', 'markdown', 'math', 'microsoft', 'mongodb', 'nodejs', 'php', 'python', 'qt', 'react', 'rss',
       'ruby', 'shell', 'telegram', 'typescript', 'vue', 'windows'];
     for (let name of tags) {
-      const t = await strapi.query('tag').findOne({name});
+      const t = await strapi.query('api::tag.tag').findOne({where: {name}});
       if (t === null) {
-        await strapi.query('tag').create({name});
+        await strapi.query('api::tag.tag').create({data: {name}});
       }
     }
   }
