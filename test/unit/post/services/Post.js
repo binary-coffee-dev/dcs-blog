@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 
 const marked = require('marked');
 
-const Post = require('../../../../api/post/services/Post');
+const Post = require('../../../../src/api/post/services/Post');
 const {cleanBody} = require('../../../../config/functions/delivery.to.email.subscriptions');
 
 const EXAMPLE_BODY = `
@@ -57,7 +57,7 @@ describe('Post service', function () {
     expect(date.getDate()).to.be.equal(25);
   });
 
-  it('should extract summary from article', function () {
+  it('should extract summary from comment', function () {
     expect(cleanBody(marked(EXAMPLE_BODY))).to.equal(EXPECTED_BODY);
   });
 

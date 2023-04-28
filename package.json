@@ -19,35 +19,26 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "chai-spies": "^1.0.0",
+    "nyc": "^15.0.0",
     "mocha": "^10.2.0",
     "sqlite3": "^5.1.6"
   },
   "dependencies": {
+    "@strapi/strapi": "4.1.2",
+    "@strapi/plugin-graphql": "4.1.2",
+    "@strapi/plugin-users-permissions": "4.1.2",
+    "@strapi/provider-email-nodemailer": "4.1.2",
     "axios": "^0.21.4",
-    "babel-eslint": "^10.0.3",
     "ejs": "^3.0.1",
     "eslint": "^6.8.0",
     "fast-xml-parser": "^3.16.0",
     "feed": "^4.1.0",
-    "graphql": "^15.5.0",
     "html-minifier": "^4.0.0",
     "marked": "^2.0.3",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
     "mysql": "^2.18.1",
-    "nyc": "^15.0.0",
     "pre-push": "^0.1.1",
-    "strapi": "3.6.8",
-    "strapi-admin": "^3.6.8",
-    "strapi-connector-bookshelf": "^3.6.8",
-    "strapi-plugin-content-manager": "^3.6.8",
-    "strapi-plugin-content-type-builder": "^3.6.8",
-    "strapi-plugin-email": "3.6.8",
-    "strapi-plugin-graphql": "3.6.8",
-    "strapi-plugin-upload": "^3.6.8",
-    "strapi-plugin-users-permissions": "^3.6.8",
-    "strapi-provider-email-nodemailer": "^2.0.0",
-    "strapi-utils": "3.6.8",
     "svg-captcha": "^1.4.0"
   },
   "pre-push": {
@@ -59,7 +50,7 @@
     "name": "binary-coffee"
   },
   "strapi": {
-    "uuid": "b06e5cbc-9b4c-4cb3-b08b-d3d7fb24241a"
+    "uuid": "b8aa7baf-d6dc-4c50-93d4-7739bc88c3fd"
   },
   "engines": {
     "node": ">=14.0.0",

@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 
-const subscription = require('../../../../api/subscription/services/subscription');
+const subscription = require('../../../../src/api/subscription/services/subscription');
 
 describe('Subscription service', function () {
   it('should get a random text of size 12', function () {

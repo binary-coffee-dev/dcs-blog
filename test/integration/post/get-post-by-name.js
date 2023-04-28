@@ -43,7 +43,7 @@ describe('Get post by name INTEGRATION', () => {
     await strapi.query('user', 'users-permissions').delete({});
   });
 
-  it('should calculate the read time in the new created article', async () => {
+  it('should calculate the read time in the new created comment', async () => {
     const jwt = generateJwt(strapi, authUserOwner);
     const postRes = await createPostRequest(strapi, chai, {
       body: 'Quia voluptatem quae assumenda earum atque deserunt corporis vitae esse perspiciatis cupiditate quia debitis ullam sed est nam odit tenetur sit sint nemo occaecati veritatis quis repellendus est aut aut est odio qui doloremque harum perferendis tenetur ipsa ut quia et dolores voluptates est aut voluptas sapiente maxime et rerum et explicabo voluptas voluptatum suscipit quaerat ducimus similique sunt in soluta ipsum qui minima vitae aut non est itaque assumenda voluptatibus sequi ab rerum ea architecto minus optio ad rerum quia soluta deleniti in facilis quod est et repudiandae ex vitae culpa eum harum est voluptatem et fugiat voluptates vel reprehenderit quo doloribus voluptas ut blanditiis velit fuga voluptatem corporis autem deleniti necessitatibus nemo consequatur quia veniam dolorem voluptas vitae cumque qui at similique aperiam enim blanditiis et voluptatum occaecati cumque nostrum necessitatibus earum qui autem aut architecto aut modi provident repellat asperiores voluptatem sequi quae ratione numquam laborum esse a a delectus sapiente omnis animi quo recusandae in quia ab eum minima in autem ut explicabo quia enim modi rerum dolor optio quae vel iste quos et fugiat tempore qui corrupti quas dolores cumque vero vitae totam corrupti ut sed dolores ipsam ut mollitia autem qui enim fuga illum.',
@@ -59,7 +59,7 @@ describe('Get post by name INTEGRATION', () => {
     expect(postRes2.readingTime).to.be.equal(30);
   });
 
-  it('should get the post by name the owner of the article', async () => {
+  it('should get the post by name the owner of the comment', async () => {
     const jwt = generateJwt(strapi, authUserOwner);
     const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server)
@@ -93,7 +93,7 @@ describe('Get post by name INTEGRATION', () => {
     }
   });
 
-  it('should not have access to an article if the user is not the owner', (done) => {
+  it('should not have access to an comment if the user is not the owner', (done) => {
     const jwt = generateJwt(strapi, authUser);
     chai.request(strapi.server)
       .post('/graphql')
@@ -105,7 +105,7 @@ describe('Get post by name INTEGRATION', () => {
       });
   });
 
-  it('should not have access to an article a public user', (done) => {
+  it('should not have access to an comment a public user', (done) => {
     chai.request(strapi.server)
       .post('/graphql')
       .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})

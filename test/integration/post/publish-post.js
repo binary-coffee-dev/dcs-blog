@@ -36,7 +36,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     await strapi.query('user', 'users-permissions').delete({});
   });
 
-  it('should create an article with the publishedAt attribute (admin user)', async () => {
+  it('should create an comment with the publishedAt attribute (admin user)', async () => {
     const jwt = generateJwt(strapi, adminUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'The good one',}, jwt);
 
@@ -45,7 +45,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(post.published_at).not.null;
   });
 
-  it('should create an article without the publishedAt attribute (staff user)', async () => {
+  it('should create an comment without the publishedAt attribute (staff user)', async () => {
     const jwt = generateJwt(strapi, staffUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work',}, jwt);
 
@@ -54,7 +54,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(post.published_at).to.be.null;
   });
 
-  it('should create an article without the publishedAt attribute (auth user)', async () => {
+  it('should create an comment without the publishedAt attribute (auth user)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work two',}, jwt);
 
@@ -63,7 +63,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(post.published_at).to.be.null;
   });
 
-  it('should update an article with the publishedAt attribute (admin user)', async () => {
+  it('should update an comment with the publishedAt attribute (admin user)', async () => {
     const jwt = generateJwt(strapi, adminUser);
 
     const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
@@ -76,7 +76,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(post.published_at).not.null;
   });
 
-  it('should update an article without the publishedAt attribute (staff user)', async () => {
+  it('should update an comment without the publishedAt attribute (staff user)', async () => {
     const jwt = generateJwt(strapi, staffUser);
 
     const staffPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
@@ -89,7 +89,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(post.published_at).to.be.null;
   });
 
-  it('should update an article without the publishedAt attribute (auth user)', async () => {
+  it('should update an comment without the publishedAt attribute (auth user)', async () => {
     const jwt = generateJwt(strapi, authUser);
 
     const authPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
@@ -130,7 +130,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(fail).to.be.equal(false, 'Expected error didn\'t thrown');
   });
 
-  it('should create and then update article and test the created links', async () => {
+  it('should create and then update comment and test the created links', async () => {
     // create post
     const jwt = generateJwt(strapi, adminUser);
     let postRes = await createPostRequest(strapi, chai, {title: 'The good one'}, jwt);

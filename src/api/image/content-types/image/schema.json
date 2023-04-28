@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "images",
+  "info": {
+    "singularName": "image",
+    "pluralName": "images",
+    "displayName": "Image",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "image": {
+      "collection": "file",
+      "via": "related",
+      "plugin": "upload",
+      "required": false
+    },
+    "user": {
+      "plugin": "users-permissions",
+      "model": "user"
+    }
+  }
+}

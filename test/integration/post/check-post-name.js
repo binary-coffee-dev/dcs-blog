@@ -22,7 +22,7 @@ describe('Check auto-generation of the post\'s name in create/update actions INT
     await strapi.query('user', 'users-permissions').delete({});
   });
 
-  it('should create an article with the name attribute', async () => {
+  it('should create an comment with the name attribute', async () => {
     const jwt = generateJwt(strapi, authUser);
     const postRes = await createPostRequest(strapi, chai, {
       publishedAt: null,

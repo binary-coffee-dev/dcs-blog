@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "podcast",
+  "info": {
+    "singularName": "podcast",
+    "pluralName": "podcasts",
+    "displayName": "Podcast",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": false
+    },
+    "episodes": {
+      "via": "podcast",
+      "collection": "episode"
+    },
+    "identifier": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    }
+  }
+}
