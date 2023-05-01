@@ -3,20 +3,19 @@
 module.exports = {
   afterCreate: async (event) => {
     const {result} = event;
-    const post = await strapi.query('api::post.post').findOne({id: result.post.id});
-    await strapi.query('api::post.post').update({id: post.id}, {likes: (+post.likes) + 1});
+    const opinion = await strapi.query('api::opinion.opinion').findOne({where: {id: result.id}, populate: ['post']});
+    await strapi.query('api::post.post').update({where: {id: opinion.post.id}, data: {likes: (+opinion.post.likes) + 1}});
+  },
+  beforeDelete: async (event) => {
+    const {where} = event.params;
+    const opinion = await strapi.query('api::opinion.opinion').findOne({where, populate: ['post']});
+    event.state.postId = opinion.post.id;
   },
   afterDelete: async (event) => {
-    const {result} = event;
-    const posts = [];
-    if (Array.isArray(result)) {
-      result.forEach(r => r.post && posts.push(r.post.id));
-    } else {
-      posts.push(result.post.id);
-    }
-    for (const id of posts) {
-      const post = await strapi.query('api::post.post').findOne({id});
-      await strapi.query('api::post.post').update({id}, {likes: (+post.likes) - 1});
+    const {postId} = event.state;
+    if (postId) {
+      const post = await strapi.query('api::post.post').findOne({where: {id: postId}});
+      await strapi.query('api::post.post').update({where: {id: postId}, data: {likes: (+post.likes) - 1}});
     }
   }
 };

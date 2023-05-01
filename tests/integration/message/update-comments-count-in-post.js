@@ -12,7 +12,7 @@ const expect = chai.expect;
 const MUTATION_CREATE_COMMENT = {
   operationName: null,
   // language=GraphQL
-  query: 'mutation create(\n  $body: String\n  $post: ID\n) {\n  createComment(input: {data: {body: $body, post: $post}}){\n    comment {\n      id\n      body\n      published_at\n      name\n      user {\n        username\n        avatar {\n          url\n        }\n      }\n    }\n  }\n}'
+  query: 'mutation create($body: String, $post: ID) {\n    createComment(data: {body: $body, post: $post}){\n        data {\n            id\n            attributes {\n                body\n                email\n                name\n                user {\n                    data {\n                        id\n                        attributes {\n                            username\n                        }\n                    }\n                }\n            }\n        }\n    }\n}'
 };
 
 describe('Update comments count in post INTEGRATION', () => {
@@ -25,9 +25,9 @@ describe('Update comments count in post INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('comment').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('api::comment.comment').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should increment the count of comments in the post', async () => {
@@ -35,7 +35,7 @@ describe('Update comments count in post INTEGRATION', () => {
 
     for (let i = 0; i < 10; i++) {
       await new Promise((resolve, reject) => {
-        chai.request(strapi.server)
+        chai.request(strapi.server.httpServer)
           .post('/graphql')
           .set('Authorization', `Bearer ${jwt}`)
           .send({...MUTATION_CREATE_COMMENT, variables: {body: randomName(100), post: post.id}})

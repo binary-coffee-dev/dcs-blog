@@ -19,6 +19,16 @@ module.exports = {
       method: "GET",
       path: "/sitemap",
       handler: "post.sitemap"
+    },
+    {
+      method: "GET",
+      path: "/similarPosts",
+      handler: "post.findSimilarPosts"
+    },
+    {
+      method: "GET",
+      path: "/findOneByName",
+      handler: "post.findOneByName"
     }
   ]
 }

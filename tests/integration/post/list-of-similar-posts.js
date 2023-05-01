@@ -10,9 +10,9 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 const QUERY = {
-  operationName: 'similarPosts',
+  operationName: null,
   variables: {id: '', limit: 10},
-  query: 'query similarPosts($id: ID!, $limit: Int) {\n  similarPosts(id: $id, limit: $limit) {\n    title\n    name\n    banner {\n      url\n      __typename\n    }\n    published_at\n    id\n    tags {\n        id\n    }\n    __typename\n  }\n}\n'
+  query: 'query ($id: ID!, $limit: Int) {\n    similarPosts(id: $id, limit: $limit) {\n        title\n        body\n        banner {\n            data{\n                attributes {\n                    url\n                }\n            }\n        }\n        tags {\n            data {\n                id\n                attributes {\n                    name\n                }\n            }\n        }\n        enable\n        name\n        views\n        readingTime\n        comments\n        likes\n        createdAt\n        updatedAt\n        publishedAt\n    }\n}\n'
 };
 
 describe('List of similar posts INTEGRATION', () => {
@@ -24,7 +24,7 @@ describe('List of similar posts INTEGRATION', () => {
   before(async () => {
     authUser = await createUser({strapi});
 
-    const tag = await strapi.query('tag').findOne({name_eq: 'chrome'});
+    const tag = await strapi.query('api::tag.tag').findOne({where: {name: 'chrome'}});
     tagId = tag.id;
     for (let i = 0; i < 50; i++) {
       post = await createPost(strapi, {author: authUser.id, tags: [tagId]});
@@ -33,8 +33,8 @@ describe('List of similar posts INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should get the list of similar post (public user)', async () => {
@@ -79,7 +79,7 @@ describe('List of similar posts INTEGRATION', () => {
 
   async function requestSimilarPosts(jwt = null, limit) {
     return await new Promise((resolve, reject) => {
-      const action = chai.request(strapi.server).post('/graphql');
+      const action = chai.request(strapi.server.httpServer).post('/graphql');
       if (jwt) {
         action.set('Authorization', `Bearer ${jwt}`);
       }
@@ -90,7 +90,7 @@ describe('List of similar posts INTEGRATION', () => {
 
   function validateTags(articles) {
     for (const article of articles) {
-      expect(article.tags.map(t => +t.id)).to.include(tagId);
+      expect(article.tags.data.map(t => +t.id)).to.include(tagId);
     }
   }
 });

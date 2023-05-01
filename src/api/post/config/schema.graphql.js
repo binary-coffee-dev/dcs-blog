@@ -1,6 +1,7 @@
 const canCreatePost = require('../policies/canCreatePost');
 const canModifyPost = require('../policies/canModifyPost');
 const canPublishPost = require('../policies/canPublishPost');
+const tmp = require('../../../policies/validateFindMethod');
 
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
@@ -10,10 +11,11 @@ module.exports = (strapi) => {
       type: 'Query',
       definition(t) {
         t.field('postByName', {
-          type: nexus.nonNull('Post'),
+          type: 'Post',
           args: {name: nexus.nonNull('String'), noUpdate: 'Boolean'},
           resolve(parent, args, context) {
-            return strapi.controller('api::post.post').getPostBodyByName(context);
+            const {name, noUpdate} = args;
+            return strapi.service('api::post.post').findOneByName(context, name, noUpdate);
           }
         });
       }
@@ -39,7 +41,8 @@ module.exports = (strapi) => {
           type: nexus.nonNull(nexus.list('Post')),
           args: {id: nexus.nonNull('ID'), limit: 'Int'},
           resolve(parent, args, context) {
-            return strapi.controller('api::post.post').findSimilarPosts(context);
+            const {id, limit} = args;
+            return strapi.service('api::post.post').findSimilarPosts(id, limit);
           }
         });
       }
@@ -50,6 +53,14 @@ module.exports = (strapi) => {
 
   extensionService.use(() => ({
     resolversConfig: {
+      'Query.similarPosts': {
+        auth: {
+          scope: ['api::post.post.findSimilarPosts']
+        }
+      },
+      'Query.posts': {
+        policies: ['global::validateFindMethod']
+      },
       'Mutation.createPost': {
         policies: [canPublishPost, canCreatePost]
       },

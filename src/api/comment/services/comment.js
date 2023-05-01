@@ -1,20 +1,22 @@
 'use strict';
 
-const { createCoreService } = require('@strapi/strapi').factories;
+const {createCoreService} = require('@strapi/strapi').factories;
 
 const moment = require('moment-timezone');
 
 module.exports = createCoreService('api::comment.comment', ({strapi}) => ({
   async create(body, postId, userId) {
-    const comment = await strapi.query('comment').create({
-      body,
-      post: postId,
-      user: userId,
-      published_at: new Date()
+    const comment = await strapi.query('api::comment.comment').create({
+      data: {
+        body,
+        post: postId,
+        user: userId,
+        published_at: new Date()
+      }
     });
 
     if (strapi.config.environment !== 'test' && strapi.config.custom.enableBotNotifications) {
-      const post = await strapi.query('api::post.post').findOne({id: postId});
+      const post = await strapi.query('api::post.post').findOne({where: {id: postId}});
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;
       const postTitle = post.title;
 
@@ -31,16 +33,18 @@ module.exports = createCoreService('api::comment.comment', ({strapi}) => ({
   },
 
   async update(postId, body) {
-    await strapi.query('comment').update({id: postId}, {body});
-    return await strapi.query('comment').findOne({id: postId});
+    await strapi.query('api::comment.comment').update({where: {id: postId}, data: {body}});
+    return await strapi.query('api::comment.comment').findOne({where: {id: postId}});
   },
 
-  async recentComments(limit = 8) {
+  async recentComments(limit = strapi.config.custom.maxRecentComments) {
     limit = Math.min(limit, strapi.config.custom.maxRecentComments);
 
-    const comments = await strapi.query('comment').find({
-      _limit: limit,
-      _sort: 'created_at:DESC'
+    const comments = await strapi.query('api::comment.comment').findMany({
+      where: {},
+      limit: limit,
+      orderBy: {createdAt: 'desc'},
+      populate: ['post', 'user']
     });
 
     return comments.filter(comment => {

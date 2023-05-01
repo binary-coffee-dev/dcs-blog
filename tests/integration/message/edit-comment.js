@@ -13,7 +13,7 @@ const expect = chai.expect;
 const MUTATION_UPDATE_COMMENT = {
   operationName: null,
   // language=GraphQL
-  query: 'mutation ($id: ID!, $body: String){\n  updateComment(input: {where: {id: $id} data: {body: $body}}){\n    comment {\n      id\n      body\n      published_at\n      user {\n        id\n        username\n      }\n    }\n  }\n}'
+  query: 'mutation ($id: ID!, $body: String){\n    updateComment(id: $id, data: {body: $body}){\n        data {\n            id\n            attributes {\n                body\n                user {\n                    data {\n                        id\n                    }\n                }\n            }\n        }\n    }\n}'
 };
 
 describe('Edit comment INTEGRATION', () => {
@@ -28,22 +28,22 @@ describe('Edit comment INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('comment').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('api::comment.comment').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should edit a comment from the owner', async () => {
     const NEW_BODY = randomName();
     const jwt = generateJwt(strapi, user);
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_UPDATE_COMMENT, variables: {body: NEW_BODY, id: comment.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    comment = await strapi.query('comment').findOne({id: res.body.data.updateComment.comment.id});
+    comment = await strapi.query('api::comment.comment').findOne({where: {id: res.body.data.updateComment.data.id}});
     expect(comment.body).to.be.equal(NEW_BODY);
   });
 
@@ -52,13 +52,13 @@ describe('Edit comment INTEGRATION', () => {
     const user2 = await createUser({strapi});
     const jwt = generateJwt(strapi, user2);
     await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_UPDATE_COMMENT, variables: {body: NEW_BODY, id: comment.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    comment = await strapi.query('comment').findOne({id: comment.id});
+    comment = await strapi.query('api::comment.comment').findOne({where: {id: comment.id}});
     expect(comment.body).to.not.be.equal(NEW_BODY);
   });
 
@@ -67,13 +67,13 @@ describe('Edit comment INTEGRATION', () => {
     const user2 = await createUser({strapi, roleType: 'staff'});
     const jwt = generateJwt(strapi, user2);
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_UPDATE_COMMENT, variables: {body: NEW_BODY, id: comment.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    comment = await strapi.query('comment').findOne({id: res.body.data.updateComment.comment.id});
+    comment = await strapi.query('api::comment.comment').findOne({where: {id: res.body.data.updateComment.data.id}});
     expect(comment.body).to.be.equal(NEW_BODY);
   });
 });

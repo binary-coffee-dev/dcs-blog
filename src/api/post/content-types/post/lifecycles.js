@@ -14,10 +14,10 @@ module.exports = {
   },
 
   async beforeUpdate(event) {
-    const {data} = event.params;
-    if (event.params.id && data.title) {
+    const {data, where} = event.params;
+    if (where && data.title) {
       const newName = strapi.service('api::post.post').getNameFromTitle(data.title);
-      const titleChange = !(await strapi.service('api::link.link').existLinkInPost(newName, event.params.id));
+      const titleChange = !(await strapi.service('api::link.link').existLinkInPost(newName, where));
       if (titleChange) {
         data.name = newName;
       }
@@ -29,9 +29,9 @@ module.exports = {
     const {result} = event;
     if (result.id && result.title) {
       const newName = strapi.service('api::post.post').getNameFromTitle(result.title);
-      const titleChange = !(await strapi.service('api::link.link').existLinkInPost(newName, result.id));
+      const titleChange = !(await strapi.service('api::link.link').existLinkInPost(newName, {id: result.id}));
       if (titleChange) {
-        await strapi.query('api::link.link').create({name: result.name, post: result.id});
+        await strapi.query('api::link.link').create({data: {name: result.name, post: result.id}});
       }
     }
   },

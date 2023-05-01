@@ -6,28 +6,19 @@ const minify = require('html-minifier').minify;
 const marked = require('marked');
 
 function cleanBody(body) {
-  return body.replace( /(<([^>]+)>)/ig, '')
+  return body.replace(/(<([^>]+)>)/ig, '')
     .replace(/\r?\n|\r/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 async function getPublicPostsOfLastDays(previousDays) {
-  const posts = await strapi
-    .services
-    .post
-    .getPublicPostsOfLastDays(previousDays);
-  return posts.map(post => ({...post, body: cleanBody(marked(post.body))}));
+  const posts = await strapi.service('api::post.post').getPublicPostsOfLastDays(previousDays);
+  return posts.map(post => ({...post, body: cleanBody(marked.parse(post.body))}));
 }
 
 async function getVerifiedAndEnableSubscribers() {
-  return await strapi
-    .services
-    .subscription
-    .find({
-      verified: true,
-      enable: true
-    });
+  return await strapi.query('api::subscription.subscription').findMany({where: {verified: true, enable: true}});
 }
 
 async function getHtmlWithPosts(posts) {
@@ -42,12 +33,7 @@ async function getHtmlWithPosts(posts) {
       './public/posts-for-subscriptions-template.html',
       data,
       options,
-      function (err, str) {
-        if (err)
-          reject(err);
-        else
-          resolve(str);
-      });
+      (err, str) =>  err ? reject(err) :resolve(str))
   });
 }
 
@@ -73,7 +59,7 @@ function sendEmails(verifySubscribers, subject, html) {
       subject: subject,
       html: html
     };
-    await strapi.plugins['email'].services.email.send(mail);
+    await strapi.service('plugin::email.email').send(mail);
   });
 }
 

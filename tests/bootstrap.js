@@ -8,7 +8,7 @@ before(async function () {
 
   // await Strapi({autoReload: false, browser: false}).start();
   await Strapi().load();
-  // await instance.server.mount();
+  await strapi.server.mount();
   // strapi.app
   //   .use(strapi.router.routes())
   //   .use(strapi.router.allowedMethods());

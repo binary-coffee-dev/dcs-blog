@@ -1,18 +1,22 @@
 'use strict';
 
 module.exports = {
-  // After destroying a value.
+  beforeDelete: async (event) => {
+    const {where} = event.params;
+    const commentToBeRemoved = await strapi.query('api::comment.comment').findOne({where, populate: ['post']});
+    event.state.postId = commentToBeRemoved.post.id;
+  },
   afterDelete: async (event) => {
-    const {result} = event;
-    if (result.post && result.post.id) {
-      await strapi.service('api::post.post').updateComments(result.post.id);
+    const {state} = event;
+    if (state && state.postId) {
+      await strapi.service('api::post.post').updateComments(state.postId);
     }
   },
-  // After comment is created
   afterCreate: async (event) => {
     const {result} = event;
-    if (result.post && result.post.id) {
-      await strapi.service('api::post.post').updateComments(result.post.id);
+    const comment = await strapi.query('api::comment.comment').findOne({where: {id: result.id}, populate: ['post']});
+    if (comment && comment.post && comment.post.id) {
+      await strapi.service('api::post.post').updateComments(comment.post.id);
     }
   }
 };

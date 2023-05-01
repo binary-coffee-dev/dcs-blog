@@ -15,8 +15,8 @@ module.exports = (strapi) => {
           args: { limit: 'Int' },
 
           resolve(parent, args, context) {
-            // const { limit } = args;
-            return strapi.service('api::comment.comment').recentComments(context);
+            const { limit } = args;
+            return strapi.service('api::comment.comment').recentComments(limit);
           }
         });
       }
@@ -27,6 +27,11 @@ module.exports = (strapi) => {
 
   extensionService.use(() => ({
     resolversConfig: {
+      'Query.recentComments': {
+        auth: {
+          scope: ['api::comment.comment.recentComments']
+        }
+      },
       'Mutation.deleteComment': {
         policies: [canRemove]
       },
@@ -34,7 +39,10 @@ module.exports = (strapi) => {
         policies: [canComment]
       },
       'Mutation.updateComment': {
-        policies: [canUpdateComment]
+        policies: [canUpdateComment],
+        auth: {
+          scope: ['api::comment.comment.update']
+        }
       }
     }
   }));

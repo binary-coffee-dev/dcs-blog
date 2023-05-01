@@ -1,18 +1,8 @@
 'use strict';
 
 module.exports = (controller) => {
-  controller.find2 = async function(ctx, next, {populate} = {}) {
-    await this.find(ctx, next, {populate});
-
-    for (let i = 0; i < ctx.body.length; i++) {
-      const user = ctx.body[i];
-      user.comments = await strapi.query('comment').count({user: user.id});
-      user.posts = await strapi.query('api::post.post').count({
-        author: user.id,
-        published_at_lte: new Date(),
-        enable: true
-      });
-    }
+  controller.users = async function(ctx, next, {populate} = {}) {
+    return [];
   };
 
   const oldFindFunction = controller.find;
@@ -35,12 +25,13 @@ module.exports = (controller) => {
     await oldMeFunction(ctx);
     if (!ctx.body.avatar) {
       const FIRST_PROVIDER = 0;
-      const providers = await strapi.query('provider').find({'user': ctx.body.id});
+      const providers = await strapi.query('api::provider.provider').findMany({'user': ctx.body.id});
       const provider = providers[FIRST_PROVIDER];
       ctx.body.avatar = {
         url: provider.avatar
       };
     }
+    return ctx.body;
   };
 
   const oldUpdateFunction = controller.update;

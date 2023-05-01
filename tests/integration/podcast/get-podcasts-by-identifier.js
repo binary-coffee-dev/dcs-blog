@@ -11,8 +11,8 @@ const expect = chai.expect;
 
 const QUERY_GET_PODCAST_BY_IDENTIFIER = {
   variables: {},
-  // language=JavaScript
-  query: 'query ($identifier: String!) {\n  podcastByIdentifier(identifier: $identifier) {\n    name\n    identifier\n    episodes {\n      id\n      title\n      url\n      description\n      banner\n      date\n      duration\n    }\n  }\n}'
+  // language=GraphQL
+  query: 'query ($identifier: String!) {\n    podcastByIdentifier(identifier: $identifier) {\n        name\n        episodes {\n            data {\n                id\n                attributes {\n                    title\n                    url\n                    duration\n                    description\n                    banner\n                    date\n                }\n            }\n        }\n        identifier\n        createdAt\n        updatedAt\n    }\n}'
 };
 
 describe('Get podcasts INTEGRATION', () => {
@@ -28,40 +28,40 @@ describe('Get podcasts INTEGRATION', () => {
     adminUser = await createUser({strapi, roleType: 'administrator'});
 
     const podcastIns = await strapi
-      .query('podcast').create({identifier: 'espacio-binario', name: 'Espacio Binario'});
+      .query('api::podcast.podcast').create({data: {identifier: 'espacio-binario', name: 'Espacio Binario'}});
     for (let i = 0; i < NUMBER_OF_EPISODES; i++) {
       await createEpisode(strapi, podcastIns);
     }
   });
 
   after(async () => {
-    strapi.query('podcast').delete({});
-    strapi.query('episode').delete({});
-    strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::podcast.podcast').deleteMany({});
+    await strapi.query('api::episode.episode').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should get the podcast and the list of episodes (public user)', async () => {
-    await astestRequestPodcast();
+    await testRequestPodcast();
   });
 
   it('should get the podcast and the list of episodes (auth user)', async () => {
     const jwt = generateJwt(strapi, authUser);
-    await astestRequestPodcast(jwt);
+    await testRequestPodcast(jwt);
   });
 
   it('should get the podcast and the list of episodes (staff user)', async () => {
     const jwt = generateJwt(strapi, staffUser);
-    await astestRequestPodcast(jwt);
+    await testRequestPodcast(jwt);
   });
 
   it('should get the podcast and the list of episodes (admin user)', async () => {
     const jwt = generateJwt(strapi, adminUser);
-    await astestRequestPodcast(jwt);
+    await testRequestPodcast(jwt);
   });
 
-  async function astestRequestPodcast(jwt) {
+  async function testRequestPodcast(jwt) {
     const res = await new Promise((resolve, reject) => {
-      const req = chai.request(strapi.server).post('/graphql');
+      const req = chai.request(strapi.server.httpServer).post('/graphql');
       if (jwt) {
         req.set('Authorization', `Bearer ${jwt}`);
       }
@@ -73,6 +73,6 @@ describe('Get podcasts INTEGRATION', () => {
     });
     expect(res.body.data.podcastByIdentifier.name).to.be.equal('Espacio Binario');
     expect(res.body.data.podcastByIdentifier.identifier).to.be.equal('espacio-binario');
-    expect(res.body.data.podcastByIdentifier.episodes.length).to.be.equal(NUMBER_OF_EPISODES);
+    expect(res.body.data.podcastByIdentifier.episodes.data.length).to.be.equal(NUMBER_OF_EPISODES);
   }
 });

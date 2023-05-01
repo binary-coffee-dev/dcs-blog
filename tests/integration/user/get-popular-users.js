@@ -11,7 +11,7 @@ const expect = chai.expect;
 
 const QUERY_GET_POPULAR_USERS = {
   operationName: null,
-  query: 'query {\n  topPopularUsers {\n    users {\n      id\n      created_at\n      updated_at\n      username\n      email\n      provider\n      confirmed\n      blocked\n      avatarUrl\n      name\n      page\n    }\n    values\n  }\n}'
+  query: '{\n    topPopularUsers {\n        users {\n            id\n            attributes {\n                username\n                email\n                provider\n                confirmed\n                blocked\n                role {\n                    data {\n                        attributes {\n                            type\n                            name\n                        }\n                    }\n                }\n                avatar {\n                    data {\n                        attributes {\n                            url\n                        }\n                    }\n                }\n                avatarUrl\n                name\n                page\n                createdAt\n                updatedAt\n            }\n        }\n        values\n    }\n}\n'
 };
 const MAX_NUMBER = 10;
 
@@ -35,13 +35,13 @@ describe('Get popular users INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should get the the list of popular users', async () => {
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .send(QUERY_GET_POPULAR_USERS)
         .end((err, res) => err ? reject(err) : resolve(res));
@@ -59,7 +59,7 @@ describe('Get popular users INTEGRATION', () => {
   it('should get the the list of popular users (auth)', async () => {
     const jwt = generateJwt(strapi, users[0]);
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send(QUERY_GET_POPULAR_USERS)

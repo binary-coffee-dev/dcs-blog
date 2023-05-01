@@ -12,7 +12,7 @@ const expect = chai.expect;
 const QUERY_LIST_OF_FILES = {
   operationName: null,
   // language=GraphQL
-  query: '\nquery ($limit: Int!, $start: Int!, $where: JSON) {\n  imagesConnection(sort: "created_at:DESC",limit: $limit, start: $start, where: $where){\n    values {\n      id\n      image {\n        id\n        name\n        url\n        mime\n      }\n    }\n    aggregate {\n      count\n      totalCount\n    }\n  }\n}'
+  query: 'query ($limit: Int!, $start: Int!, $filters: ImageFiltersInput) {\n    images(sort: ["createdAt:desc"], pagination: {limit: $limit, start: $start}, filters: $filters){\n        data {\n            id\n            attributes {\n                image {\n                    data {\n                        attributes {\n                            url\n                            name\n                        }\n                    }\n                }\n            }\n        }\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n}'
 };
 
 describe('Get list of upload files INTEGRATION', () => {
@@ -25,55 +25,55 @@ describe('Get list of upload files INTEGRATION', () => {
 
     for (let i = 0; i < 40; i++) {
       await createFile(strapi, user);
-      if (i<20) {
+      if (i < 20) {
         await createFile(strapi, user2);
       }
     }
   });
 
   after(async () => {
-    await strapi.query('image').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
-    await strapi.query('file', 'upload').delete({});
+    await strapi.query('api::image.image').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
+    await strapi.query('plugin::upload.file').deleteMany({});
   });
 
   it('should get the list of images', async () => {
     const jwt = generateJwt(strapi, user);
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
       .send({
-        ...QUERY_LIST_OF_FILES, variables: {limit: 20, start: 0, where: {}}
+        ...QUERY_LIST_OF_FILES, variables: {limit: 20, start: 0, filters: {}}
       })
       .end((err, res) => err ? reject(err) : resolve(res)));
 
-    expect(res.body.data.imagesConnection.values.length).to.be.equal(20);
+    expect(res.body.data.images.data.length).to.be.equal(20);
   });
 
   it('should get images filtered by user', async () => {
     const jwt = generateJwt(strapi, user2);
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
       .send({
-        ...QUERY_LIST_OF_FILES, variables: {limit: 100, start: 0, where: {user: user2.id}}
+        ...QUERY_LIST_OF_FILES, variables: {limit: 100, start: 0, filters: {user: {id: {eq: user2.id}}}}
       })
       .end((err, res) => err ? reject(err) : resolve(res)));
 
-    expect(res.body.data.imagesConnection.values.length).to.be.equal(20);
+    expect(res.body.data.images.data.length).to.be.equal(20);
   });
 
   it('should get correctly pagination of the images', async () => {
     const jwt = generateJwt(strapi, user);
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
       .send({
-        ...QUERY_LIST_OF_FILES, variables: {limit: 6, start: 0, where: {user: user2.id}}
+        ...QUERY_LIST_OF_FILES, variables: {limit: 6, start: 0, filters: {user: {id: {eq: user2.id}}}}
       })
       .end((err, res) => err ? reject(err) : resolve(res)));
 
-    expect(res.body.data.imagesConnection.values.length).to.be.equal(6);
-    expect(res.body.data.imagesConnection.aggregate.count).to.be.equal(20);
+    expect(res.body.data.images.data.length).to.be.equal(6);
+    expect(res.body.data.images.meta.pagination.total).to.be.equal(20);
   });
 });

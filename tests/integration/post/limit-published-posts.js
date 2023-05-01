@@ -5,6 +5,7 @@ const randomName = require('../../helpers/random-name');
 const createUser = require('../../helpers/create-user');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 const createPostRequest = require('../../helpers/create-post-request');
+const createPost = require("../../helpers/create-post");
 
 chai.use(chaiHttp);
 
@@ -20,24 +21,24 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should limit the number of post by user in the same day', async () => {
     // create a post 2 days before the new ones are created
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 2);
-    const sql = 'INSERT INTO post (title, name, body, enable, published_at, created_at, author) VALUES (?,?,?,?,?,?,?);';
-    await strapi.connections.default.raw(sql,
-      [randomName(), randomName(), randomName(), true, new Date(new Date() - 10), yesterday, authUser.id]);
+    const post = await createPost(strapi, {author: authUser});
+    const sql = 'UPDATE posts SET created_at=? WHERE id=?;';
+    await strapi.db.connection.raw(sql, [yesterday, post.id]);
 
     const jwt = generateJwt(strapi, authUser);
     for (let i = 0; i < strapi.config.custom.maxNumberOfArticlesPerDay; i++) {
       const res = await createPostRequest(strapi, chai, {enable: true}, jwt);
       expect(!!res).to.be.true;
     }
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
       .send({

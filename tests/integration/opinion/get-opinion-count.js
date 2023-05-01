@@ -12,7 +12,8 @@ const expect = chai.expect;
 const LIKE = 'like';
 const QUERY_COUNT_OPINION = {
   operationName: null,
-  query: 'query ($where: JSON!){\n  countOpinions(where: $where)\n}'
+  // language=GraphQL
+  query: 'query ($name: String!, $userId: ID){\n    opinions(filters: {post: {name: {eq: $name}}, type: {eq: "like"}, user: {id: {eq: $userId}}}) {\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n}'
 };
 
 describe('create/edit/remove opinion INTEGRATION', () => {
@@ -25,47 +26,47 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   afterEach(async () => {
-    await strapi.query('opinion').delete({});
+    await strapi.query('api::opinion.opinion').deleteMany({});
   });
 
   it('should count the number of opinions by post', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPostRequest(strapi, chai, {author: authUser.id}, jwt);
 
-    await strapi.query('opinion').create({user: authUser.id, post: post.id, type: LIKE});
-    await strapi.query('opinion').create({user: staffUser.id, post: post.id, type: LIKE});
+    await strapi.query('api::opinion.opinion').create({data: {user: authUser.id, post: post.id, type: LIKE}});
+    await strapi.query('api::opinion.opinion').create({data: {user: staffUser.id, post: post.id, type: LIKE}});
 
     const res = await new Promise(resolve => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...QUERY_COUNT_OPINION, variables: {where: {post: post.name, type: LIKE}}})
+        .send({...QUERY_COUNT_OPINION, variables: {name: post.attributes.name}})
         .end((err, res) => resolve(res));
     });
 
-    expect(res.body.data.countOpinions).to.be.equal(2);
+    expect(res.body.data.opinions.meta.pagination.total).to.be.equal(2);
   });
 
   it('should count the number of opinions by post', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPostRequest(strapi, chai, {author: authUser.id}, jwt);
 
-    await strapi.query('opinion').create({user: authUser.id, post: post.id, type: LIKE});
-    await strapi.query('opinion').create({user: staffUser.id, post: post.id, type: LIKE});
+    await strapi.query('api::opinion.opinion').create({data: {user: authUser.id, post: post.id, type: LIKE}});
+    await strapi.query('api::opinion.opinion').create({data: {user: staffUser.id, post: post.id, type: LIKE}});
 
     const res = await new Promise(resolve => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...QUERY_COUNT_OPINION, variables: {where: {post: post.name, user: 'current', type: LIKE}}})
+        .send({...QUERY_COUNT_OPINION, variables: {name: post.attributes.name, userId: authUser.id}})
         .end((err, res) => resolve(res));
     });
 
-    expect(res.body.data.countOpinions).to.be.equal(1);
+    expect(res.body.data.opinions.meta.pagination.total).to.be.equal(1);
   });
 });

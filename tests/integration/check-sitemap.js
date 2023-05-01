@@ -28,10 +28,11 @@ describe('Check sitemap functionality INTEGRATION', () => {
 
   it('should get the sitemap of the site', async () => {
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
-        .get('/sitemap')
+      chai.request(strapi.server.httpServer)
+        .get('/api/sitemap')
         .end((err, res) => err ? reject(err) : resolve(res));
     });
+    expect(res.status).to.be.equal(200);
     expect(res.type).to.be.equal('application/xml');
   });
 });

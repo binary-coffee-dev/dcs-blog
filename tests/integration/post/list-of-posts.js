@@ -10,14 +10,15 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 const QUERY = {
-  operationName: 'pageQuery',
+  operationName: null,
   variables: {
     limit: 10,
     start: 0,
-    where: {},
-    sort: 'created_at:DESC',
+    filters: {},
+    sort: ['publishedAt:desc'],
   },
-  query: 'query pageQuery($limit: Int\u0021, $start: Int\u0021, $where: JSON\u0021, $sort: String\u0021) {\n  postsConnection(sort: $sort, limit: $limit, start: $start, where: $where) {\n    values {\n      id\n      name\n      title\n      enable\n      body\n      comments\n      published_at\n      views\n      banner {\n        name\n        url\n        __typename\n      }\n      author {\n        id\n        username\n        email\n        page\n        __typename\n      }\n      tags {\n        name\n        __typename\n      }\n      __typename\n    }\n    aggregate {\n      count\n      __typename\n    }\n    __typename\n  }\n  countPosts(where: $where)\n}\n'
+  // language=GraphQL
+  query: 'query ($limit: Int!, $start: Int!, $filters: PostFiltersInput!, $sort: [String]){\n    posts(filters: $filters, pagination: {limit: $limit, start: $start}, sort: $sort, publicationState: PREVIEW) {\n        data {\n            id\n            attributes {\n                title\n                name\n                body\n                comments\n                likes\n                views\n                createdAt\n                updatedAt\n                publishedAt\n                enable\n                banner {\n                    data {\n                        id\n                        attributes {\n                            url\n                        }\n                    }\n                }\n                author {\n                    data {\n                        id\n                        attributes {\n                            username\n                            email\n                            page\n                        }\n                    }\n                }\n                tags {\n                    data {\n                        id\n                        attributes {\n                            name\n                        }\n                    }\n                }\n            }\n        }\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n}'
 };
 
 describe('Post list (dashboard list) INTEGRATION', () => {
@@ -30,18 +31,18 @@ describe('Post list (dashboard list) INTEGRATION', () => {
     await createPost(strapi);
 
     authUser = await createUser({strapi});
-    await createPost(strapi, {author: authUser, published_at: null});
+    await createPost(strapi, {author: authUser, publishedAt: null});
 
     staffUser = await createUser({strapi, roleType: 'staff'});
-    await createPost(strapi, {author: staffUser, published_at: null});
+    await createPost(strapi, {author: staffUser, publishedAt: null});
 
     adminUser = await createUser({strapi, roleType: 'administrator'});
-    await createPost(strapi, {author: adminUser, published_at: null});
+    await createPost(strapi, {author: adminUser, publishedAt: null});
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should get the not published articles for the not authenticated users', async () => {
@@ -50,7 +51,7 @@ describe('Post list (dashboard list) INTEGRATION', () => {
 
   it('should get the articles of the current auth user', async () => {
     const jwt = generateJwt(strapi, authUser);
-    await requestArticles(jwt, 2);
+    await requestArticles(jwt, 1);
   });
 
   it('should get the articles of the current staff user', async () => {
@@ -65,14 +66,14 @@ describe('Post list (dashboard list) INTEGRATION', () => {
 
   async function requestArticles(jwt, expectedValue) {
     const res = await new Promise((resolve, reject) => {
-      const action = chai.request(strapi.server).post('/graphql');
+      const action = chai.request(strapi.server.httpServer).post('/graphql');
       if (jwt) {
         action.set('Authorization', `Bearer ${jwt}`);
       }
       action.send(QUERY)
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    expect(res.body.data.countPosts).to.equal(expectedValue);
-    expect(res.body.data.postsConnection.values.length).to.equal(expectedValue);
+    expect(res.body.data.posts.meta.pagination.total).to.equal(expectedValue);
+    expect(res.body.data.posts.data.length).to.equal(expectedValue);
   }
 });

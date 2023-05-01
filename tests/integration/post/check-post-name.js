@@ -18,8 +18,8 @@ describe('Check auto-generation of the post\'s name in create/update actions INT
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should create an comment with the name attribute', async () => {

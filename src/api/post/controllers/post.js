@@ -34,7 +34,7 @@ module.exports = createCoreController('api::post.post', ({strapi}) => ({
   async findSimilarPosts(ctx) {
     const id = ctx.params.id;
     const limit = (ctx.params.limit || ctx.params._limit);
-    const articles = await strapi.service('api::post.post').findSimilarPosts(ctx, id, limit);
+    const articles = await strapi.service('api::post.post').findSimilarPosts(id, limit);
     return articles.map(article => this.sanitizeOutput(article, ctx));
   },
 
@@ -56,7 +56,7 @@ module.exports = createCoreController('api::post.post', ({strapi}) => ({
     return ctx.body;
   },
 
-  async sitemap (ctx) {
+  async sitemap(ctx) {
     const siteUrl = strapi.config.custom.siteUrl;
     const parser = new Parser({ignoreAttributes: false});
 
@@ -71,15 +71,17 @@ module.exports = createCoreController('api::post.post', ({strapi}) => ({
       }
     };
 
-    const posts = await strapi.query('api::post.post').find({
-      enable: true,
-      published_at_lte: new Date(),
-      _sort: 'published_at:ASC'
+    const posts = await strapi.query('api::post.post').findMany({
+      where: {
+        enable: true,
+        publishedAt: {$lte: new Date()},
+      },
+      orderBy: {publishedAt: 'asc'}
     });
 
     posts.forEach(post => mapsite.urlset.url.push({
       loc: `${siteUrl}/post/${post['name']}`,
-      lastmod: new Date(post['published_at']).toISOString(),
+      lastmod: new Date(post['publishedAt']).toISOString(),
       changefreq: 'monthly',
       priority: 0.5
     }));

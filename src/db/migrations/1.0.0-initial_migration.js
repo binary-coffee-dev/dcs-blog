@@ -36,13 +36,13 @@ module.exports = {
       {
         roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'podcast.podcast',
-        actions: ['count', 'find', 'findone', 'podcastbyidentifier'],
+        actions: ['find', 'findOne', 'podcastByIdentifier'],
         type: 'api'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'episode.episode',
-        actions: ['count', 'find', 'findone'],
+        actions: ['find', 'findOne'],
         type: 'api'
       },
       {
@@ -54,25 +54,25 @@ module.exports = {
       {
         roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'post.post',
-        actions: ['count', 'find', 'findone', 'feedbyusername', 'findonebyname', 'findsimilarposts', 'getpostbodybyname', 'feed'],
+        actions: ['find', 'findOne', 'feedByUsername', 'findOneByName', 'findSimilarPosts', 'getPostBodyByName', 'feed', 'sitemap'],
         type: 'api'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
-        controller: 'upload.upload',
-        actions: ['count', 'find', 'findone', 'findconnection', 'search'],
+        controller: 'upload.content-api',
+        actions: ['find', 'findOne'],
         type: 'plugin'
       },
       {
         roles: [authRole, staffRole, adminRole],
-        controller: 'upload.upload',
+        controller: 'upload.content-api',
         actions: ['upload', 'destroy'],
         type: 'plugin'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'opinion.opinion',
-        actions: ['count', 'find', 'findone'],
+        actions: ['find', 'findOne'],
         type: 'api'
       },
       {
@@ -84,19 +84,19 @@ module.exports = {
       {
         roles: [publicRole, authRole, staffRole, adminRole],
         controller: 'users-permissions.user',
-        actions: ['toppopularusers', 'topactiveusers', 'find', 'findone', 'find2', 'update'],
+        actions: ['topPopularUsers', 'topActiveUsers', 'find', 'findOne', 'users', 'update'],
         type: 'plugin'
       },
       {
         roles: [publicRole, authRole, staffRole, adminRole],
         controller: 'users-permissions.auth',
-        actions: ['loginwithprovider'],
+        actions: ['loginWithProvider'],
         type: 'plugin'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'comment.comment',
-        actions: ['count', 'find', 'findone', 'recentcomments'],
+        actions: ['find', 'findOne', 'recentComments'],
         type: 'api'
       },
       {
@@ -108,13 +108,13 @@ module.exports = {
       {
         roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'image.image',
-        actions: ['find', 'findone', 'findextra', 'count'],
+        actions: ['find', 'findOne'/*, 'findExtra'*/],
         type: 'api'
       },
       {
         roles: [authRole, publicRole, staffRole, adminRole],
         controller: 'tag.tag',
-        actions: ['find', 'findone', 'count'],
+        actions: ['find', 'findOne'],
         type: 'api'
       },
     ];

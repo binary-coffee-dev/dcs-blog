@@ -1,8 +1,12 @@
 const expect = require('chai').expect;
 
-const subscription = require('../../../../src/api/subscription/services/subscription');
-
 describe('Subscription service', function () {
+  let subscription;
+
+  before(() => {
+    subscription = strapi.service('api::subscription.subscription');
+  });
+
   it('should get a random text of size 12', function () {
     const token = subscription.generateToken();
     expect(token.length).to.be.equal(12);

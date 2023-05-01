@@ -10,17 +10,19 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
     const sort = (ctx.query.sort || ctx.query._sort);
 
     const query = this.createQueryObject(ctx, publicOnly, where);
-    return await strapi.query('api::post.post').find({
-      ...query,
-      _sort: sort,
-      _limit: Math.min(limit, strapi.config.custom.maxPostRequestLimit),
-      _start: Math.max(start, 0)
+    return await strapi.query('api::post.post').findMany({
+      where: {
+        ...query,
+        _sort: sort,
+        _limit: Math.min(limit, strapi.config.custom.maxPostRequestLimit),
+        _start: Math.max(start, 0)
+      }
     });
   },
 
   async count(ctx, publicOnly, where) {
     const query = this.createQueryObject(ctx, publicOnly, where);
-    return await strapi.query('api::post.post').count(query);
+    return await strapi.query('api::post.post').count({where: query});
   },
 
   createQueryObject(ctx, publicOnly, where = {}) {
@@ -70,8 +72,8 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
   },
 
   async findOneByName(ctx, name, noUpdate) {
-    const link = await strapi.query('api::link.link').findOne({name});
-    const post = await strapi.query('api::post.post').findOne({id: link.post.id});
+    const link = await strapi.query('api::link.link').findOne({where: {name}, populate: ['post']});
+    const post = await strapi.query('api::post.post').findOne({where: {id: link.post.id}, populate: ['author']});
     if (post) {
       if (
         this.isPublish(post) ||
@@ -82,26 +84,27 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
         if (!noUpdate) {
           await this.updateViews(post);
         }
-        return post;
+        return strapi.controller('api::post.post').sanitizeOutput(post, ctx);
       }
     }
-    ctx.forbidden();
-    return {};
+    return null;
   },
 
-  async findSimilarPosts(ctx, id, limit = 10) {
+  async findSimilarPosts(id, limit = 10) {
     limit = Math.max(Math.min(limit, strapi.config.custom.maxSimilarPostRequestLimit), 0);
 
-    const post = await strapi.query('api::post.post').findOne({id});
+    const post = await strapi.query('api::post.post').findOne({where: {id}, populate: ['tags']});
     const tags = post.tags || [];
 
-    return await strapi.query('api::post.post').find({
-      published_at_lte: new Date(),
-      enable: true,
-      id_ne: id,
-      tags_in: tags.map(t => t.id),
-      _sort: 'views:DESC',
-      _limit: limit
+    return await strapi.query('api::post.post').findMany({
+      where: {
+        publishedAt: {$lte: new Date()},
+        enable: true,
+        id: {$ne: id},
+        tags: {id: {$in: tags.map(t => t.id)}},
+      },
+      orderBy: {views: 'desc'},
+      limit
     });
   },
 
@@ -129,31 +132,35 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
 
   async updateViews(post) {
     const views = `${parseInt(post.views || 0) + 1}`;
-    await strapi.query('api::post.post').update({id: post.id}, {views});
+    await strapi.query('api::post.post').update({where: {id: post.id}, data: {views}});
   },
 
   async updateComments(postId) {
-    const countOfComments = await strapi.query('comment').count({post: postId});
-    await strapi.query('api::post.post').update({id: postId}, {comments: countOfComments});
+    const countOfComments = await strapi.query('api::comment.comment').count({where: {post: postId}});
+    await strapi.query('api::post.post').update({where: {id: postId}, data: {comments: countOfComments}});
   },
 
   async getPublicPostsOfLastDays(days) {
     const date = new Date();
     date.setDate(date.getDate() - days);
-    return await strapi.query('api::post.post').find({
-      published_at_gt: date,
-      enable_eq: true
+    return await strapi.query('api::post.post').findMany({
+      where: {
+        publishedAt: {$gt: date},
+        enable: true
+      }
     });
   },
 
   async getFeed(ctx, format) {
     const feed = this.createFeedInstance();
 
-    const posts = await strapi.query('api::post.post').find({
-      enable_eq: true,
-      published_at_lte: new Date(),
-      _limit: strapi.config.custom.feedArticlesLimit,
-      _sort: 'published_at:DESC'
+    const posts = await strapi.query('api::post.post').findMany({
+      where: {
+        enable: true,
+        publishedAt: {$lte: new Date()},
+      },
+      limit: strapi.config.custom.feedArticlesLimit,
+      orderBy: {publishedAt: 'desc'}
     });
 
     if (posts) {
@@ -166,17 +173,19 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
   },
 
   async getFeedByUsername(ctx, username, format) {
-    const user = await strapi.query('plugin::users-permissions.user').findOne({username});
+    const user = await strapi.query('plugin::users-permissions.user').findOne({where: {username}});
 
     const feed = this.createFeedInstance();
 
     if (user) {
-      const posts = await strapi.query('api::post.post').find({
-        enable_eq: true,
-        author_eq: user.id,
-        published_at_lte: new Date(),
-        _limit: strapi.config.custom.feedArticlesLimit,
-        _sort: 'published_at:DESC'
+      const posts = await strapi.query('api::post.post').findMany({
+        where: {
+          enable: true,
+          author: user.id,
+          publishedAt: {$lte: new Date()},
+        },
+        limit: strapi.config.custom.feedArticlesLimit,
+        orderBy: {publishedAt: 'desc'}
       });
 
       if (posts) {
@@ -196,7 +205,7 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
       title: post.title,
       id: `${siteUrl}/post/${post.name}`,
       link: `${siteUrl}/post/${post.name}`,
-      content: marked(post.body),
+      content: marked.parse(post.body),
       author: [
         {
           name: post.author && post.author.name || 'unknow',
@@ -204,7 +213,7 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
           link: this.getAuthorPage(post.author)
         }
       ],
-      date: new Date(post.published_at),
+      date: new Date(post.publishedAt),
       image: post.banner ? `${apiUrl}${post.banner.url}` : undefined
     };
   },
@@ -263,6 +272,6 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
   },
 
   isPublish(post) {
-    return post && post.enable && post.published_at && new Date(post.published_at).getTime() <= new Date().getTime();
+    return post && post.enable && post.publishedAt && new Date(post.publishedAt).getTime() <= new Date().getTime();
   }
 }));

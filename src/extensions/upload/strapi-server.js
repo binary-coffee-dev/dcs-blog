@@ -1,7 +1,6 @@
-const uploadController = require('./controllers/upload');
-
-const canRemoveFilePolicy = require('./policies/canRemoveFile')
-const canUploadPolicy = require('./policies/canUpload')
+const canRemoveFilePolicy = require('./policies/canRemoveFile');
+const canUploadPolicy = require('./policies/canUpload');
+const lifecycles = require('./lifecycles');
 
 function includePoliciesIfMissing(route) {
   if (!route.config) {
@@ -13,7 +12,7 @@ function includePoliciesIfMissing(route) {
 }
 
 module.exports = (plugin) => {
-  uploadController(plugin.controllers['content-api']);
+  lifecycles(plugin);
 
   plugin.policies['canRemoveFile'] = canRemoveFilePolicy;
   plugin.policies['canUpload'] = canUploadPolicy;

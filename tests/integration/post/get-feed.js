@@ -25,17 +25,18 @@ describe('Get feed INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should get the feed', async () => {
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
-        .get('/posts/feed/json1')
+      chai.request(strapi.server.httpServer)
+        .get('/api/posts/feed/json1')
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    expect(!!res.body).to.be.true;
+    expect(res.body).not.undefined;
+    expect(res.body.error).to.be.undefined;
     expect(res.body.items.length).to.be.equal(strapi.config.custom.feedArticlesLimit);
   });
 });

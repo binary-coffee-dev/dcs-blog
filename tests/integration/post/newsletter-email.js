@@ -2,7 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const spies = require('chai-spies');
 
-const deliveryToEmailSubscriptions = require('../../../config/functions/delivery.to.email.subscriptions');
+const deliveryToEmailSubscriptions = require('../../../src/functions/delivery.to.email.subscriptions');
 
 const createUser = require('../../helpers/create-user');
 const checkHtmlEmail = require('../../helpers/check-html-email');
@@ -42,27 +42,27 @@ describe('NewsLetter post list INTEGRATION', () => {
     }
 
     for (let i = 0; i < 60; i++) {
-      await strapi.query('subscription').create({verified: true, enable: true, email: 'some@tests.com'});
+      await strapi.query('api::subscription.subscription').create({data: {verified: true, enable: true, email: 'some@tests.com'}});
     }
 
-    savedFunction = strapi.plugins['email'].services.email.send;
-    strapi.plugins['email'].services.email.send = chai.spy((messageToSend) => {
+    savedFunction = strapi.service('plugin::email.email').send;
+    strapi.service('plugin::email.email').send = chai.spy((messageToSend) => {
       message = messageToSend;
       return Promise.resolve();
     });
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('subscription').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
-    strapi.plugins['email'].services.email.send = savedFunction;
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('api::subscription.subscription').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
+    strapi.service('plugin::email.email').send = savedFunction;
   });
 
   it('should get the not published articles for the not authenticated users', async () => {
     await deliveryToEmailSubscriptions.send('Binary Coffee Weekly Posts', 7);
 
-    expect(strapi.plugins['email'].services.email.send).to.have.been.called.exactly(2);
+    expect(strapi.service('plugin::email.email').send).to.have.been.called.exactly(2);
     expect(checkHtmlEmail(message.html)).to.be.equal(NOMBER_OF_ARTICLES);
   });
 });

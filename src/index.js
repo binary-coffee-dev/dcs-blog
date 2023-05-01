@@ -18,7 +18,12 @@ module.exports = {
     graphqlPost(strapi);
     graphqlSubscription(strapi);
     graphqlUser(strapi);
-    // graphqlUpload(strapi);
+    graphqlUpload(strapi);
+
+    strapi.config.functions = {
+      dateUtil: require('./functions/dateUtil'),
+      // sendBotNotification: require('./functions/sendBotNotification')
+    };
   },
   async bootstrap() {
     await migrationCore.run();

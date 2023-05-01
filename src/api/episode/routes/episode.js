@@ -2,4 +2,6 @@
 
 const {createCoreRouter} = require('@strapi/strapi').factories;
 
-module.exports = createCoreRouter('api::episode.episode', {only: []});
+module.exports = createCoreRouter('api::episode.episode', {
+  prefix: ''
+});

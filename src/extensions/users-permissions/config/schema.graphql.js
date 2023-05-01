@@ -1,13 +1,16 @@
+const canRemove = require("../../../api/comment/policies/canRemove");
+const canComment = require("../../../api/comment/policies/canComment");
+const canUpdateComment = require("../../../api/comment/policies/canUpdateComment");
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
   extensionService.use(({nexus}) => {
     const UsersPermissionsUser2 = nexus.objectType({
-      name: 'UsersPermissionsUser2',
+      name: 'UsersPermissionsUsersExtra',
       definition(t) {
         t.id('id');
-        t.field('created_at', {type: 'DateTime'});
-        t.field('updated_at', {type: 'DateTime'});
+        t.field('createdAt', {type: 'DateTime'});
+        t.field('updatedAt', {type: 'DateTime'});
         t.string('username');
         t.boolean('confirmed');
         t.boolean('blocked');
@@ -39,8 +42,8 @@ module.exports = (strapi) => {
     const TopUsers = nexus.objectType({
       name: 'TopUsers',
       definition(t) {
-        t.list.field('users', {type: 'UsersPermissionsUser'});
-        t.int('values');
+        t.list.field('users', {type: 'UsersPermissionsUserEntity'});
+        t.list.field('values', {type: 'Int'});
       }
     });
 
@@ -50,7 +53,7 @@ module.exports = (strapi) => {
         t.field('myData', {
           type: nexus.nonNull('UsersPermissionsMYData'),
           resolve(parent, args, context) {
-            return strapi.controller('plugin::users-permissions.user').me(context);
+            return strapi.service('plugin::users-permissions.extra').myData(context);
           }
         });
       }
@@ -62,7 +65,7 @@ module.exports = (strapi) => {
         t.field('topActiveUsers', {
           type: nexus.nonNull('TopUsers'),
           resolve(parent, args, context) {
-            return strapi.controller('plugin::users-permissions.user').topActiveUsers(context);
+            return strapi.service('plugin::users-permissions.extra').topActiveUsers(context);
           }
         });
       }
@@ -74,20 +77,24 @@ module.exports = (strapi) => {
         t.field('topPopularUsers', {
           type: nexus.nonNull('TopUsers'),
           resolve(parent, args, context) {
-            return strapi.controller('plugin::users-permissions.user').topPopularUsers(context);
+            return strapi.service('plugin::users-permissions.extra').topPopularUsers(context);
           }
         });
       }
     });
 
-    const users2 = nexus.extendType({
+    const users = nexus.extendType({
       type: 'Query',
       definition(t) {
-        t.field('users2', {
-          type: nexus.nonNull(nexus.list('UsersPermissionsUser2')),
-          args: {sort: 'String', limit: 'Int', start: 'Int', where: 'JSON', publicationState: 'PublicationState'},
+        t.field('users', {
+          type: nexus.nonNull(nexus.list('UsersPermissionsUsersExtra')),
+          args: {
+            filters: 'UsersPermissionsUserFiltersInput',
+            pagination: 'PaginationArg',
+            sort: nexus.list('String')
+          },
           resolve(parent, args, context) {
-            return strapi.controller('plugin::users-permissions.user').find2(context);
+            return strapi.service('plugin::users-permissions.extra').users(args);
           }
         });
       }
@@ -100,14 +107,42 @@ module.exports = (strapi) => {
           type: nexus.nonNull('String'),
           args: {provider: nexus.nonNull('String'), code: nexus.nonNull('String')},
           resolve(parent, args, context) {
-            return strapi.controller('plugin::users-permissions.auth').loginWithProvider(context);
+            return strapi.controller('plugin::users-permissions.extra').loginWithProvider(context);
           }
         });
       }
     });
 
-    return {types: [UsersPermissionsUser2, UsersPermissionsMYData, TopUsers, myData, topActiveUsers, topPopularUsers, users2, loginWithProvider]};
+    return {
+      types: [UsersPermissionsUser2, UsersPermissionsMYData, TopUsers, myData, topActiveUsers, topPopularUsers,
+        users, loginWithProvider]
+    };
   });
+
+  extensionService.use(() => ({
+    resolversConfig: {
+      'Query.users': {
+        auth: {
+          scope: ['plugin::users-permissions.user.users']
+        }
+      },
+      'Query.myData': {
+        auth: {
+          scope: ['plugin::users-permissions.user.me']
+        }
+      },
+      'Query.topActiveUsers': {
+        auth: {
+          scope: ['plugin::users-permissions.user.topActiveUsers']
+        }
+      },
+      'Query.topPopularUsers': {
+        auth: {
+          scope: ['plugin::users-permissions.user.topPopularUsers']
+        }
+      }
+    }
+  }));
 };
 
 /*

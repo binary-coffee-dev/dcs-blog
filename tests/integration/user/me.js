@@ -10,19 +10,20 @@ const expect = chai.expect;
 
 const QUERY_MY_USER = {
   operationName: null,
-  query: 'query{\n  myData{\n    id\n    username\n    email\n    page\n    avatarUrl\n    role { name type }\n  }\n}'
+  query: 'query{\n    myData {\n        id\n        username\n        email\n        avatarUrl\n        confirmed\n        blocked\n        role {\n            name\n            type\n        }\n        page\n        avatar {\n            url\n        }\n    }\n}'
 };
 
 describe('Get me user INTEGRATION', () => {
 
-  before(async () => {});
+  before(async () => {
+  });
 
   it('should get my user data', async () => {
-    const provider = await strapi.query('provider').create({provider: 'github'});
+    const provider = await strapi.query('api::provider.provider').create({data: {provider: 'github'}});
     let user = await createUser({strapi, provider});
 
     const jwt = generateJwt(strapi, user);
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
       .send(QUERY_MY_USER)

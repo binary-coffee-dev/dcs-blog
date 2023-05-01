@@ -2,4 +2,4 @@
 
 const {createCoreRouter} = require('@strapi/strapi').factories;
 
-module.exports = createCoreRouter('api::comment.comment', {only: []});
+module.exports = createCoreRouter('api::comment.comment');

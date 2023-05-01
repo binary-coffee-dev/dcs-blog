@@ -1,8 +1,47 @@
 {
-  "name": "dcs-blog-backend",
-  "private": true,
-  "version": "1.1.0",
+  "author": {
+    "name": "binary-coffee"
+  },
+  "dependencies": {
+    "@strapi/plugin-graphql": "4.7.0",
+    "@strapi/plugin-i18n": "4.7.0",
+    "@strapi/plugin-users-permissions": "4.7.0",
+    "@strapi/provider-email-nodemailer": "4.7.0",
+    "@strapi/strapi": "^4.10.1",
+    "axios": "^0.21.4",
+    "ejs": "^3.0.1",
+    "eslint": "^6.8.0",
+    "fast-xml-parser": "^3.16.0",
+    "feed": "^4.1.0",
+    "html-minifier": "^4.0.0",
+    "marked": "^4.3.0",
+    "moment": "^2.26.0",
+    "moment-timezone": "^0.5.31",
+    "mysql": "^2.18.1",
+    "pre-push": "^0.1.1",
+    "svg-captcha": "^1.4.0"
+  },
   "description": "Binary Coffee backend",
+  "devDependencies": {
+    "better-sqlite3": "^8.3.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "chai-spies": "^1.0.0",
+    "mocha": "^10.2.0",
+    "nyc": "^15.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT",
+  "name": "dcs-blog-backend",
+  "pre-push": {
+    "run": [
+      "check"
+    ]
+  },
+  "private": true,
   "scripts": {
     "develop": "strapi develop",
     "start": "strapi start",
@@ -15,46 +54,8 @@
     "lint:fix": "eslint . --fix",
     "check": "npm run test && npm run lint && npm run build"
   },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-http": "^4.3.0",
-    "chai-spies": "^1.0.0",
-    "nyc": "^15.0.0",
-    "mocha": "^10.2.0",
-    "sqlite3": "^5.1.6"
-  },
-  "dependencies": {
-    "@strapi/plugin-graphql": "4.1.2",
-    "@strapi/plugin-users-permissions": "4.1.2",
-    "@strapi/provider-email-nodemailer": "4.1.2",
-    "@strapi/strapi": "4.1.2",
-    "axios": "^0.21.4",
-    "ejs": "^3.0.1",
-    "eslint": "^6.8.0",
-    "fast-xml-parser": "^3.16.0",
-    "feed": "^4.1.0",
-    "html-minifier": "^4.0.0",
-    "marked": "^2.0.3",
-    "moment": "^2.26.0",
-    "moment-timezone": "^0.5.31",
-    "mysql": "^2.18.1",
-    "pre-push": "^0.1.1",
-    "svg-captcha": "^1.4.0"
-  },
-  "pre-push": {
-    "run": [
-      "check"
-    ]
-  },
-  "author": {
-    "name": "binary-coffee"
-  },
   "strapi": {
     "uuid": "b8aa7baf-d6dc-4c50-93d4-7739bc88c3fd"
   },
-  "engines": {
-    "node": ">=14.0.0",
-    "npm": ">=6.0.0"
-  },
-  "license": "MIT"
+  "version": "1.1.0"
 }

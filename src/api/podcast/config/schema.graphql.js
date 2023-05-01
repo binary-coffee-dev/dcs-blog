@@ -1,3 +1,6 @@
+const canRemove = require("../../comment/policies/canRemove");
+const canComment = require("../../comment/policies/canComment");
+const canUpdateComment = require("../../comment/policies/canUpdateComment");
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
@@ -10,7 +13,8 @@ module.exports = (strapi) => {
           args: { identifier: nexus.nonNull('String') },
 
           resolve(parent, args, context) {
-            return strapi.service('api::podcast.podcast').podcastByIdentifier(context);
+            const {identifier} = args;
+            return strapi.service('api::podcast.podcast').findOneByIdentifier(identifier);
           }
         });
       }
@@ -18,6 +22,16 @@ module.exports = (strapi) => {
 
     return { types: [podcastByIdentifier] };
   });
+
+  extensionService.use(() => ({
+    resolversConfig: {
+      'Query.podcastByIdentifier': {
+        auth: {
+          scope: ['api::podcast.podcast.podcastByIdentifier']
+        }
+      }
+    }
+  }));
 };
 
 /*

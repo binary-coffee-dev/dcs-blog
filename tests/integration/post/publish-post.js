@@ -17,7 +17,7 @@ const QUERY_GET_POST_BY_NAME = {
     id: 'this-is-a-tests-yes'
   },
   // language=GraphQL
-  query: 'query fetchPost($id: String!) {\n  postByName(name: $id) {\n    id\n    name\n    title\n    body\n    published_at\n    views\n    tags {\n      id\n      name\n      __typename\n    }\n    comments\n    banner {\n      url\n      __typename\n    }\n    author {\n      id\n      username\n      email\n      avatarUrl\n      page\n      __typename\n    }\n    tags {\n      name\n      __typename\n    }\n    __typename\n  }\n  likes:countOpinions(where: {post: $id, type: "like"})\n  userLike:countOpinions(where: {post: $id, type: "like", user: "current"})\n}\n'
+  query: 'query fetchPost($id: String!, $postName: ID, $userId: ID) {\n    postByName(name: $id) {\n        title\n        body\n        enable\n        name\n        views\n        readingTime\n        comments\n        likes\n        createdAt\n        updatedAt\n        publishedAt\n    }\n    likes:opinions(filters: {post: {id: {eq: $postName}}, type: {eq: "like"}}) {\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n    userLikes:opinions(filters: {post: {id: {eq: $postName}}, type: {eq: "like"}, user: {id: {eq: $userId}}}) {\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n}\n'
 };
 
 describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
@@ -32,74 +32,74 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
-  it('should create an comment with the publishedAt attribute (admin user)', async () => {
+  it('should create a post with the publishedAt attribute (admin user)', async () => {
     const jwt = generateJwt(strapi, adminUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'The good one',}, jwt);
 
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).not.null;
+    expect(post.publishedAt).not.null;
   });
 
-  it('should create an comment without the publishedAt attribute (staff user)', async () => {
+  it('should create a post without the publishedAt attribute (staff user)', async () => {
     const jwt = generateJwt(strapi, staffUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work',}, jwt);
 
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).to.be.null;
+    expect(post.publishedAt).to.be.null;
   });
 
-  it('should create an comment without the publishedAt attribute (auth user)', async () => {
+  it('should create a post without the publishedAt attribute (auth user)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work two',}, jwt);
 
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).to.be.null;
+    expect(post.publishedAt).to.be.null;
   });
 
-  it('should update an comment with the publishedAt attribute (admin user)', async () => {
+  it('should update a post with the publishedAt attribute (admin user)', async () => {
     const jwt = generateJwt(strapi, adminUser);
 
-    const adminPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
+    const adminPost = await createPostRequest(strapi, chai, {author: authUser.id, publishedAt: null}, jwt);
 
-    expect(adminPost.published_at).to.be.null;
+    expect(adminPost.publishedAt).to.be.undefined;
 
     const postRes = await updatePostRequest(strapi, chai, {id: adminPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).not.null;
+    expect(post.publishedAt).not.null;
   });
 
-  it('should update an comment without the publishedAt attribute (staff user)', async () => {
+  it('should update a post without the publishedAt attribute (staff user)', async () => {
     const jwt = generateJwt(strapi, staffUser);
 
-    const staffPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
+    const staffPost = await createPostRequest(strapi, chai, {author: authUser.id, publishedAt: null}, jwt);
 
-    expect(staffPost.published_at).to.be.null;
+    expect(staffPost.publishedAt).to.be.undefined;
 
     const postRes = await updatePostRequest(strapi, chai, {id: staffPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).to.be.null;
+    expect(post.publishedAt).to.be.null;
   });
 
-  it('should update an comment without the publishedAt attribute (auth user)', async () => {
+  it('should update a post without the publishedAt attribute (auth user)', async () => {
     const jwt = generateJwt(strapi, authUser);
 
-    const authPost = await createPostRequest(strapi, chai, {author: authUser._id, publishedAt: null}, jwt);
+    const authPost = await createPostRequest(strapi, chai, {author: authUser.id, publishedAt: null}, jwt);
 
-    expect(authPost.published_at).to.be.null;
+    expect(authPost.publishedAt).to.be.undefined;
 
     const postRes = await updatePostRequest(strapi, chai, {id: authPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.published_at).to.be.null;
+    expect(post.publishedAt).to.be.null;
   });
 
   it('should not allow to publish a post with an empty title', async () => {
@@ -130,7 +130,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(fail).to.be.equal(false, 'Expected error didn\'t thrown');
   });
 
-  it('should create and then update comment and tests the created links', async () => {
+  it('should create and then update post and tests the created links', async () => {
     // create post
     const jwt = generateJwt(strapi, adminUser);
     let postRes = await createPostRequest(strapi, chai, {title: 'The good one'}, jwt);
@@ -138,36 +138,36 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     let post = await getPostById(strapi, postRes.id);
     const initialName = post.name;
 
-    expect(post.published_at).not.null;
+    expect(post.publishedAt).not.null;
 
     // update post without change title
     postRes = await updatePostRequest(strapi, chai, {id: post.id, title: post.title}, jwt);
     post = await getPostById(strapi, postRes.id);
 
-    let links = await strapi.query('api::link.link').find({post: post.id});
+    let links = await strapi.query('api::link.link').findMany({where: {post: post.id}});
 
-    expect(post.published_at).not.null;
+    expect(post.publishedAt).not.null;
     expect(links.length).to.equal(1);
 
     // update with new title
     postRes = await updatePostRequest(strapi, chai, {id: post.id, title: 'this is the new title'}, jwt);
     post = await getPostById(strapi, postRes.id);
 
-    links = await strapi.query('api::link.link').find({post: post.id});
+    links = await strapi.query('api::link.link').findMany({where: {post: post.id}});
 
-    expect(post.published_at).not.null;
+    expect(post.publishedAt).not.null;
     expect(links.length).to.equal(2);
 
     // check if post can be requested with an old name
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...QUERY_GET_POST_BY_NAME, variables: {id: initialName}})
+        .send({...QUERY_GET_POST_BY_NAME, variables: {id: initialName, postName: initialName, userId: adminUser.id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
 
-    expect(res.body.data).not.null;
+    expect(res.body.data).not.undefined;
     expect(res.body.data.postByName).not.null;
     expect(res.body.data.postByName.name).to.equal(post.name);
   });

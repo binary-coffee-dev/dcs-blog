@@ -20,8 +20,8 @@ describe('Get post body by name INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should get a post body by the name throw the api rest', async () => {
@@ -32,8 +32,8 @@ describe('Get post body by name INTEGRATION', () => {
 
     const jwt2 = generateJwt(strapi, authUser);
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
-        .get(`/post-body-by-name/${post.name}/download.md`)
+      chai.request(strapi.server.httpServer)
+        .get(`/api/post-body-by-name/${post.name}/download.md`)
         .set('Authorization', `Bearer ${jwt2}`)
         .end((err, res) => err ? reject(err) : resolve(res));
     });

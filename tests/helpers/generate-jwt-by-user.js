@@ -1,3 +1,3 @@
 module.exports = (strapi, user) => {
-  return strapi.plugins['users-permissions'].services.jwt.issue({id: user.id});
+  return strapi.service('plugin::users-permissions.jwt').issue({id: user.id});
 };

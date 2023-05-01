@@ -13,11 +13,12 @@ const expect = chai.expect;
 const LIKE = 'like';
 const MUTATION_CREATE_OPINION = {
   operationName: null,
-  query: 'mutation ($post: ID, $user: ID, $type: String){\n  createOpinion(input: {data: {post: $post, user: $user, type: $type}}){\n    opinion {\n      id\n    }\n  }\n}'
+  // language=GraphQL
+  query: 'mutation ($post: ID, $user: ID, $type: String){\n  createOpinion(data: {post: $post, user: $user, type: $type}){\n    data {\n      id\n    }\n  }\n}'
 };
 const MUTATION_REMOVE_OPINION = {
   operationName: null,
-  query: 'mutation ($id: ID!){\n  deleteOpinion(input: {where: {id: $id}}){\n    opinion {\n      id\n    }\n  }\n}'
+  query: 'mutation ($id: ID!){\n  deleteOpinion(id: $id){\n    data {\n      id\n    }\n  }\n}'
 };
 
 describe('create/edit/remove opinion INTEGRATION', () => {
@@ -30,19 +31,19 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   afterEach(async () => {
-    await strapi.query('opinion').delete({});
+    await strapi.query('api::opinion.opinion').deleteMany({});
   });
 
   it('should not create a new opinion if the user is not the same of the opinion (auth)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: authUser.id});
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
@@ -50,42 +51,55 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     });
 
     expect(res.body.errors.length).to.be.equal(1);
+    expect(res.body.errors[0].message).to.be.equal('Policy Failed');
+
+    const postQ = await strapi.query('api::post.post').findOne({where: {id: post.id}});
+    expect(+postQ.likes).to.be.equal(0);
   });
 
   it('should create a new opinion (auth)', async () => {
     const jwt = generateJwt(strapi, staffUser);
     const post = await createPost(strapi, {author: staffUser.id});
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
 
-    const id = res.body.data.createOpinion.opinion.id;
-    const opinion = await strapi.query('opinion').findOne({id});
+    expect(res.body.data.createOpinion.data).not.undefined;
+
+    const id = +res.body.data.createOpinion.data.id;
+    const opinion = await strapi.query('api::opinion.opinion').findOne({where: {id}});
     const postUpdated = await getPostById(strapi, post.id);
 
-    expect(!!res.body.data.createOpinion.opinion).to.be.true;
-    expect(!!opinion).to.be.true;
+    expect(opinion).not.null;
     expect(+postUpdated.likes).to.be.equal((+post.likes) + 1);
   });
 
   it('should not remove the opinion of other user (auth)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: authUser.id});
-    const opi = await strapi.query('opinion').create({user: staffUser.id, post: post.id, type: LIKE});
-    await new Promise(resolve => {
-      chai.request(strapi.server)
+    const opi = await strapi.query('api::opinion.opinion').create({
+      data: {
+        user: staffUser.id,
+        post: post.id,
+        type: LIKE
+      }
+    });
+    const res = await new Promise(resolve => {
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
+        .send({...MUTATION_REMOVE_OPINION, variables: {id: opi.id}})
         .end((err, res) => resolve(res));
     });
 
-    const opinion = await strapi.query('opinion').findOne({id: opi.id});
+    expect(res.body.errors.length).to.be.equal(1);
+    expect(res.body.errors[0].message).to.be.equal('Policy Failed');
 
+    const opinion = await strapi.query('api::opinion.opinion').findOne({where: {id: opi.id}});
     expect(opinion).not.null;
   });
 
@@ -93,23 +107,26 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: staffUser.id});
 
-    await new Promise(resolve => {
-      chai.request(strapi.server)
+    const res1 = await new Promise(resolve => {
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: authUser.id, type: LIKE}})
         .end((err, res) => resolve(res));
     });
-    await new Promise(resolve => {
-      chai.request(strapi.server)
+    expect(res1.body.errors).to.be.undefined;
+
+    const res2 = await new Promise(resolve => {
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
+        .send({...MUTATION_REMOVE_OPINION, variables: {id: +res1.body.data.createOpinion.data.id}})
         .end((err, res) => resolve(res));
     });
+    expect(res2.body.errors).to.be.undefined;
 
     const postUpdated = await getPostById(strapi, post.id);
-    const opinions = await strapi.query('opinion').find({post: post.id, user: authUser.id});
+    const opinions = await strapi.query('api::opinion.opinion').findMany({where: {post: post.id, user: authUser.id}});
 
     expect(opinions.length).to.be.equal(0);
     expect(+postUpdated.likes).to.be.equal(0);
@@ -118,37 +135,41 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   it('should not create more than one opinion by user in a post (staff)', async () => {
     const post = await createPost(strapi);
     const jwt = generateJwt(strapi, staffUser);
-    await new Promise(resolve => {
-      chai.request(strapi.server)
+    const res1 = await new Promise(resolve => {
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
         .end((err, res) => resolve(res));
     });
-    await new Promise(resolve => {
-      chai.request(strapi.server)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
-        .end((err, res) => resolve(res));
-    });
+    expect(res1.body.errors).to.be.undefined;
 
-    const opinions = await strapi.query('opinion').find({post: post.id, user: staffUser.id});
+    const res2 = await new Promise(resolve => {
+      chai.request(strapi.server.httpServer)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
+        .end((err, res) => resolve(res));
+    });
+    expect(res2.body.errors.length).to.be.equal(1);
+    expect(res2.body.errors[0].message).to.be.equal('Policy Failed');
+
+    const opinions = await strapi.query('api::opinion.opinion').count({where: {post: post.id, user: staffUser.id}});
     const postUpdated = await getPostById(strapi, post.id);
 
-    expect(opinions.length).to.be.equal(1);
+    expect(opinions).to.be.equal(1);
     expect(+postUpdated.likes).to.be.equal(1);
   });
 
   it('should not create a new opinion (public)', async () => {
     const post = await createPost(strapi, {author: authUser.id});
     const res = await new Promise(resolve => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: authUser.id, type: LIKE}})
         .end((err, res) => resolve(res));
     });
     expect(res.body.errors.length).to.be.equal(1);
-    expect(res.body.errors[0].message).to.be.equal('Forbidden');
+    expect(res.body.errors[0].message).to.be.equal('Forbidden access');
   });
 });

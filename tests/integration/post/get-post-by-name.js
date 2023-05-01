@@ -16,7 +16,7 @@ const QUERY_GET_POST_BY_NAME = {
     id: 'this-is-a-tests-yes'
   },
   // language=GraphQL
-  query: 'query fetchPost($id: String!, $noUpdate: Boolean) {\n  postByName(name: $id, noUpdate: $noUpdate) {\n    id\n    name\n    title\n    body\n    published_at\n    views\n    tags {\n      id\n      name\n      __typename\n    }\n    comments\n    banner {\n      url\n      __typename\n    }\n    author {\n      id\n      username\n      email\n      avatarUrl\n      page\n      __typename\n    }\n    tags {\n      name\n      __typename\n    }\n    __typename\n  }\n}\n'
+  query: 'query fetchPost($id: String!, $noUpdate: Boolean) {\n    postByName(name: $id, noUpdate: $noUpdate) {\n        title\n        body\n        author {\n            data {\n                id\n                attributes {\n                    username\n                    avatarUrl\n                }\n            }\n        }\n        banner {\n            data {\n                attributes {\n                    url\n                }\n            }\n        }\n        tags {\n            data {\n                id\n                attributes {\n                    name\n                }\n            }\n        }\n        enable\n        name\n        views\n        readingTime\n        comments\n        likes\n        createdAt\n        updatedAt\n        publishedAt\n    }\n}\n'
 };
 
 describe('Get post by name INTEGRATION', () => {
@@ -35,12 +35,12 @@ describe('Get post by name INTEGRATION', () => {
 
     const jwt = generateJwt(strapi, authUserOwner);
     const postRes = await createPostRequest(strapi, chai, {enable: false}, jwt);
-    postName = postRes.name;
+    postName = postRes.attributes.name;
   });
 
   after(async () => {
-    await strapi.query('api::post.post').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
+    await strapi.query('api::post.post').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should calculate the read time in the new created comment', async () => {
@@ -50,27 +50,27 @@ describe('Get post by name INTEGRATION', () => {
       title: 'this is a tests yes asdff asdf',
       enable: false
     }, jwt);
-    expect(postRes.readingTime).to.be.equal(60);
+    expect(postRes.attributes.readingTime).to.be.equal(60);
 
     const postRes2 = await updatePostRequest(strapi, chai, {
       id: postRes.id,
       body: 'Dignissimos libero iste id rem qui quibusdam officiis facilis ea recusandae eum est qui minus et velit placeat omnis voluptates autem quasi dolorum nesciunt numquam nemo in deserunt esse maxime neque assumenda et ipsam provident mollitia est maiores distinctio et qui dolores eum ad dolores alias aliquid possimus placeat quos itaque vel quasi esse iure sapiente nesciunt praesentium facilis eaque vel ipsum quia ut sit consequuntur sed nemo in qui placeat et modi ut harum alias magni velit iure soluta sit tenetur sequi occaecati illum dolores suscipit illum ipsam voluptatem pariatur ut nostrum delectus quia officiis vitae doloribus quia laborum.'
     }, jwt);
-    expect(postRes2.readingTime).to.be.equal(30);
+    expect(postRes2.attributes.readingTime).to.be.equal(30);
   });
 
   it('should get the post by name the owner of the comment', async () => {
     const jwt = generateJwt(strapi, authUserOwner);
     const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
 
-    expect(!!res.body.data.postByName).to.be.true;
-    expect(+res.body.data.postByName.author.id).to.equal(authUserOwner.id);
+    expect(res.body.data.postByName).not.undefined.and.not.null;
+    expect(+res.body.data.postByName.author.data.id).to.equal(authUserOwner.id);
     expect(res.body.data.postByName.name).to.equal(postName);
   });
 
@@ -79,7 +79,7 @@ describe('Get post by name INTEGRATION', () => {
     let initViews = Number.MAX_SAFE_INTEGER;
     for (let i = 0; i < 20; i++) {
       const res = await new Promise((resolve, reject) => {
-        chai.request(strapi.server)
+        chai.request(strapi.server.httpServer)
           .post('/graphql')
           .set('Authorization', `Bearer ${jwt}`)
           .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName, noUpdate: true}})
@@ -93,53 +93,56 @@ describe('Get post by name INTEGRATION', () => {
     }
   });
 
-  it('should not have access to an comment if the user is not the owner', (done) => {
+  it('should not have access to an comment if the user is not the owner', async () => {
     const jwt = generateJwt(strapi, authUser);
-    chai.request(strapi.server)
-      .post('/graphql')
-      .set('Authorization', `Bearer ${jwt}`)
-      .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
-      .end((err, res) => {
-        expect(!!res.body.data).to.be.false;
-        done();
-      });
+    const res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server.httpServer)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    expect(res.body.errors).to.be.undefined;
+    expect(res.body.data.postByName).to.be.null;
   });
 
-  it('should not have access to an comment a public user', (done) => {
-    chai.request(strapi.server)
-      .post('/graphql')
-      .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
-      .end((err, res) => {
-        expect(!!res.body.data).to.be.false;
-        done();
-      });
+  it('should not have access to an comment a public user', async () => {
+    const res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server.httpServer)
+        .post('/graphql')
+        .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    expect(res.body.errors.length).to.be.equal(1);
+    expect(res.body.errors[0].message).to.be.equal('Forbidden access');
+    expect(res.body.data.postByName).to.be.null;
   });
 
-  it('should get the post an user with staff role', (done) => {
+  it('should get the post an user with staff role', async () => {
     const jwt = generateJwt(strapi, staffUser);
-    chai.request(strapi.server)
-      .post('/graphql')
-      .set('Authorization', `Bearer ${jwt}`)
-      .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
-      .end((err, res) => {
-        expect(!!res.body.data.postByName).to.be.true;
-        expect(+res.body.data.postByName.author.id).to.equal(authUserOwner.id);
-        expect(res.body.data.postByName.name).to.equal(postName);
-        done();
-      });
+    const res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server.httpServer)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    expect(res.body.data.postByName).not.undefined;
+    expect(+res.body.data.postByName.author.data.id).to.equal(authUserOwner.id);
+    expect(res.body.data.postByName.name).to.equal(postName);
   });
 
-  it('should get the post an user with admin role', (done) => {
+  it('should get the post an user with admin role', async () => {
     const jwt = generateJwt(strapi, adminUser);
-    chai.request(strapi.server)
-      .post('/graphql')
-      .set('Authorization', `Bearer ${jwt}`)
-      .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
-      .end((err, res) => {
-        expect(!!res.body.data.postByName).to.be.true;
-        expect(+res.body.data.postByName.author.id).to.equal(authUserOwner.id);
-        expect(res.body.data.postByName.name).to.equal(postName);
-        done();
-      });
+    const res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server.httpServer)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    expect(res.body.data.postByName).not.undefined;
+    expect(+res.body.data.postByName.author.data.id).to.equal(authUserOwner.id);
+    expect(res.body.data.postByName.name).to.equal(postName);
   });
 });

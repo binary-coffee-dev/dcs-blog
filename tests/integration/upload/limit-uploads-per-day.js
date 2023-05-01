@@ -29,36 +29,37 @@ describe('Limit uploads per day INTEGRATION', () => {
         fileData.url = `/uploads/${randomName(20)}`;
         return Promise.resolve();
       },
-      delete: () => Promise.resolve()
+      delete: () => Promise.resolve(),
+      checkFileSize: () => Promise.resolve()
     };
   });
 
   after(async () => {
     removeFile(FILEPATH);
     strapi.plugins.upload.provider = provider;
-    await strapi.query('image').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
-    await strapi.query('file', 'upload').delete({});
+    await strapi.query('api::image.image').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
+    await strapi.query('plugin::upload.file').deleteMany({});
   });
 
   it('should limit to 20 the upload files per day', async () => {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const image = await strapi.query('image').create({user: user.id});
-    await strapi.connections.default.raw('UPDATE images SET created_at=? WHERE id=?;', [yesterday, image.id]);
+    const image = await strapi.query('api::image.image').create({data: {user: user.id}});
+    await strapi.db.connection.raw('UPDATE images SET created_at=? WHERE id=?;', [yesterday, image.id]);
 
     const jwt = generateJwt(strapi, user);
     for (let i = 0; i < strapi.config.custom.maxNumberOfUploadsPerDay; i++) {
-      const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-        .post('/upload')
+      const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
+        .post('/api/upload')
         .set('Authorization', `Bearer ${jwt}`)
         .set('Content-Type', 'image/png')
         .attach('files', FILEPATH, `image${i}.png`)
         .end((err, res) => err ? reject(err) : resolve(res)));
       expect(res.status).to.be.equal(200);
     }
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-      .post('/upload')
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
+      .post('/api/upload')
       .set('Authorization', `Bearer ${jwt}`)
       .set('Content-Type', 'image/png')
       .attach('files', FILEPATH, 'image6.png')
@@ -69,8 +70,8 @@ describe('Limit uploads per day INTEGRATION', () => {
   it('should not limit the uploads to the admins', async () => {
     const jwt = generateJwt(strapi, admin);
     for (let i = 0; i < strapi.config.custom.maxNumberOfUploadsPerDay + 10; i++) {
-      const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-        .post('/upload')
+      const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
+        .post('/api/upload')
         .set('Authorization', `Bearer ${jwt}`)
         .set('Content-Type', 'image/png')
         .attach('files', FILEPATH, `image${i}.png`)

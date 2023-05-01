@@ -17,7 +17,7 @@ const FILEPATH = path.join(__dirname, 'tmp2.png');
 const MUTATION_REMOVE_FILE = {
   operationName: null,
   // language=GraphQL
-  query: 'mutation ($id: ID!){\n  deleteFile(input: {where: {id: $id}}){\n    file {\n      id\n    }\n  }\n}'
+  query: 'mutation ($id: ID!){\n    removeFile(id: $id) {\n        data {\n            id\n        }\n    }\n}'
 };
 
 describe('Remove images INTEGRATION', () => {
@@ -40,7 +40,10 @@ describe('Remove images INTEGRATION', () => {
         fileData.url = `/uploads/${randomName(20)}`;
         return Promise.resolve();
       }),
-      delete: chai.spy(() => Promise.resolve())
+      delete: chai.spy(() => {
+        Promise.resolve()
+      }),
+      checkFileSize: () => Promise.resolve()
     };
     strapi.plugins.upload.provider = mockProvider;
   });
@@ -48,36 +51,39 @@ describe('Remove images INTEGRATION', () => {
   after(async () => {
     removeFile(FILEPATH);
     strapi.plugins.upload.provider = provider;
-    await strapi.query('image').delete({});
-    await strapi.query('plugin::users-permissions.user').delete({});
-    await strapi.query('file', 'upload').delete({});
+    await strapi.query('api::image.image').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
+    await strapi.query('plugin::upload.file').deleteMany({});
   });
 
-  it('should allow the user to remove his image', async () => {
+  it('should allow the user to remove his image (auth)', async () => {
     const jwt = generateJwt(strapi, user);
 
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-      .post('/upload')
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
+      .post('/api/upload')
       .set('Authorization', `Bearer ${jwt}`)
       .set('Content-Type', 'image/png')
       .attach('files', FILEPATH, 'image6.png')
       .end((err, res) => err ? reject(err) : resolve(res)));
     expect(res.status).to.be.equal(200);
     expect(mockProvider.upload).to.have.been.called();
-    let fileUpload = await strapi.query('file', 'upload').findOne({id: res.body[0].id});
+    let fileUpload = await strapi.query('plugin::upload.file').findOne({
+      where: {id: res.body[0].id},
+      populate: ['related']
+    });
     expect(fileUpload).not.null;
-    let img = await strapi.query('image').findOne({id: fileUpload.related[0].id});
+    let img = await strapi.query('api::image.image').findOne({where: {id: fileUpload.related[0].id}});
     expect(img).not.null;
 
-    await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+    const res2 = await new Promise((resolve, reject) => {
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_REMOVE_FILE, variables: {id: res.body[0].id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
     expect(mockProvider.delete).to.have.been.called();
-    img = await strapi.query('image').findOne({id: img.id});
+    img = await strapi.query('api::image.image').findOne({where: {id: img.id}});
     expect(img).to.be.null;
   });
 
@@ -87,29 +93,32 @@ describe('Remove images INTEGRATION', () => {
     const jwt = generateJwt(strapi, user);
 
     // upload file
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-      .post('/upload')
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
+      .post('/api/upload')
       .set('Authorization', `Bearer ${jwt2}`)
       .set('Content-Type', 'image/png')
       .attach('files', FILEPATH, 'image6.png')
       .end((err, res) => err ? reject(err) : resolve(res)));
     expect(res.status).to.be.equal(200);
     expect(mockProvider.upload).to.have.been.called();
-    let fileUpload = await strapi.query('file', 'upload').findOne({id: res.body[0].id});
+    let fileUpload = await strapi.query('plugin::upload.file').findOne({
+      where: {id: res.body[0].id},
+      populate: ['related']
+    });
     expect(fileUpload).not.null;
-    let img = await strapi.query('image').findOne({id: fileUpload.related[0].id});
+    let img = await strapi.query('api::image.image').findOne({where: {id: fileUpload.related[0].id}});
     expect(img).not.null;
 
     // remove file
     await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_REMOVE_FILE, variables: {id: res.body[0].id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
     expect(mockProvider.delete).to.not.have.been.called.once;
-    img = await strapi.query('image').findOne({id: img.id});
+    img = await strapi.query('api::image.image').findOne({where: {id: img.id}});
     expect(img).not.null;
   });
 
@@ -118,28 +127,31 @@ describe('Remove images INTEGRATION', () => {
     const jwt2 = generateJwt(strapi, user2);
     const jwt = generateJwt(strapi, user);
 
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-      .post('/upload')
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
+      .post('/api/upload')
       .set('Authorization', `Bearer ${jwt2}`)
       .set('Content-Type', 'image/png')
       .attach('files', FILEPATH, 'image6.png')
       .end((err, res) => err ? reject(err) : resolve(res)));
     expect(res.status).to.be.equal(200);
     expect(mockProvider.upload).to.have.been.called();
-    let fileUpload = await strapi.query('file', 'upload').findOne({id: res.body[0].id});
+    let fileUpload = await strapi.query('plugin::upload.file').findOne({
+      where: {id: res.body[0].id},
+      populate: ['related']
+    });
     expect(fileUpload).not.null;
-    let img = await strapi.query('image').findOne({id: fileUpload.related[0].id});
+    let img = await strapi.query('api::image.image').findOne({where: {id: fileUpload.related[0].id}});
     expect(img).not.null;
 
     await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_REMOVE_FILE, variables: {id: res.body[0].id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
     expect(mockProvider.delete).to.not.have.been.called.once;
-    img = await strapi.query('image').findOne({id: img.id});
+    img = await strapi.query('api::image.image').findOne({where: {id: img.id}});
     expect(!!img).to.be.true;
   });
 
@@ -148,28 +160,31 @@ describe('Remove images INTEGRATION', () => {
     const jwt2 = generateJwt(strapi, user);
     const jwt = generateJwt(strapi, admin);
 
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server)
-      .post('/upload')
+    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
+      .post('/api/upload')
       .set('Authorization', `Bearer ${jwt2}`)
       .set('Content-Type', 'image/png')
       .attach('files', FILEPATH, 'image6.png')
       .end((err, res) => err ? reject(err) : resolve(res)));
     expect(res.status).to.be.equal(200);
     expect(mockProvider.upload).to.have.been.called();
-    let fileUpload = await strapi.query('file', 'upload').findOne({id: res.body[0].id});
+    let fileUpload = await strapi.query('plugin::upload.file').findOne({
+      where: {id: res.body[0].id},
+      populate: ['related']
+    });
     expect(fileUpload).not.null;
-    let img = await strapi.query('image').findOne({id: fileUpload.related[0].id});
+    let img = await strapi.query('api::image.image').findOne({where: {id: fileUpload.related[0].id}});
     expect(img).not.null;
 
     await new Promise((resolve, reject) => {
-      chai.request(strapi.server)
+      chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
         .send({...MUTATION_REMOVE_FILE, variables: {id: res.body[0].id}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
     expect(mockProvider.delete).to.have.been.called.once;
-    img = await strapi.query('image').findOne({id: img.id});
+    img = await strapi.query('api::image.image').findOne({where: {id: img.id}});
     expect(!!img).to.be.false;
   });
 });
