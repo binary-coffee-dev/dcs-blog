@@ -73,7 +73,7 @@ jobs:
   # DEPLOY PROJECT (DEVELOP)
   deploy-dev:
 
-    needs: [ tests ]
+    needs: [ test ]
     if: github.ref == 'refs/heads/develop'
 
     runs-on: ubuntu-latest
