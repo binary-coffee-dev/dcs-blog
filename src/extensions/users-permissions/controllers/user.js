@@ -1,7 +1,8 @@
 'use strict';
 
 module.exports = (controller) => {
-  controller.users = async function(ctx, next, {populate} = {}) {
+  controller.users = async function() {
+    // toDo 01.05.23, guille,
     return [];
   };
 

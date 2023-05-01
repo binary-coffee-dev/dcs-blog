@@ -14,7 +14,7 @@ module.exports = (strapi) => {
 
           args: { limit: 'Int' },
 
-          resolve(parent, args, context) {
+          resolve(parent, args) {
             const { limit } = args;
             return strapi.service('api::comment.comment').recentComments(limit);
           }

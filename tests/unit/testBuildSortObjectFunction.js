@@ -1,14 +1,14 @@
 const expect = require('chai').expect;
 
-const {buildSortObject} = require("../../src/extensions/users-permissions/services/user");
+const {buildSortObject} = require('../../src/extensions/users-permissions/services/user');
 
 describe('buildSortObject function', function () {
   it('should convert sort array to valid orderBy object', function () {
     const res = buildSortObject(['some:asc', 'eso:desc', 'ne:asc']);
     expect(res).to.deep.equal({
       eso: 'desc',
-      ne: "asc",
-      some: "asc"
+      ne: 'asc',
+      some: 'asc'
     });
   });
 

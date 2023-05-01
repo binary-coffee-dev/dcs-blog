@@ -18,17 +18,18 @@
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
     "mysql": "^2.18.1",
-    "pre-push": "^0.1.1",
     "svg-captcha": "^1.4.0"
   },
   "description": "Binary Coffee backend",
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "better-sqlite3": "^8.3.0",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "chai-spies": "^1.0.0",
     "mocha": "^10.2.0",
-    "nyc": "^15.0.0"
+    "nyc": "^15.0.0",
+    "pre-push": "^0.1.1"
   },
   "engines": {
     "node": ">=14.0.0",
@@ -50,7 +51,7 @@
     "test": "NODE_ENV=test nyc --reporter=lcov --reporter=html mocha --ui bdd tests/bootstrap.js tests/integration/**/*.js tests/unit/**/*.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "check": "npm run test:cov && npm run lint && npm run build"
+    "check": "npm test && npm run lint && npm run build"
   },
   "strapi": {
     "uuid": "b8aa7baf-d6dc-4c50-93d4-7739bc88c3fd"

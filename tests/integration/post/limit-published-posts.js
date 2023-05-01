@@ -5,7 +5,7 @@ const randomName = require('../../helpers/random-name');
 const createUser = require('../../helpers/create-user');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 const createPostRequest = require('../../helpers/create-post-request');
-const createPost = require("../../helpers/create-post");
+const createPost = require('../../helpers/create-post');
 
 chai.use(chaiHttp);
 

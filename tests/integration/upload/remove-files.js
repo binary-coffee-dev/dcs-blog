@@ -5,7 +5,6 @@ const spies = require('chai-spies');
 const createUser = require('../../helpers/create-user');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 const createFile = require('../../helpers/create-file');
-const randomName = require("../../helpers/random-name");
 
 chai.use(chaiHttp);
 chai.use(spies);
@@ -67,7 +66,7 @@ describe('Remove file/images INTEGRATION', () => {
 
     const {file, image} = await createFile(strapi, staffUser);
 
-    const res = await new Promise(resolve => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server.httpServer)
         .delete(`/api/upload/files/${file.id}`)
         .set('Authorization', `Bearer ${jwt}`)
@@ -88,7 +87,7 @@ describe('Remove file/images INTEGRATION', () => {
 
     const {file, image} = await createFile(strapi, authUser);
 
-    const res = await new Promise(resolve => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server.httpServer)
         .delete(`/api/upload/files/${file.id}`)
         .set('Authorization', `Bearer ${jwt}`)
@@ -109,7 +108,7 @@ describe('Remove file/images INTEGRATION', () => {
 
     const {file, image} = await createFile(strapi, staffUser);
 
-    const res = await new Promise(resolve => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server.httpServer)
         .delete(`/api/upload/files/${file.id}`)
         .set('Authorization', `Bearer ${jwt}`)
@@ -128,7 +127,7 @@ describe('Remove file/images INTEGRATION', () => {
   it('should not be able to remove the file (public)', async () => {
     const {file, image} = await createFile(strapi, authUser);
 
-    const res = await new Promise(resolve => {
+    const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server.httpServer)
         .delete(`/api/upload/files/${file.id}`)
         .end((err, res) => err ? reject(err) : resolve(res));

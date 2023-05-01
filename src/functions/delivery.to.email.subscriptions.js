@@ -33,7 +33,7 @@ async function getHtmlWithPosts(posts) {
       './public/posts-for-subscriptions-template.html',
       data,
       options,
-      (err, str) =>  err ? reject(err) :resolve(str))
+      (err, str) =>  err ? reject(err) :resolve(str));
   });
 }
 

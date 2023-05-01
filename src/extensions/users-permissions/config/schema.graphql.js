@@ -1,6 +1,3 @@
-const canRemove = require("../../../api/comment/policies/canRemove");
-const canComment = require("../../../api/comment/policies/canComment");
-const canUpdateComment = require("../../../api/comment/policies/canUpdateComment");
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
@@ -93,7 +90,7 @@ module.exports = (strapi) => {
             pagination: 'PaginationArg',
             sort: nexus.list('String')
           },
-          resolve(parent, args, context) {
+          resolve(parent, args) {
             return strapi.service('plugin::users-permissions.extra').users(args);
           }
         });

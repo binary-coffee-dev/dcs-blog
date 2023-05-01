@@ -1,6 +1,3 @@
-const canRemove = require("../../comment/policies/canRemove");
-const canComment = require("../../comment/policies/canComment");
-const canUpdateComment = require("../../comment/policies/canUpdateComment");
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
@@ -12,7 +9,7 @@ module.exports = (strapi) => {
           type: nexus.nonNull('Podcast'),
           args: { identifier: nexus.nonNull('String') },
 
-          resolve(parent, args, context) {
+          resolve(parent, args) {
             const {identifier} = args;
             return strapi.service('api::podcast.podcast').findOneByIdentifier(identifier);
           }

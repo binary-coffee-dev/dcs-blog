@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 
-const {buildWhereObject} = require("../../src/extensions/users-permissions/services/user");
+const {buildWhereObject} = require('../../src/extensions/users-permissions/services/user');
 
 describe('buildWhereObject function', function () {
   it('should convert filters object to valid where object', function () {

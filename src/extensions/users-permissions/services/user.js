@@ -3,7 +3,7 @@ function buildSortObject(sort) {
     sort = [];
   }
   return sort.reduce((p, v) => {
-    const vs = v.split(':')
+    const vs = v.split(':');
     if (vs.length === 2) {
       p[vs[0]] = vs[1];
     }

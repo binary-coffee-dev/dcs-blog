@@ -2,7 +2,7 @@
 
 const {createCoreController} = require('@strapi/strapi').factories;
 
-const {j2xParser: Parser} = require("fast-xml-parser");
+const {j2xParser: Parser} = require('fast-xml-parser');
 
 module.exports = createCoreController('api::post.post', ({strapi}) => ({
   async find(ctx) {

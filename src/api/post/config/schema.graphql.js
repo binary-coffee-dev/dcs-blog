@@ -1,7 +1,7 @@
 const canCreatePost = require('../policies/canCreatePost');
 const canModifyPost = require('../policies/canModifyPost');
 const canPublishPost = require('../policies/canPublishPost');
-const tmp = require('../../../policies/validateFindMethod');
+const validateFindMethod = require('../policies/validateFindMethod');
 
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
@@ -40,7 +40,7 @@ module.exports = (strapi) => {
         t.field('similarPosts', {
           type: nexus.nonNull(nexus.list('Post')),
           args: {id: nexus.nonNull('ID'), limit: 'Int'},
-          resolve(parent, args, context) {
+          resolve(parent, args) {
             const {id, limit} = args;
             return strapi.service('api::post.post').findSimilarPosts(id, limit);
           }
@@ -59,7 +59,7 @@ module.exports = (strapi) => {
         }
       },
       'Query.posts': {
-        policies: ['global::validateFindMethod']
+        policies: [validateFindMethod]
       },
       'Mutation.createPost': {
         policies: [canPublishPost, canCreatePost]

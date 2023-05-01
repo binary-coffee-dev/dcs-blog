@@ -41,7 +41,7 @@ describe('Remove images INTEGRATION', () => {
         return Promise.resolve();
       }),
       delete: chai.spy(() => {
-        Promise.resolve()
+        Promise.resolve();
       }),
       checkFileSize: () => Promise.resolve()
     };
@@ -75,7 +75,7 @@ describe('Remove images INTEGRATION', () => {
     let img = await strapi.query('api::image.image').findOne({where: {id: fileUpload.related[0].id}});
     expect(img).not.null;
 
-    const res2 = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)

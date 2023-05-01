@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = async (ctx, config, {strapi}) => {
-  const {filters = {}, pagination, sort, publicationState} = ctx.args;
+module.exports = async (ctx) => {
+  const {filters = {}, publicationState} = ctx.args;
   if (publicationState === 'preview') {
     if (ctx.state.user === undefined) {
       filters.publishedAt = {lte: new Date()};

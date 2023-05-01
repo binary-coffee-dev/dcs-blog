@@ -1,9 +1,9 @@
 module.exports = {
   routes: [
     {
-      method: "GET",
-      path: "/recentComments",
-      handler: "comment.recentComments",
+      method: 'GET',
+      path: '/recentComments',
+      handler: 'comment.recentComments',
     }
   ]
-}
+};
