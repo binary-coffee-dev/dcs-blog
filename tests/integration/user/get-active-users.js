@@ -11,7 +11,8 @@ const expect = chai.expect;
 
 const QUERY_GET_ACTIVE_USERS = {
   operationName: null,
-  query: '{\n    topActiveUsers {\n        users {\n            id\n            attributes {\n                username\n                email\n                provider\n                confirmed\n                blocked\n                role {\n                    data {\n                        attributes {\n                            type\n                            name\n                        }\n                    }\n                }\n                avatar {\n                    data {\n                        attributes {\n                            url\n                        }\n                    }\n                }\n                avatarUrl\n                name\n                page\n                createdAt\n                updatedAt\n            }\n        }\n        values\n    }\n}\n'
+  // language=GraphQL
+  query: 'query {\n    topActiveUsers {\n        users {\n            id\n            attributes {\n                username\n                email\n                provider\n                confirmed\n                blocked\n                role {\n                    data {\n                        attributes {\n                            type\n                            name\n                        }\n                    }\n                }\n                avatar {\n                    data {\n                        attributes {\n                            url\n                        }\n                    }\n                }\n                avatarUrl\n                name\n                page\n                createdAt\n                updatedAt\n            }\n        }\n        values\n    }\n}\n'
 };
 const MAX_NUMBER = 10;
 
