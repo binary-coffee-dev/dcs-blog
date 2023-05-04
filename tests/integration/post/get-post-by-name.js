@@ -11,12 +11,12 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 const QUERY_GET_POST_BY_NAME = {
-  operationName: 'fetchPost',
+  operationName: null,
   variables: {
     id: 'this-is-a-tests-yes'
   },
   // language=GraphQL
-  query: 'query fetchPost($id: String!, $noUpdate: Boolean) {\n    postByName(name: $id, noUpdate: $noUpdate) {\n        title\n        body\n        author {\n            data {\n                id\n                attributes {\n                    username\n                    avatarUrl\n                }\n            }\n        }\n        banner {\n            data {\n                attributes {\n                    url\n                }\n            }\n        }\n        tags {\n            data {\n                id\n                attributes {\n                    name\n                }\n            }\n        }\n        enable\n        name\n        views\n        readingTime\n        comments\n        likes\n        createdAt\n        updatedAt\n        publishedAt\n    }\n}\n'
+  query: 'query ($id: String!, $noUpdate: Boolean) {\n    postByName(name: $id, noUpdate: $noUpdate) {\n        data {\n            id\n            attributes {\n                title\n                body\n                author {\n                    data {\n                        id\n                        attributes {\n                            username\n                            avatarUrl\n                        }\n                    }\n                }\n                banner {\n                    data {\n                        attributes {\n                            url\n                        }\n                    }\n                }\n                tags {\n                    data {\n                        id\n                        attributes {\n                            name\n                        }\n                    }\n                }\n                enable\n                name\n                views\n                readingTime\n                comments\n                likes\n                createdAt\n                updatedAt\n                publishedAt\n            }\n        }\n    }\n}\n'
 };
 
 describe('Get post by name INTEGRATION', () => {
@@ -69,9 +69,9 @@ describe('Get post by name INTEGRATION', () => {
         .end((err, res) => err ? reject(err) : resolve(res));
     });
 
-    expect(res.body.data.postByName).not.undefined.and.not.null;
-    expect(+res.body.data.postByName.author.data.id).to.equal(authUserOwner.id);
-    expect(res.body.data.postByName.name).to.equal(postName);
+    expect(res.body.data.postByName.data).not.undefined.and.not.null;
+    expect(+res.body.data.postByName.data.attributes.author.data.id).to.equal(authUserOwner.id);
+    expect(res.body.data.postByName.data.attributes.name).to.equal(postName);
   });
 
   it('should not update the view if the parameter no_updated is false', async () => {
@@ -93,7 +93,7 @@ describe('Get post by name INTEGRATION', () => {
     }
   });
 
-  it('should not have access to an comment if the user is not the owner', async () => {
+  it('should not have access to a post if the user is not the owner', async () => {
     const jwt = generateJwt(strapi, authUser);
     const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server.httpServer)
@@ -102,11 +102,12 @@ describe('Get post by name INTEGRATION', () => {
         .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    expect(res.body.errors).to.be.undefined;
-    expect(res.body.data.postByName).to.be.null;
+    expect(res.body.errors.length).to.be.equal(1);
+    expect(res.body.errors[0].message).to.be.equal('Policy Failed');
+    expect(res.body.data).to.be.null;
   });
 
-  it('should not have access to an comment a public user', async () => {
+  it('should not have access to a post as a public user', async () => {
     const res = await new Promise((resolve, reject) => {
       chai.request(strapi.server.httpServer)
         .post('/graphql')
@@ -114,8 +115,8 @@ describe('Get post by name INTEGRATION', () => {
         .end((err, res) => err ? reject(err) : resolve(res));
     });
     expect(res.body.errors.length).to.be.equal(1);
-    expect(res.body.errors[0].message).to.be.equal('Forbidden access');
-    expect(res.body.data.postByName).to.be.null;
+    expect(res.body.errors[0].message).to.be.equal('Policy Failed');
+    expect(res.body.data).to.be.null;
   });
 
   it('should get the post an user with staff role', async () => {
@@ -127,9 +128,9 @@ describe('Get post by name INTEGRATION', () => {
         .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    expect(res.body.data.postByName).not.undefined;
-    expect(+res.body.data.postByName.author.data.id).to.equal(authUserOwner.id);
-    expect(res.body.data.postByName.name).to.equal(postName);
+    expect(res.body.data.postByName.data).not.undefined.and.not.null;
+    expect(+res.body.data.postByName.data.attributes.author.data.id).to.equal(authUserOwner.id);
+    expect(res.body.data.postByName.data.attributes.name).to.equal(postName);
   });
 
   it('should get the post an user with admin role', async () => {
@@ -141,8 +142,8 @@ describe('Get post by name INTEGRATION', () => {
         .send({...QUERY_GET_POST_BY_NAME, variables: {id: postName}})
         .end((err, res) => err ? reject(err) : resolve(res));
     });
-    expect(res.body.data.postByName).not.undefined;
-    expect(+res.body.data.postByName.author.data.id).to.equal(authUserOwner.id);
-    expect(res.body.data.postByName.name).to.equal(postName);
+    expect(res.body.data.postByName.data).not.undefined.and.not.null;
+    expect(+res.body.data.postByName.data.attributes.author.data.id).to.equal(authUserOwner.id);
+    expect(res.body.data.postByName.data.attributes.name).to.equal(postName);
   });
 });

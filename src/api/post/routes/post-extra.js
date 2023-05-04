@@ -3,17 +3,17 @@ module.exports = {
     {
       method: 'GET',
       path: '/post-body-by-name/:name/download.md',
-      handler: 'post.getPostBodyByName',
+      handler: 'post.getPostBodyByName'
     },
     {
       method: 'GET',
       path: '/posts/feed/:username/:format',
-      handler: 'post.feedByUsername',
+      handler: 'post.feedByUsername'
     },
     {
       method: 'GET',
       path: '/posts/feed/:format',
-      handler: 'post.feed',
+      handler: 'post.feed'
     },
     {
       method: 'GET',
@@ -23,12 +23,14 @@ module.exports = {
     {
       method: 'GET',
       path: '/similarPosts',
-      handler: 'post.findSimilarPosts'
+      handler: 'post.findSimilarPosts',
+      policies: ['global::disable']
     },
     {
       method: 'GET',
       path: '/findOneByName',
-      handler: 'post.findOneByName'
+      handler: 'post.findOneByName',
+      policies: ['global::disable']
     }
   ]
 };

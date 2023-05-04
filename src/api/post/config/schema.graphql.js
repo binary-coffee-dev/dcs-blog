@@ -1,17 +1,25 @@
 const canCreatePost = require('../policies/canCreatePost');
 const canModifyPost = require('../policies/canModifyPost');
 const canPublishPost = require('../policies/canPublishPost');
+const canSeePost = require('../policies/canSeePost');
 const validateFindMethod = require('../policies/validateFindMethod');
 
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
   extensionService.use(({nexus}) => {
+    const PostEntityResponse2 = nexus.objectType({
+      name: 'PostEntityResponse2',
+      definition(t) {
+        t.field('data', {type: 'PostEntity'});
+      }
+    });
+
     const postByName = nexus.extendType({
       type: 'Query',
       definition(t) {
         t.field('postByName', {
-          type: 'Post',
+          type: nexus.nonNull('PostEntityResponse2'),
           args: {name: nexus.nonNull('String'), noUpdate: 'Boolean'},
           resolve(parent, args, context) {
             const {name, noUpdate} = args;
@@ -48,7 +56,7 @@ module.exports = (strapi) => {
       }
     });
 
-    return {types: [postByName, countPosts, similarPosts]};
+    return {types: [PostEntityResponse2, postByName, countPosts, similarPosts]};
   });
 
   extensionService.use(() => ({
@@ -60,6 +68,12 @@ module.exports = (strapi) => {
       },
       'Query.posts': {
         policies: [validateFindMethod]
+      },
+      'Query.postByName': {
+        policies: [canSeePost],
+        auth: {
+          scope: ['api::post.post.findOneByName']
+        }
       },
       'Mutation.createPost': {
         policies: [canPublishPost, canCreatePost]

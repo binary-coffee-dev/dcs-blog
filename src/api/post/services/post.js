@@ -74,20 +74,11 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
   async findOneByName(ctx, name, noUpdate) {
     const link = await strapi.query('api::link.link').findOne({where: {name}, populate: ['post']});
     const post = await strapi.query('api::post.post').findOne({where: {id: link.post.id}, populate: ['author']});
-    if (post) {
-      if (
-        this.isPublish(post) ||
-        (post.author && post.author.id === ctx.state.user.id) ||
-        this.isAdmin(ctx) ||
-        this.isStaff(ctx)
-      ) {
-        if (!noUpdate) {
-          await this.updateViews(post);
-        }
-        return strapi.controller('api::post.post').sanitizeOutput(post, ctx);
-      }
+    if (!noUpdate) {
+      await this.updateViews(post);
     }
-    return null;
+    const data = await strapi.controller('api::post.post').sanitizeOutput(post, ctx);
+    return {data};
   },
 
   async findSimilarPosts(id, limit = 10) {
