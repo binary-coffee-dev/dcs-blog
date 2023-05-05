@@ -12,7 +12,7 @@ const expect = chai.expect;
 const QUERY_GET_POPULAR_USERS = {
   operationName: null,
   // language=GraphQL
-  query: 'query {\n    topPopularUsers {\n        users {\n            id\n            attributes {\n                username\n                email\n                provider\n                confirmed\n                blocked\n                role {\n                    data {\n                        attributes {\n                            type\n                            name\n                        }\n                    }\n                }\n                avatar {\n                    data {\n                        attributes {\n                            url\n                        }\n                    }\n                }\n                avatarUrl\n                name\n                page\n                createdAt\n                updatedAt\n            }\n        }\n        values\n    }\n}\n'
+  query: 'query {\n    topPopularUsers {\n        users {\n            data {\n                id\n                attributes {\n                    username\n                    email\n                    provider\n                    confirmed\n                    blocked\n                    role {\n                        data {\n                            attributes {\n                                type\n                                name\n                            }\n                        }\n                    }\n                    avatar {\n                        data {\n                            attributes {\n                                url\n                            }\n                        }\n                    }\n                    avatarUrl\n                    name\n                    page\n                    createdAt\n                    updatedAt\n                }\n            }\n        }\n        values\n    }\n}\n'
 };
 const MAX_NUMBER = 10;
 
@@ -53,7 +53,7 @@ describe('Get popular users INTEGRATION', () => {
     expect(topValues.length).to.be.equal(strapi.config.custom.maxNumberOfTopUsers);
 
     for (let i = 0; i < strapi.config.custom.maxNumberOfTopUsers; i++) {
-      expect(+topUsers[i].id).to.be.equal(+users[MAX_NUMBER - i - 1].id);
+      expect(+topUsers[i].data.id).to.be.equal(+users[MAX_NUMBER - i - 1].id);
     }
   });
 
@@ -72,7 +72,7 @@ describe('Get popular users INTEGRATION', () => {
     expect(topValues.length).to.be.equal(strapi.config.custom.maxNumberOfTopUsers);
 
     for (let i = 0; i < strapi.config.custom.maxNumberOfTopUsers; i++) {
-      expect(+topUsers[i].id).to.be.equal(+users[MAX_NUMBER - i - 1].id);
+      expect(+topUsers[i].data.id).to.be.equal(+users[MAX_NUMBER - i - 1].id);
     }
   });
 });

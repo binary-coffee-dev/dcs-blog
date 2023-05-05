@@ -94,7 +94,7 @@ module.exports = (services) => {
       }, new Map());
       users = users.sort((a, b) => ma.get(b.id) - ma.get(a.id));
       const values = usersQuery.map(v => +v.counter);
-      return {users, values};
+      return {users: users.map(data => ({data})), values};
     },
 
     async users(args) {

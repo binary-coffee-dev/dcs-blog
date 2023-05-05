@@ -89,6 +89,12 @@ module.exports = {
       },
       {
         roles: [publicRole, authRole, staffRole, adminRole],
+        controller: 'users-permissions.role',
+        actions: ['find', 'findOne'],
+        type: 'plugin'
+      },
+      {
+        roles: [publicRole, authRole, staffRole, adminRole],
         controller: 'users-permissions.auth',
         actions: ['loginWithProvider'],
         type: 'plugin'

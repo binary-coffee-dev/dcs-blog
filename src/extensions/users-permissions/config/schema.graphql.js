@@ -36,23 +36,18 @@ module.exports = (strapi) => {
       }
     });
 
-    const TopUsers = nexus.objectType({
-      name: 'TopUsers',
+    const UsersPermissionsUserEntityRes = nexus.objectType({
+      name: 'UsersPermissionsUserEntityRes',
       definition(t) {
-        t.list.field('users', {type: 'UsersPermissionsUserEntity'});
-        t.list.field('values', {type: 'Int'});
+        t.field('data', {type: 'UsersPermissionsUserEntity'});
       }
     });
 
-    const myData = nexus.extendType({
-      type: 'Query',
+    const TopUsers = nexus.objectType({
+      name: 'TopUsers',
       definition(t) {
-        t.field('myData', {
-          type: nexus.nonNull('UsersPermissionsMYData'),
-          resolve(parent, args, context) {
-            return strapi.service('plugin::users-permissions.extra').myData(context);
-          }
-        });
+        t.list.field('users', {type: 'UsersPermissionsUserEntityRes'});
+        t.list.field('values', {type: 'Int'});
       }
     });
 
@@ -75,6 +70,18 @@ module.exports = (strapi) => {
           type: nexus.nonNull('TopUsers'),
           resolve(parent, args, context) {
             return strapi.service('plugin::users-permissions.extra').topPopularUsers(context);
+          }
+        });
+      }
+    });
+
+    const myData = nexus.extendType({
+      type: 'Query',
+      definition(t) {
+        t.field('myData', {
+          type: nexus.nonNull('UsersPermissionsMYData'),
+          resolve(parent, args, context) {
+            return strapi.service('plugin::users-permissions.extra').myData(context);
           }
         });
       }
@@ -111,7 +118,7 @@ module.exports = (strapi) => {
     });
 
     return {
-      types: [UsersPermissionsUser2, UsersPermissionsMYData, TopUsers, myData, topActiveUsers, topPopularUsers,
+      types: [UsersPermissionsUser2, UsersPermissionsMYData, UsersPermissionsUserEntityRes, TopUsers, myData, topActiveUsers, topPopularUsers,
         users, loginWithProvider]
     };
   });
