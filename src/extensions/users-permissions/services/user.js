@@ -124,45 +124,50 @@ module.exports = (services) => {
     },
 
     async findOrCreateProvide({username, provider, scope, avatar, html_url, name, token}) {
-      let provide = await strapi.query('api::provider.provider').findOne({username, provider});
+      let provide = await strapi.query('api::provider.provider').findOne({where: {username, provider}, populate: ['user']});
       if (!provide) {
         provide = await strapi.query('api::provider.provider').create({
-          username,
-          provider,
-          scope,
-          avatar,
-          url: html_url,
-          name,
-          token
+          data: {
+            username,
+            provider,
+            scope,
+            avatar,
+            url: html_url,
+            name,
+            token
+          }
         });
       }
       return provide;
     },
 
     async createUserByProvider(provider) {
-      let user, username = provider.username, count = 1;
+      let user, username = provider.username, count = 2;
       do {
-        user = await strapi.query('plugin::users-permissions.user').findOne({username});
+        user = await strapi.query('plugin::users-permissions.user').findOne({where: {username}});
         if (user) {
           username = provider.username + (count++);
         }
       } while (user);
-      const authenticatedRole = await strapi.query('plugin::users-permissions.role').findOne({type: 'authenticated'});
+      const authenticatedRole = await strapi.query('plugin::users-permissions.role').findOne({where: {type: 'authenticated'}});
       return await strapi.query('plugin::users-permissions.user').create({
-        username,
-        confirmed: true,
-        blocked: false,
-        name: provider.name || username,
-        page: provider.url,
-        avatarUrl: provider.avatar,
-        providers: [provider.id],
-        role: authenticatedRole.id
+        data: {
+          username,
+          confirmed: true,
+          blocked: false,
+          name: provider.name || username,
+          page: provider.url,
+          avatarUrl: provider.avatar,
+          providers: [provider.id],
+          role: authenticatedRole.id
+        }
       });
     },
 
     provider: {
       github: {
-        auth: () => strapi.service('api::provider.github').auth
+        auth: () => strapi.service('api::provider.provider').github.auth,
+        user: () => strapi.service('api::provider.provider').github.user
       }
     }
   });

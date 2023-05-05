@@ -26,7 +26,7 @@ module.exports = (controller) => {
     await oldMeFunction(ctx);
     if (!ctx.body.avatar) {
       const FIRST_PROVIDER = 0;
-      const providers = await strapi.query('api::provider.provider').findMany({'user': ctx.body.id});
+      const providers = await strapi.query('api::provider.provider').findMany({user: ctx.body.id});
       const provider = providers[FIRST_PROVIDER];
       ctx.body.avatar = {
         url: provider.avatar

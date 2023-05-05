@@ -111,7 +111,8 @@ module.exports = (strapi) => {
           type: nexus.nonNull('String'),
           args: {provider: nexus.nonNull('String'), code: nexus.nonNull('String')},
           resolve(parent, args, context) {
-            return strapi.controller('plugin::users-permissions.extra').loginWithProvider(context);
+            context.args = args;
+            return strapi.controller('plugin::users-permissions.auth').loginWithProvider(context);
           }
         });
       }
@@ -143,6 +144,11 @@ module.exports = (strapi) => {
       'Query.topPopularUsers': {
         auth: {
           scope: ['plugin::users-permissions.user.topPopularUsers']
+        }
+      },
+      'Mutation.loginWithProvider': {
+        auth: {
+          scope: ['plugin::users-permissions.auth.loginWithProvider']
         }
       }
     }

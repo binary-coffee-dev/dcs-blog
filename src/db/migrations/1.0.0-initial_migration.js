@@ -84,7 +84,7 @@ module.exports = {
       {
         roles: [publicRole, authRole, staffRole, adminRole],
         controller: 'users-permissions.user',
-        actions: ['topPopularUsers', 'topActiveUsers', 'find', 'findOne', 'users', 'update'],
+        actions: ['topPopularUsers', 'topActiveUsers', 'find', 'findOne', 'users', 'update', 'loginWithProvider', 'me',],
         type: 'plugin'
       },
       {
