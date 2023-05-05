@@ -3,12 +3,5 @@ module.exports = () => ({
   port: 3021,
   cron: {
     enabled: false
-  },
-  admin: {
-    autoOpen: false,
-    browser: false,
-    auth: {
-      secret: '6V#j7xt3ZHBg'
-    }
   }
 });

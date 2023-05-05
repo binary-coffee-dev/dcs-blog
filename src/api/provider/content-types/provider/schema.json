@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "providers",
+  "info": {
+    "singularName": "provider",
+    "pluralName": "providers",
+    "displayName": "Provider",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false,
+    "timestamps": true
+  },
+  "attributes": {
+    "provider": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    },
+    "avatar": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "token": {
+      "private": true,
+      "type": "string"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "providers"
+    }
+  }
+}
