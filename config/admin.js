@@ -1,6 +1,7 @@
 module.exports = ({env}) => ({
   autoOpen: false,
   prefix: '',
+  url: env('API_URL', 'http://localhost:1337') + '/admin',
   auth: {
     secret: env('ADMIN_JWT_SECRET', '6V#j7xt3ZHBgBphIiwv2')
   },
