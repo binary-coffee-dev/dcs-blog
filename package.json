@@ -8,7 +8,7 @@
     "@strapi/plugin-users-permissions": "4.7.0",
     "@strapi/provider-email-nodemailer": "4.7.0",
     "@strapi/strapi": "^4.10.1",
-    "axios": "^0.21.4",
+    "axios": "^0.22.0",
     "ejs": "^3.0.1",
     "eslint": "^6.8.0",
     "fast-xml-parser": "^3.16.0",
