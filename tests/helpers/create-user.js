@@ -1,6 +1,6 @@
 const randomName = require('./random-name');
 
-module.exports = async function ({strapi, roleType = 'authenticated', provider = undefined}) {
+module.exports = async function ({strapi, roleType = 'authenticated', provider = undefined, data = {}}) {
   const role = await strapi.query('plugin::users-permissions.role').findOne({where: {type: roleType}});
   return await strapi.query('plugin::users-permissions.user').create({
     data: {
@@ -9,7 +9,8 @@ module.exports = async function ({strapi, roleType = 'authenticated', provider =
       role: role,
       name: randomName(),
       avatarUrl: '/some/eso.jpg',
-      providers: (provider ? [provider.id] : undefined)
+      providers: (provider ? [provider.id] : undefined),
+      ...data
     },
     populate: ['role', 'avatar']
   });

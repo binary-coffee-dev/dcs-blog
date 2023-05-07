@@ -11,7 +11,9 @@ const expect = chai.expect;
 
 describe('Get me user INTEGRATION', () => {
 
-  before(async () => {
+  after(async () => {
+    await strapi.query('api::provider.provider').deleteMany({});
+    await strapi.query('plugin::users-permissions.user').deleteMany({});
   });
 
   it('should get my user data', async () => {
