@@ -92,7 +92,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
       chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: opi.id}})
+        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
         .end((err, res) => resolve(res));
     });
 
@@ -120,7 +120,7 @@ describe('create/edit/remove opinion INTEGRATION', () => {
       chai.request(strapi.server.httpServer)
         .post('/graphql')
         .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: +res1.body.data.createOpinion.data.id}})
+        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
         .end((err, res) => resolve(res));
     });
     expect(res2.body.errors).to.be.undefined;
