@@ -52,7 +52,7 @@ module.exports = createCoreController('api::post.post', ({strapi}) => ({
     const name = ctx.params.name || ctx.params._name || '';
     const article = await strapi.service('api::post.post').findOneByName(ctx, name);
     ctx.type = 'text/markdown; charset=UTF-8';
-    ctx.body = article.body;
+    ctx.body = article.data.body;
     return ctx.body;
   },
 

@@ -38,7 +38,7 @@ describe('Get post body by name INTEGRATION', () => {
         .end((err, res) => err ? reject(err) : resolve(res));
     });
 
-    expect(res.text).to.equal(post.body);
     expect(res.status).to.be.equal(200);
+    expect(res.text).to.equal(post.body);
   });
 });

@@ -17,7 +17,7 @@ const QUERY_GET_POST_BY_NAME = {
     id: 'this-is-a-tests-yes'
   },
   // language=GraphQL
-  query: 'query fetchPost($id: String!, $postName: ID, $userId: ID) {\n    postByName(name: $id) {\n        title\n        body\n        enable\n        name\n        views\n        readingTime\n        comments\n        likes\n        createdAt\n        updatedAt\n        publishedAt\n    }\n    likes:opinions(filters: {post: {id: {eq: $postName}}, type: {eq: "like"}}) {\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n    userLikes:opinions(filters: {post: {id: {eq: $postName}}, type: {eq: "like"}, user: {id: {eq: $userId}}}) {\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n}\n'
+  query: 'query fetchPost($id: String!, $postName: ID, $userId: ID) {\n    postByName(name: $id) {\n        data {\n            id\n            attributes {\n                title\n                body\n                enable\n                name\n                views\n                readingTime\n                comments\n                likes\n                createdAt\n                updatedAt\n                publishedAt\n            }\n        }\n    }\n    likes:opinions(filters: {post: {id: {eq: $postName}}, type: {eq: "like"}}) {\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n    userLikes:opinions(filters: {post: {id: {eq: $postName}}, type: {eq: "like"}, user: {id: {eq: $userId}}}) {\n        meta {\n            pagination {\n                total\n            }\n        }\n    }\n}\n'
 };
 
 describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
@@ -169,6 +169,6 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     expect(res.body.data).not.undefined;
     expect(res.body.data.postByName).not.null;
-    expect(res.body.data.postByName.name).to.equal(post.name);
+    expect(res.body.data.postByName.data.attributes.name).to.equal(post.name);
   });
 });
