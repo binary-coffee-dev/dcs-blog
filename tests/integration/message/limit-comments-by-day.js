@@ -75,4 +75,24 @@ describe('Create comments INTEGRATION', () => {
       expect(res.body.data).not.null.and.not.undefined;
     }
   });
+
+  it('should create a comment with the correct user id', async () => {
+    const jwt = generateJwt(strapi, user);
+    const res = await new Promise((resolve, reject) => {
+      chai.request(strapi.server.httpServer)
+        .post('/graphql')
+        .set('Authorization', `Bearer ${jwt}`)
+        .send({...MUTATION_CREATE_COMMENT, variables: {body: randomName(100), post: post.id}})
+        .end((err, res) => err ? reject(err) : resolve(res));
+    });
+    expect(res.body.errors).to.be.undefined;
+    expect(res.body.data).not.null.and.not.undefined;
+
+    const comment = await strapi.query('api::comment.comment').findOne({
+      where: {id: res.body.data.createComment.data.id},
+      populate: ['user', 'post']
+    });
+    expect(+comment.user.id).to.be.equal(+user.id);
+    expect(+comment.post.id).to.be.equal(+post.id);
+  });
 });

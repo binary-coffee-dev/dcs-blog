@@ -1,6 +1,9 @@
 'use strict';
 
 module.exports = async (ctx, config, { strapi }) => {
+  if (!(ctx && ctx.state && ctx.state.user)) {
+    return false;
+  }
   if (!strapi.service('api::post.post').isAdmin(ctx)) {
     const startOfDay = strapi.config.functions.dateUtil.getStartDay();
     const nextDay = strapi.config.functions.dateUtil.getEndDay();
@@ -16,5 +19,6 @@ module.exports = async (ctx, config, { strapi }) => {
       return false;
     }
   }
+  ctx.args.data.user = ctx.state.user.id;
   return true;
 };
