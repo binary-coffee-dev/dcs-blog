@@ -1,6 +1,6 @@
 'use strict';
 
-const allowedUpdateFields = new Set(['page']);
+const allowedUpdateFields = new Set(['page', 'avatar']);
 
 module.exports = async (ctx) => {
   const {data} = ctx.args;

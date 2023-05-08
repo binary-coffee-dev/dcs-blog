@@ -1,13 +1,13 @@
 'use strict';
 
 module.exports = (controller) => {
-  controller.users = async function() {
+  controller.users = async function () {
     // toDo 01.05.23, guille,
     return [];
   };
 
   const oldFindFunction = controller.find;
-  controller.find = async function(ctx, next, {populate} = {}) {
+  controller.find = async function (ctx, next, {populate} = {}) {
     if (ctx.query.username) {
       ctx.query.username_contains = ctx.query.username;
       delete ctx.query.username;
@@ -22,7 +22,7 @@ module.exports = (controller) => {
   };
 
   const oldMeFunction = controller.me;
-  controller.me = async function(ctx) {
+  controller.me = async function (ctx) {
     await oldMeFunction(ctx);
     if (!ctx.body.avatar) {
       const FIRST_PROVIDER = 0;
@@ -36,17 +36,24 @@ module.exports = (controller) => {
   };
 
   const oldUpdateFunction = controller.update;
-  controller.update = async function(ctx) {
+  controller.update = async function (ctx) {
     await oldUpdateFunction(ctx);
-    const user = await strapi.query('plugin::users-permissions.user').findOne({id: ctx.params.id});
+    let user = await strapi.query('plugin::users-permissions.user').findOne({
+      where: {id: ctx.params.id},
+      populate: ['avatar']
+    });
     if (user.avatar) {
-      user.avatarUrl = user.avatar.url;
-      await strapi.query('plugin::users-permissions.user').update({id: user.id}, user);
+      await strapi.query('plugin::users-permissions.user')
+        .update({where: {id: user.id}, data: {avatarUrl: user.avatar.url}});
+      user = await strapi.query('plugin::users-permissions.user').findOne({
+        where: {id: ctx.params.id},
+        populate: true
+      });
     }
     ctx.send(user);
   };
 
-  controller.topPopularUsers = async function(ctx) {
+  controller.topPopularUsers = async function (ctx) {
     const {users, values} = await strapi.service('plugin::users-permissions.user').topPopularUsers();
 
     ctx.send({
@@ -55,7 +62,7 @@ module.exports = (controller) => {
     });
   };
 
-  controller.topActiveUsers = async function(ctx) {
+  controller.topActiveUsers = async function (ctx) {
     const {users, values} = await strapi.service('plugin::users-permissions.user').topActiveUsers();
 
     ctx.send({
