@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "episodes",
+  "info": {
+    "singularName": "episode",
+    "pluralName": "episodes",
+    "displayName": "Episode",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false,
+    "timestamps": true
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "podcast": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::podcast.podcast",
+      "inversedBy": "episodes"
+    },
+    "banner": {
+      "type": "string",
+      "required": true
+    },
+    "duration": {
+      "type": "integer",
+      "required": false
+    },
+    "date": {
+      "type": "datetime"
+    }
+  }
+}

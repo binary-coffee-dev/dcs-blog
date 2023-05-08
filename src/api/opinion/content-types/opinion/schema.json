@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "opinions",
+  "info": {
+    "singularName": "opinion",
+    "pluralName": "opinions",
+    "displayName": "Opinion",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false,
+    "timestamps": true
+  },
+  "attributes": {
+    "post": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::post.post",
+      "inversedBy": "opinions"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "opinions"
+    },
+    "type": {
+      "type": "string"
+    }
+  }
+}

@@ -1,5 +1,5 @@
 module.exports = ({env}) => ({
-  myCustomConfiguration: 'This configuration is accessible through strapi.config.myCustomConfiguration',
+  myCustomConfiguration: 'This configuration is accessible through strapi.routes.myCustomConfiguration',
 
   captchaSecret: env('CAPTCHA_SECRET', 'captcha-secret'),
 

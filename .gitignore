@@ -4,7 +4,7 @@
 .nyc_output
 data
 
-test/testing-database.db
+tests/testing-database.db
 
 ############################
 # OS X

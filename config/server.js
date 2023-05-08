@@ -1,13 +1,17 @@
+// const cronTasks = require('./cron-tasks');
+
 module.exports = ({env}) => ({
   host: env('HOST', '0.0.0.0'),
   port: env.int('PORT', 1337),
-  cron: {
-    enabled: true
+  url: env('API_URL', 'http://localhost:1337'),
+  // cron: {
+  //   enabled: true,
+  //   tasks: cronTasks
+  // },
+  app: {
+    keys: [env('SECRET1', 'mySecretKey1'), env('SECRET2', 'mySecretKey2')]
   },
-  admin: {
-    autoOpen: false,
-    auth: {
-      secret: env('ADMIN_JWT_SECRET', '6V#j7xt3ZHBgBphIiwv2')
-    }
+  webhooks: {
+    populateRelations: env.bool('WEBHOOKS_POPULATE_RELATIONS', false),
   }
 });
