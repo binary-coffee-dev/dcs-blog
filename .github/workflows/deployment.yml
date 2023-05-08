@@ -164,7 +164,7 @@ jobs:
       - name: Deploy project with docker in hosting
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: cd ${{ secrets.PROD__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.PROD__BACKEND_PORT }} ./deploy.sh blog-api-prod
+          command: cd ${{ secrets.PROD__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.PROD__BACKEND_PORT }} ./deploy.sh blog-api-prod-v4
           host: ${{ secrets.PROD__REMOTE_HOST }}
           username: ${{ secrets.PROD__REMOTE_USER }}
           privateKey: ${{ secrets.PROD__SERVER_SSH_KEY}}
