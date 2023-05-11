@@ -6,6 +6,7 @@ const createUser = require('../../helpers/create-user');
 const randomName = require('../../helpers/random-name');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 const {createFile, removeFile} = require('../../helpers/fileUtils');
+const uploadImageRequest = require('../../helpers/upload-image-request');
 
 chai.use(chaiHttp);
 const expect = chai.expect;
@@ -50,32 +51,17 @@ describe('Limit uploads per day INTEGRATION', () => {
 
     const jwt = generateJwt(strapi, user);
     for (let i = 0; i < strapi.config.custom.maxNumberOfUploadsPerDay; i++) {
-      const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
-        .post('/api/upload')
-        .set('Authorization', `Bearer ${jwt}`)
-        .set('Content-Type', 'image/png')
-        .attach('files', FILEPATH, `image${i}.png`)
-        .end((err, res) => err ? reject(err) : resolve(res)));
+      const res = await uploadImageRequest(strapi, chai, {filePath: FILEPATH, fileName: `image${i}.png`}, jwt);
       expect(res.status).to.be.equal(200);
     }
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
-      .post('/api/upload')
-      .set('Authorization', `Bearer ${jwt}`)
-      .set('Content-Type', 'image/png')
-      .attach('files', FILEPATH, 'image6.png')
-      .end((err, res) => err ? reject(err) : resolve(res)));
+    const res = await uploadImageRequest(strapi, chai, {filePath: FILEPATH, fileName: 'image6.png'}, jwt);
     expect(res.status).to.be.equal(403);
   });
 
   it('should not limit the uploads to the admins', async () => {
     const jwt = generateJwt(strapi, admin);
     for (let i = 0; i < strapi.config.custom.maxNumberOfUploadsPerDay + 10; i++) {
-      const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
-        .post('/api/upload')
-        .set('Authorization', `Bearer ${jwt}`)
-        .set('Content-Type', 'image/png')
-        .attach('files', FILEPATH, `image${i}.png`)
-        .end((err, res) => err ? reject(err) : resolve(res)));
+      const res = await uploadImageRequest(strapi, chai, {filePath: FILEPATH, fileName: `image${i}.png`}, jwt);
       expect(res.status).to.be.equal(200);
     }
   });

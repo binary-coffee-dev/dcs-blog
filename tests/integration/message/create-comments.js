@@ -5,15 +5,10 @@ const randomName = require('../../helpers/random-name');
 const createUser = require('../../helpers/create-user');
 const createPost = require('../../helpers/create-post');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
+const createCommentRequest = require('../../helpers/create-comment-request');
 
 chai.use(chaiHttp);
 const expect = chai.expect;
-
-const MUTATION_CREATE_COMMENT = {
-  operationName: null,
-  // language=GraphQL
-  query: 'mutation create($body: String, $post: ID) {\n    createComment(data: {body: $body, post: $post}){\n        data {\n            id\n            attributes {\n                body\n                email\n                name\n                user {\n                    data {\n                        id\n                        attributes {\n                            username\n                        }\n                    }\n                }\n            }\n        }\n    }\n}'
-};
 
 describe('Create comments INTEGRATION', () => {
   let user;
@@ -32,13 +27,7 @@ describe('Create comments INTEGRATION', () => {
 
   it('should create a comment with the correct user id', async () => {
     const jwt = generateJwt(strapi, user);
-    const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server.httpServer)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_CREATE_COMMENT, variables: {body: randomName(100), post: post.id}})
-        .end((err, res) => err ? reject(err) : resolve(res));
-    });
+    const res = await createCommentRequest.request(strapi, chai, {body: randomName(100), post: post.id}, jwt);
     expect(res.body.errors).to.be.undefined;
     expect(res.body.data).not.null.and.not.undefined;
 

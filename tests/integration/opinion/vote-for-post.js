@@ -5,21 +5,12 @@ const createUser = require('../../helpers/create-user');
 const generateJwt = require('../../helpers/generate-jwt-by-user');
 const createPost = require('../../helpers/create-post');
 const getPostById = require('../../helpers/get-post-by-id');
+const createOpinionRequest = require('../../helpers/create-opinion-request');
+const deleteOpinionRequest = require('../../helpers/delete-opinion-request');
 
 chai.use(chaiHttp);
 
 const expect = chai.expect;
-
-const LIKE = 'like';
-const MUTATION_CREATE_OPINION = {
-  operationName: null,
-  // language=GraphQL
-  query: 'mutation ($post: ID, $user: ID, $type: String){\n  createOpinion(data: {post: $post, user: $user, type: $type}){\n    data {\n      id\n    }\n  }\n}'
-};
-const MUTATION_REMOVE_OPINION = {
-  operationName: null,
-  query: 'mutation ($id: ID!){\n  deleteOpinion(id: $id){\n    data {\n      id\n    }\n  }\n}'
-};
 
 describe('create/edit/remove opinion INTEGRATION', () => {
   let authUser;
@@ -42,13 +33,11 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   it('should not create a new opinion if the user is not the same of the opinion (auth)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: authUser.id});
-    const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server.httpServer)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
-        .end((err, res) => err ? reject(err) : resolve(res));
-    });
+    const res = await createOpinionRequest.request(strapi, chai, {
+      post: post.id,
+      user: staffUser.id,
+      type: createOpinionRequest.LIKE
+    }, jwt);
 
     expect(res.body.errors.length).to.be.equal(1);
     expect(res.body.errors[0].message).to.be.equal('Policy Failed');
@@ -60,18 +49,15 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   it('should create a new opinion (auth)', async () => {
     const jwt = generateJwt(strapi, staffUser);
     const post = await createPost(strapi, {author: staffUser.id});
-    const res = await new Promise((resolve, reject) => {
-      chai.request(strapi.server.httpServer)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
-        .end((err, res) => err ? reject(err) : resolve(res));
-    });
+    const resOpinion = await createOpinionRequest(strapi, chai, {
+      post: post.id,
+      user: staffUser.id,
+      type: createOpinionRequest.LIKE
+    }, jwt);
 
-    expect(res.body.data.createOpinion.data).not.undefined;
+    expect(resOpinion).not.undefined;
 
-    const id = +res.body.data.createOpinion.data.id;
-    const opinion = await strapi.query('api::opinion.opinion').findOne({where: {id}});
+    const opinion = await strapi.query('api::opinion.opinion').findOne({where: {id: +resOpinion.id}});
     const postUpdated = await getPostById(strapi, post.id);
 
     expect(opinion).not.null;
@@ -85,16 +71,10 @@ describe('create/edit/remove opinion INTEGRATION', () => {
       data: {
         user: staffUser.id,
         post: post.id,
-        type: LIKE
+        type: createOpinionRequest.LIKE
       }
     });
-    const res = await new Promise(resolve => {
-      chai.request(strapi.server.httpServer)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
-        .end((err, res) => resolve(res));
-    });
+    const res = await deleteOpinionRequest.request(strapi, chai, {id: post.id}, jwt);
 
     expect(res.body.errors.length).to.be.equal(1);
     expect(res.body.errors[0].message).to.be.equal('Policy Failed');
@@ -107,22 +87,14 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     const jwt = generateJwt(strapi, authUser);
     const post = await createPost(strapi, {author: staffUser.id});
 
-    const res1 = await new Promise(resolve => {
-      chai.request(strapi.server.httpServer)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: authUser.id, type: LIKE}})
-        .end((err, res) => resolve(res));
-    });
+    const res1 = await createOpinionRequest.request(strapi, chai, {
+      post: post.id,
+      user: authUser.id,
+      type: createOpinionRequest.LIKE
+    }, jwt);
     expect(res1.body.errors).to.be.undefined;
 
-    const res2 = await new Promise(resolve => {
-      chai.request(strapi.server.httpServer)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_REMOVE_OPINION, variables: {id: post.id}})
-        .end((err, res) => resolve(res));
-    });
+    const res2 = await deleteOpinionRequest.request(strapi, chai, {id: post.id}, jwt);
     expect(res2.body.errors).to.be.undefined;
 
     const postUpdated = await getPostById(strapi, post.id);
@@ -135,22 +107,18 @@ describe('create/edit/remove opinion INTEGRATION', () => {
   it('should not create more than one opinion by user in a post (staff)', async () => {
     const post = await createPost(strapi);
     const jwt = generateJwt(strapi, staffUser);
-    const res1 = await new Promise(resolve => {
-      chai.request(strapi.server.httpServer)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
-        .end((err, res) => resolve(res));
-    });
+    const res1 = await createOpinionRequest.request(strapi, chai, {
+      post: post.id,
+      user: staffUser.id,
+      type: createOpinionRequest.LIKE
+    }, jwt);
     expect(res1.body.errors).to.be.undefined;
 
-    const res2 = await new Promise(resolve => {
-      chai.request(strapi.server.httpServer)
-        .post('/graphql')
-        .set('Authorization', `Bearer ${jwt}`)
-        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: staffUser.id, type: LIKE}})
-        .end((err, res) => resolve(res));
-    });
+    const res2 = await createOpinionRequest.request(strapi, chai, {
+      post: post.id,
+      user: staffUser.id,
+      type: createOpinionRequest.LIKE
+    }, jwt);
     expect(res2.body.errors.length).to.be.equal(1);
     expect(res2.body.errors[0].message).to.be.equal('Policy Failed');
 
@@ -166,7 +134,10 @@ describe('create/edit/remove opinion INTEGRATION', () => {
     const res = await new Promise(resolve => {
       chai.request(strapi.server.httpServer)
         .post('/graphql')
-        .send({...MUTATION_CREATE_OPINION, variables: {post: post.id, user: authUser.id, type: LIKE}})
+        .send({
+          ...createOpinionRequest.MUTATION_CREATE_OPINION,
+          variables: {post: post.id, user: authUser.id, type: createOpinionRequest.LIKE}
+        })
         .end((err, res) => resolve(res));
     });
     expect(res.body.errors.length).to.be.equal(1);
