@@ -8,8 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false,
-    "timestamps": true
+    "draftAndPublish": false
   },
   "attributes": {
     "provider": {
@@ -39,6 +38,9 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "providers"
+    },
+    "email": {
+      "type": "email"
     }
   }
 }
