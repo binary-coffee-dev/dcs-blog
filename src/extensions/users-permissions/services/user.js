@@ -141,7 +141,7 @@ module.exports = (services) => {
       return provide;
     },
 
-    async createUserByProvider(provider) {
+    async createUserByProvider(provider, email) {
       let user, username = provider.username, count = 2;
       do {
         user = await strapi.query('plugin::users-permissions.user').findOne({where: {username}});
@@ -159,7 +159,8 @@ module.exports = (services) => {
           page: provider.url,
           avatarUrl: provider.avatar,
           providers: [provider.id],
-          role: authenticatedRole.id
+          role: authenticatedRole.id,
+          email
         }
       });
     },
