@@ -1,35 +1,17 @@
 'use strict';
 
-async function createRoleIfNotExist(type, name, description) {
-  let role = await strapi.query('plugin::users-permissions.role').findOne({where: {type}});
-  if (!role) {
-    role = await strapi.query('plugin::users-permissions.role').create({data: {name, description, type}});
-  }
-  return role;
-}
-
-async function updateOrCreateRolePermissions(role, type, controller, action) {
-  const searchAction = `${type}::${controller}.${action}`;
-  let permission = await strapi.query('plugin::users-permissions.permission')
-    .findOne({where: {action: searchAction, role: role.id}});
-  if (!permission) {
-    await strapi.query('plugin::users-permissions.permission')
-      .create({data: {action: searchAction, role: role.id}});
-  }
-}
-
-module.exports = {
+const migration = {
   version: '1.0.0',
   description: 'Initial setting up after migrations from mongodb to mysql.',
 
   migrate: async () => {
-    let authRole = await createRoleIfNotExist(
+    let authRole = await migration.createRoleIfNotExist(
       'authenticated', 'Authenticated', 'Default role given to authenticated user.');
-    let publicRole = await createRoleIfNotExist(
+    let publicRole = await migration.createRoleIfNotExist(
       'public', 'Public', 'Default role given to unauthenticated user.');
-    let staffRole = await createRoleIfNotExist(
+    let staffRole = await migration.createRoleIfNotExist(
       'staff', 'Staff', 'Users that can review the all the articles.');
-    let adminRole = await createRoleIfNotExist(
+    let adminRole = await migration.createRoleIfNotExist(
       'administrator', 'Administrator', 'Administration control in the application.');
 
     const controllers = [
@@ -125,12 +107,36 @@ module.exports = {
       },
     ];
 
+    await migration.executePermissionMigrations(controllers);
+  },
+
+  async createRoleIfNotExist(type, name, description) {
+    let role = await strapi.query('plugin::users-permissions.role').findOne({where: {type}});
+    if (!role) {
+      role = await strapi.query('plugin::users-permissions.role').create({data: {name, description, type}});
+    }
+    return role;
+  },
+
+  async executePermissionMigrations(controllers){
     for (let controller of controllers) {
       for (let action of controller.actions) {
         for (let role of controller.roles) {
-          await updateOrCreateRolePermissions(role, controller.type, controller.controller, action);
+          await migration.updateOrCreateRolePermissions(role, controller.type, controller.controller, action);
         }
       }
     }
+  },
+
+  async updateOrCreateRolePermissions(role, type, controller, action) {
+    const searchAction = `${type}::${controller}.${action}`;
+    let permission = await strapi.query('plugin::users-permissions.permission')
+      .findOne({where: {action: searchAction, role: role.id}});
+    if (!permission) {
+      await strapi.query('plugin::users-permissions.permission')
+        .create({data: {action: searchAction, role: role.id}});
+    }
   }
 };
+
+module.exports = migration;

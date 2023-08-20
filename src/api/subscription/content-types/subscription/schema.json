@@ -8,12 +8,12 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false,
-    "timestamps": true
+    "draftAndPublish": false
   },
   "attributes": {
     "email": {
-      "type": "email"
+      "type": "email",
+      "private": true
     },
     "enable": {
       "type": "boolean",
@@ -24,7 +24,8 @@
       "default": false
     },
     "token": {
-      "type": "string"
+      "type": "string",
+      "private": true
     }
   }
 }

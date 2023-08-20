@@ -2,7 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const spies = require('chai-spies');
 
-const deliveryToEmailSubscriptions = require('../../../src/functions/delivery.to.email.subscriptions');
+const deliveryToEmailSubscriptions = require('../../../src/functions/subscriptions.emails');
 
 const createUser = require('../../helpers/create-user');
 const checkHtmlEmail = require('../../helpers/check-html-email');

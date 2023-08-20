@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 
 const marked = require('marked');
 
-const {cleanBody} = require('../../../../src/functions/delivery.to.email.subscriptions');
+const {cleanBody} = require('../../../../src/functions/subscriptions.emails');
 
 const EXAMPLE_BODY = `
 ## ¿De donde surgió la idea?

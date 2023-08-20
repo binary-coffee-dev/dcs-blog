@@ -1,16 +1,16 @@
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
-  extensionService.use(({ nexus }) => {
+  extensionService.use(({nexus}) => {
     const subscribe = nexus.extendType({
       type: 'Mutation',
       definition(t) {
         t.field('subscribe', {
-          type: nexus.nonNull('Subscription'),
-          args: { email: nexus.nonNull('String') },
+          type: nexus.nonNull('SubscriptionEntity'),
+          args: {email: nexus.nonNull('String')},
 
           resolve(parent, args, context) {
-            return strapi.controller('api::subscription.subscription').subscribe(context);
+            return strapi.service('api::subscription.subscription').subscribe({args, ctx: context});
           }
         });
       }
@@ -21,15 +21,32 @@ module.exports = (strapi) => {
       definition(t) {
         t.field('verify', {
           type: nexus.nonNull('Subscription'),
-          args: { token: nexus.nonNull('String') },
+          args: {token: nexus.nonNull('String')},
 
           resolve(parent, args, context) {
-            return strapi.controller('api::subscription.subscription').verify(context);
+            return strapi.service('api::subscription.subscription').verify({args, ctx: context});
           }
         });
       }
     });
 
-    return { types: [subscribe, verify] };
+    return {types: [subscribe, verify]};
   });
+
+  extensionService.use(() => ({
+    resolversConfig: {
+      'Mutation.subscribe': {
+        policies: [],
+        auth: {
+          scope: ['api::subscription.subscription.subscribe']
+        }
+      },
+      'Mutation.verify': {
+        policies: [],
+        auth: {
+          scope: ['api::subscription.subscription.verify']
+        }
+      }
+    }
+  }));
 };
