@@ -50,7 +50,7 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
     return null;
   },
 
-  async verify({args, ctx}) {
+  async verify({ctx}) {
     const token = ctx.request.body.token;
     const subscriptions = await strapi.service('api::subscription.subscription').findMany({where: {token}});
     if (subscriptions.length > 0) {
@@ -64,7 +64,7 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
     return null;
   },
 
-  async unsubscribe({args, ctx}) {
+  async unsubscribe() {
     return null;
   },
 
