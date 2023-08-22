@@ -50,16 +50,17 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
     return null;
   },
 
-  async verify({ctx}) {
-    const token = ctx.request.body.token;
-    const subscriptions = await strapi.service('api::subscription.subscription').findMany({where: {token}});
+  async verify({args, ctx}) {
+    const {token} = args;
+    const subscriptions = await strapi.query('api::subscription.subscription').findMany({where: {token}});
     if (subscriptions.length > 0) {
       const subscription = subscriptions[0];
-      const subsUpdated = await strapi.service('api::subscription.subscription').update({
+      const subsUpdated = await strapi.query('api::subscription.subscription').update({
         where: {id: subscription.id},
         data: {enable: true, verified: true}
       });
-      ctx.send({...subsUpdated, token: undefined, email: undefined});
+
+      return await strapi.controller('api::subscription.subscription').sanitizeOutput(subsUpdated, ctx);
     }
     return null;
   },
