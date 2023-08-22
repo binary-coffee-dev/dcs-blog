@@ -15,14 +15,17 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
     const value = await strapi.query('api::subscription.subscription').findMany({where: {email}});
     if (value.length === 0 || (value.length > 0 && !value[FIRST_ELEMENT].verified)) {
       const token = strapi.service('api::subscription.subscription').generateToken(100);
+      const unsubscribeToken = strapi.service('api::subscription.subscription').generateToken(100);
+
       const subscription = value.length === 0 ? await strapi.service('api::subscription.subscription').create({
         data: {
           email,
-          token
+          token,
+          unsubscribeToken
         }
       }) : value[FIRST_ELEMENT];
-      const verifyLink = `${strapi.config.custom.siteUrl}/verify/${subscription.token}`;
 
+      const verifyLink = `${strapi.config.custom.siteUrl}/verify/${subscription.token}`;
       let html = await new Promise((resolve, reject) => {
         ejs.renderFile(
           './public/subscription-email-template.html',
@@ -50,6 +53,22 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
     return null;
   },
 
+  async unsubscribe({args, ctx}) {
+    const {unsubscribeToken} = args;
+    const subscriptions = await strapi.query('api::subscription.subscription').findMany({where: {unsubscribeToken}});
+
+    if (subscriptions.length > 0) {
+      const subscription = subscriptions[0];
+      const subsUpdated = await strapi.query('api::subscription.subscription').update({
+        where: {id: subscription.id},
+        data: {verified: false}
+      });
+
+      return await strapi.controller('api::subscription.subscription').sanitizeOutput(subsUpdated, ctx);
+    }
+    return null;
+  },
+
   async verify({args, ctx}) {
     const {token} = args;
     const subscriptions = await strapi.query('api::subscription.subscription').findMany({where: {token}});
@@ -62,10 +81,6 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
 
       return await strapi.controller('api::subscription.subscription').sanitizeOutput(subsUpdated, ctx);
     }
-    return null;
-  },
-
-  async unsubscribe() {
     return null;
   },
 

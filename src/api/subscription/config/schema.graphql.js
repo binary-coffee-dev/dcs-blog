@@ -16,6 +16,20 @@ module.exports = (strapi) => {
       }
     });
 
+    const unsubscribe = nexus.extendType({
+      type: 'Mutation',
+      definition(t) {
+        t.field('unsubscribe', {
+          type: nexus.nonNull('Subscription'),
+          args: {unsubscribeToken: nexus.nonNull('String')},
+
+          resolve(parent, args, context) {
+            return strapi.service('api::subscription.subscription').unsubscribe({args, ctx: context});
+          }
+        });
+      }
+    });
+
     const verify = nexus.extendType({
       type: 'Mutation',
       definition(t) {
@@ -30,7 +44,7 @@ module.exports = (strapi) => {
       }
     });
 
-    return {types: [subscribe, verify]};
+    return {types: [subscribe, unsubscribe, verify]};
   });
 
   extensionService.use(() => ({
@@ -39,6 +53,12 @@ module.exports = (strapi) => {
         policies: [],
         auth: {
           scope: ['api::subscription.subscription.subscribe']
+        }
+      },
+      'Mutation.unsubscribe': {
+        policies: [],
+        auth: {
+          scope: ['api::subscription.subscription.unsubscribe']
         }
       },
       'Mutation.verify': {

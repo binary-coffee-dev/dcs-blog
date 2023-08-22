@@ -26,6 +26,10 @@
     "token": {
       "type": "string",
       "private": true
+    },
+    "unsubscribeToken": {
+      "type": "string",
+      "private": true
     }
   }
 }
