@@ -30,6 +30,11 @@
     "unsubscribeToken": {
       "type": "string",
       "private": true
+    },
+    "lastSubscriptionTime": {
+      "type": "datetime",
+      "private": true,
+      "required": true
     }
   }
 }

@@ -23,6 +23,7 @@ module.exports = {
     strapi.config.functions = {
       dateUtil: require('./functions/dateUtil'),
       subscriptionsEmails: require('./functions/subscriptions.emails'),
+      token: require('./functions/token'),
       // sendBotNotification: require('./functions/sendBotNotification'),
     };
   },

@@ -7,6 +7,12 @@ const minify = require('html-minifier').minify;
 
 
 module.exports = createCoreService('api::subscription.subscription', () => ({
+  isSubscribedToday(lastSubscriptionTime) {
+    const date = new Date(lastSubscriptionTime);
+    return date < strapi.config.functions.dateUtil.getEndDay() &&
+      date > strapi.config.functions.dateUtil.getStartDay();
+  },
+
   async subscribe({args, ctx}) {
     const FIRST_ELEMENT = 0;
 
@@ -14,16 +20,23 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
 
     const value = await strapi.query('api::subscription.subscription').findMany({where: {email}});
     if (value.length === 0 || (value.length > 0 && !value[FIRST_ELEMENT].verified)) {
-      const token = strapi.service('api::subscription.subscription').generateToken(100);
-      const unsubscribeToken = strapi.service('api::subscription.subscription').generateToken(100);
 
-      const subscription = value.length === 0 ? await strapi.service('api::subscription.subscription').create({
+      const token = strapi.config.functions.token.generate(100);
+      const unsubscribeToken = strapi.config.functions.token.generate(100);
+
+      const subscription = value.length === 0 ? await strapi.query('api::subscription.subscription').create({
         data: {
           email,
           token,
-          unsubscribeToken
+          unsubscribeToken,
+          lastSubscriptionTime: new Date()
         }
       }) : value[FIRST_ELEMENT];
+
+      await strapi.query('api::subscription.subscription').update({
+        where: {email},
+        data: {lastSubscriptionTime: new Date()}
+      });
 
       const verifyLink = `${strapi.config.custom.siteUrl}/verify/${subscription.token}`;
       let html = await new Promise((resolve, reject) => {
@@ -82,13 +95,5 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
       return await strapi.controller('api::subscription.subscription').sanitizeOutput(subsUpdated, ctx);
     }
     return null;
-  },
-
-  generateToken(size = 12) {
-    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_';
-    return new Array(size)
-      .fill(undefined)
-      .map(() => characters[Math.floor(Math.random() * characters.length)])
-      .reduce((prev, ch) => prev + ch, '');
   },
 }));

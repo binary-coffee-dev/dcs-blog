@@ -1,3 +1,5 @@
+const canSubscribe = require('../policies/canSubscribe');
+
 module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
@@ -50,7 +52,7 @@ module.exports = (strapi) => {
   extensionService.use(() => ({
     resolversConfig: {
       'Mutation.subscribe': {
-        policies: [],
+        policies: [canSubscribe],
         auth: {
           scope: ['api::subscription.subscription.subscribe']
         }

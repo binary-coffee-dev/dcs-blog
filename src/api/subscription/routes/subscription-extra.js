@@ -3,17 +3,20 @@ module.exports = {
     {
       method: 'POST',
       path: '/subscribe',
-      handler: 'subscription.subscribe'
+      handler: 'subscription.subscribe',
+      policies: ['global::disable']
     },
     {
       method: 'POST',
       path: '/verify',
-      handler: 'subscription.verify'
+      handler: 'subscription.verify',
+      policies: ['global::disable']
     },
     {
       method: 'POST',
       path: '/unsubscribe',
-      handler: 'subscription.unsubscribe'
+      handler: 'subscription.unsubscribe',
+      policies: ['global::disable']
     },
   ]
 };
