@@ -11,7 +11,7 @@ const SUBSCRIBE_MUTATION = {
   operationName: null,
   variables: {email: ''},
   // language=GraphQL
-  query: 'mutation ($email: String!){\n    subscribe(email: $email) {\n        id\n    }\n}'
+  query: 'mutation ($email: String!){\n    subscribe(email: $email) {\n        id\n        attributes {\n            verified\n        }\n    }\n}'
 };
 
 const UNSUBSCRIBE_MUTATION = {

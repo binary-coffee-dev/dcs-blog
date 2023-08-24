@@ -13,7 +13,8 @@
   "attributes": {
     "email": {
       "type": "email",
-      "private": true
+      "private": true,
+      "unique": true
     },
     "enable": {
       "type": "boolean",
@@ -25,11 +26,13 @@
     },
     "token": {
       "type": "string",
-      "private": true
+      "private": true,
+      "unique": true
     },
     "unsubscribeToken": {
       "type": "string",
-      "private": true
+      "private": true,
+      "unique": true
     },
     "lastSubscriptionTime": {
       "type": "datetime",
