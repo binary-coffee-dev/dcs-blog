@@ -11,7 +11,7 @@ const SUBSCRIBE_MUTATION = {
   operationName: null,
   variables: {email: ''},
   // language=GraphQL
-  query: 'mutation ($email: String!){\n    subscribe(email: $email) {\n        id\n        attributes {\n            verified\n        }\n    }\n}'
+  query: 'mutation ($email: String!){\n    subscribe(email: $email) {\n        verified\n    }\n}'
 };
 
 const UNSUBSCRIBE_MUTATION = {
@@ -33,21 +33,9 @@ const EMAIL_EXAMPLE = 'testemail@test.com';
 describe('Subscribe public use INTEGRATION', () => {
 
   let emailProvider;
-  let emailProviderMock;
 
   before(async () => {
     emailProvider = strapi.plugins.email.provider;
-  });
-
-  beforeEach(async () => {
-    emailProviderMock = {
-      send: chai.spy(({to, subject}) => {
-        expect(to).to.be.eq(EMAIL_EXAMPLE);
-        expect(subject).to.be.eq('Binary Coffee subscription');
-        return Promise.resolve();
-      })
-    };
-    strapi.plugins.email.provider = emailProviderMock;
   });
 
   after(async () => {
@@ -59,11 +47,31 @@ describe('Subscribe public use INTEGRATION', () => {
   });
 
   it('should subscribe a public user', async () => {
-    await subscribeRequest(EMAIL_EXAMPLE);
+    const res = await subscribeRequest(EMAIL_EXAMPLE);
+
+    expect(res.body.data.subscribe.verified).to.be.false;
+  });
+
+  it('should fail to subscribe with invalid email', async () => {
+    const invalidEmails = [
+      'not_valid_email', 'not valid email', 'string', '  ', 'a d', '', 'plainaddress,', '#@%^%#$@#$@#.com',
+      '@example.com', 'Joe Smith <email@example.com>', 'email.example.com', 'email@example@example.com',
+      '.email@example.com', 'email.@example.com', 'email..email@example.com', 'this\ is"really"not\allowed@example.com',
+      'email@example.com (Joe Smith)', 'email@example', 'email@111.222.333.44444', 'email@example..com',
+      'Abc..123@example.com', '”(),:;<>[\]@example.com',
+    ];
+
+    for (const invalidEmail of invalidEmails) {
+      await subscribeRequest(invalidEmail, true);
+      const res = await strapi.query('api::subscription.subscription').findMany({where: {email: invalidEmail}});
+      expect(res.length).to.be.eq(0);
+    }
   });
 
   it('should validate a subscription from link', async () => {
-    await subscribeRequest(EMAIL_EXAMPLE);
+    const res = await subscribeRequest(EMAIL_EXAMPLE);
+
+    expect(res.body.data.subscribe.verified).to.be.false;
 
     let subscriptions = await strapi.query('api::subscription.subscription').findMany({where: {email: EMAIL_EXAMPLE}});
 
@@ -71,12 +79,12 @@ describe('Subscribe public use INTEGRATION', () => {
     expect(subscriptions).to.not.be.undefined;
     expect(subscriptions.length).to.be.eq(1);
 
-    const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
+    const res2 = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
       .post('/graphql').send({...SUBSCRIPTION_VALIDATION_MUTATION, variables: {token: subscriptions[0].token}})
       .end((err, res) => err ? reject(err) : resolve(res))
     );
 
-    expect(res.body.errors).to.be.undefined;
+    expect(res2.body.errors).to.be.undefined;
 
     subscriptions = await strapi.query('api::subscription.subscription').findMany({where: {email: EMAIL_EXAMPLE}});
 
@@ -115,17 +123,28 @@ describe('Subscribe public use INTEGRATION', () => {
     expect(subscriptions[0].verified).to.be.false;
   });
 
-  async function subscribeRequest(email, expectFail = false) {
+  async function subscribeRequest(email, expectedFail = false) {
+    strapi.plugins.email.provider = {
+      send: chai.spy(async ({to, subject, html}) => {
+        expect(to).to.be.eq(email);
+        expect(subject).to.be.eq('Binary Coffee subscription');
+
+        const {token} = await strapi.query('api::subscription.subscription').findOne({where: {email}});
+        expect(html.indexOf(token)).to.not.eq(-1);
+      })
+    };
+
     const res = await new Promise((resolve, reject) => chai.request(strapi.server.httpServer)
       .post('/graphql').send({...SUBSCRIBE_MUTATION, variables: {email}})
       .end((err, res) => err ? reject(err) : resolve(res))
     );
 
-    if (expectFail) {
+    if (expectedFail) {
       expect(res.body.errors).to.not.be.undefined;
+      expect(strapi.plugins.email.provider.send).to.not.have.been.called();
     } else {
       expect(res.body.errors).to.be.undefined;
-      expect(emailProviderMock.send).to.have.been.called();
+      expect(strapi.plugins.email.provider.send).to.have.been.called();
     }
 
     return res;

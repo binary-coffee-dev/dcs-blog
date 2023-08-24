@@ -24,6 +24,7 @@ module.exports = {
       dateUtil: require('./functions/dateUtil'),
       subscriptionsEmails: require('./functions/subscriptions.emails'),
       token: require('./functions/token'),
+      email: require('./functions/email'),
       // sendBotNotification: require('./functions/sendBotNotification'),
     };
   },

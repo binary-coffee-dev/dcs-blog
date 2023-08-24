@@ -6,6 +6,12 @@ module.exports = async (ctx, config, {strapi}) => {
   }
 
   const {email} = ctx.args;
+
+  // validate email
+  if (!strapi.config.functions.email.validate(email)) {
+    return false;
+  }
+
   const value = await strapi.query('api::subscription.subscription').findMany({where: {email}});
 
   if (value.length === 0) {

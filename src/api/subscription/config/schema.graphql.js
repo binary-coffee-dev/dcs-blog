@@ -4,11 +4,18 @@ module.exports = (strapi) => {
   const extensionService = strapi.plugin('graphql').service('extension');
 
   extensionService.use(({nexus}) => {
+    const SubscribeResponse = nexus.objectType({
+      name: 'SubscribeResponse',
+      definition(t) {
+        t.field('verified', {type: nexus.nonNull('Boolean')});
+      }
+    });
+
     const subscribe = nexus.extendType({
       type: 'Mutation',
       definition(t) {
         t.field('subscribe', {
-          type: nexus.nonNull('SubscriptionEntity'),
+          type: nexus.nonNull('SubscribeResponse'),
           args: {email: nexus.nonNull('String')},
 
           resolve(parent, args, context) {
@@ -22,7 +29,7 @@ module.exports = (strapi) => {
       type: 'Mutation',
       definition(t) {
         t.field('unsubscribe', {
-          type: nexus.nonNull('Subscription'),
+          type: nexus.nonNull('SubscribeResponse'),
           args: {unsubscribeToken: nexus.nonNull('String')},
 
           resolve(parent, args, context) {
@@ -36,7 +43,7 @@ module.exports = (strapi) => {
       type: 'Mutation',
       definition(t) {
         t.field('verify', {
-          type: nexus.nonNull('Subscription'),
+          type: nexus.nonNull('SubscribeResponse'),
           args: {token: nexus.nonNull('String')},
 
           resolve(parent, args, context) {
@@ -46,7 +53,7 @@ module.exports = (strapi) => {
       }
     });
 
-    return {types: [subscribe, unsubscribe, verify]};
+    return {types: [SubscribeResponse, subscribe, unsubscribe, verify]};
   });
 
   extensionService.use(() => ({
