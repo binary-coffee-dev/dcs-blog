@@ -13,7 +13,7 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
       date > strapi.config.functions.dateUtil.getStartDay();
   },
 
-  async subscribe({args, ctx}) {
+  async subscribe({args}) {
     const FIRST_ELEMENT = 0;
 
     const {email} = args;
@@ -59,14 +59,14 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
         html
       });
 
-      return await strapi.controller('api::subscription.subscription').sanitizeOutput(subscription, ctx);
+      return {verified: subscription.verified};
     } else if (value.length > 0) {
-      return value[FIRST_ELEMENT];
+      return {verified: value[FIRST_ELEMENT].verified};
     }
     return null;
   },
 
-  async unsubscribe({args, ctx}) {
+  async unsubscribe({args}) {
     const {unsubscribeToken} = args;
     const subscriptions = await strapi.query('api::subscription.subscription').findMany({where: {unsubscribeToken}});
 
@@ -77,12 +77,12 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
         data: {verified: false}
       });
 
-      return await strapi.controller('api::subscription.subscription').sanitizeOutput(subsUpdated, ctx);
+      return {verified: subsUpdated.verified};
     }
     return null;
   },
 
-  async verify({args, ctx}) {
+  async verify({args}) {
     const {token} = args;
     const subscriptions = await strapi.query('api::subscription.subscription').findMany({where: {token}});
     if (subscriptions.length > 0) {
@@ -92,7 +92,7 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
         data: {enable: true, verified: true}
       });
 
-      return await strapi.controller('api::subscription.subscription').sanitizeOutput(subsUpdated, ctx);
+      return {verified: subsUpdated.verified};
     }
     return null;
   },
