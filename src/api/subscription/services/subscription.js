@@ -77,7 +77,7 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
         data: {verified: false}
       });
 
-      return {verified: subsUpdated};
+      return {verified: subsUpdated.verified};
     }
     return null;
   },
@@ -92,7 +92,7 @@ module.exports = createCoreService('api::subscription.subscription', () => ({
         data: {enable: true, verified: true}
       });
 
-      return {verified: subsUpdated};
+      return {verified: subsUpdated.verified};
     }
     return null;
   },

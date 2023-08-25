@@ -18,14 +18,14 @@ const UNSUBSCRIBE_MUTATION = {
   operationName: null,
   variables: {unsubscribeToken: ''},
   // language=GraphQL
-  query: 'mutation ($unsubscribeToken: String!){\n    unsubscribe(unsubscribeToken: $unsubscribeToken) {\n        __typename\n    }\n}'
+  query: 'mutation ($unsubscribeToken: String!){\n    unsubscribe(unsubscribeToken: $unsubscribeToken) {\n        verified\n    }\n}'
 };
 
 const SUBSCRIPTION_VALIDATION_MUTATION = {
   operationName: null,
   variables: {token: ''},
   // language=GraphQL
-  query: 'mutation ($token: String!){\n    verify(token: $token) {\n        __typename\n    }\n}'
+  query: 'mutation ($token: String!){\n    verify(token: $token) {\n        verified\n    }\n}'
 };
 
 const EMAIL_EXAMPLE = 'testemail@test.com';
