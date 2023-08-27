@@ -136,9 +136,13 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
     date.setDate(date.getDate() - days);
     return await strapi.query('api::post.post').findMany({
       where: {
-        publishedAt: {$gt: date},
+        $and: [
+          {publishedAt: {$lte: new Date()}},
+          {publishedAt: {$gt: date}}
+        ],
         enable: true
-      }
+      },
+      limit: 10
     });
   },
 
