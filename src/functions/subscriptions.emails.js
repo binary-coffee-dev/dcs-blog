@@ -58,7 +58,6 @@ const subscriptionsEmails = {
     const verifySubscribers = await getVerifiedAndEnableSubscribers();
     for (const subscriber of verifySubscribers) {
       let html = await getHtmlWithPosts(posts, subscriber.unsubscribeToken);
-      require('fs').writeFileSync('./xxxxxxxxxx.html', html);
       html = minifyHtml(html);
       await subscriptionsEmails.sendEmails([subscriber], subject, html);
     }

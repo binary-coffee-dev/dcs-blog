@@ -42,6 +42,8 @@ describe('Send subscription emails INTEGRATION', () => {
 
     const unsubscriptionTokens = new Map();
 
+    // disable subscription email
+    await createEmail('w@test.com', true, false);
     // create valid subscription emails
     for (const email of emailsValid) {
       unsubscriptionTokens.set(email, await createEmail(email, true));
@@ -60,7 +62,7 @@ describe('Send subscription emails INTEGRATION', () => {
     expect(strapi.plugins.email.provider.send).to.have.been.called.exactly(emailsValid.length);
   });
 
-  async function createEmail(email, verified = true) {
+  async function createEmail(email, verified = true, enable = true) {
     const token = strapi.config.functions.token.generate(100);
     const unsubscribeToken = strapi.config.functions.token.generate(100);
 
@@ -70,6 +72,7 @@ describe('Send subscription emails INTEGRATION', () => {
         token,
         unsubscribeToken,
         verified,
+        enable,
         lastSubscriptionTime: new Date()
       }
     });
