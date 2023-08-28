@@ -30,7 +30,16 @@ describe('Send subscription emails INTEGRATION', () => {
 
   it('should send email to subscription emails', async () => {
     // create post to send in subscription
+    const possibleSuggestedArticles = [];
     const post = await createPost(strapi, {publishedAt: new Date()});
+    for (let i = 0; i < 15; i++) {
+      const date = new Date();
+      const daysBefore = (Math.floor(Math.random() * 100) + 10);
+      date.setDate(date.getDate() - daysBefore);
+
+      const newPost = await createPost(strapi, {publishedAt: date});
+      possibleSuggestedArticles.push(newPost.name);
+    }
 
     const emailsValid = [
       'a@test.com', 'b@test.com', 'c@test.com', 'd@test.com', 'e@test.com', 'f@test.com', 'h@test.com',
@@ -55,7 +64,7 @@ describe('Send subscription emails INTEGRATION', () => {
 
     // mock email provider
     const SUBJECT = 'test subject';
-    mockSendEmails(emailsValid, SUBJECT, post.title, unsubscriptionTokens);
+    mockSendEmails(emailsValid, SUBJECT, post.title, unsubscriptionTokens, possibleSuggestedArticles);
 
     await strapi.config.functions.subscriptionsEmails.sendEmailWithLatestPosts(SUBJECT, 7);
 
@@ -80,7 +89,7 @@ describe('Send subscription emails INTEGRATION', () => {
     return unsubscribeToken;
   }
 
-  function mockSendEmails(emails, expectedSubject, expectedTitle, unsubscriptionTokens) {
+  function mockSendEmails(emails, expectedSubject, expectedTitle, unsubscriptionTokens, possibleSuggestedArticles) {
     strapi.plugins.email.provider = {
       send: chai.spy(async ({to, subject, html}) => {
         expect(emails.includes(to)).to.be.true;
@@ -88,6 +97,10 @@ describe('Send subscription emails INTEGRATION', () => {
 
         expect(html.indexOf(expectedTitle)).to.not.eq(-1);
         expect(html.indexOf(unsubscriptionTokens.get(to))).to.not.eq(-1);
+
+        const numberSuggestedArticles =
+          possibleSuggestedArticles.reduce((p, v) => p + (html.indexOf(v) === -1 ? 0 : 1), 0);
+        expect(numberSuggestedArticles).to.be.eq(5);
       })
     };
   }

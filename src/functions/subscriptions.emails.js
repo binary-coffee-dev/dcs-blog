@@ -16,13 +16,19 @@ async function getPublicPostsOfLastDays(previousDays) {
   return posts.map(post => ({...post, body: cleanBody(marked.parse(post.body))}));
 }
 
+async function getSuggestionArticles(previousDays) {
+  const posts = await strapi.service('api::post.post').getRandomArticles(previousDays, 5);
+  return posts.map(post => ({...post, body: cleanBody(marked.parse(post.body))}));
+}
+
 async function getVerifiedAndEnableSubscribers() {
   return await strapi.query('api::subscription.subscription').findMany({where: {verified: true, enable: true}});
 }
 
-async function getHtmlWithPosts(posts, unsubscribeToken) {
+async function getHtmlWithPosts(posts, postsSuggestions, unsubscribeToken) {
   const data = {
-    posts: posts,
+    posts,
+    postsSuggestions,
     siteUrl: strapi.config.custom.siteUrl,
     unsubscribeToken,
     year: new Date().getFullYear()
@@ -55,10 +61,16 @@ const subscriptionsEmails = {
     if (posts.length === 0)
       return;
 
+    const postsSuggestions = await getSuggestionArticles(previousDays);
+
     const verifySubscribers = await getVerifiedAndEnableSubscribers();
     for (const subscriber of verifySubscribers) {
-      let html = await getHtmlWithPosts(posts, subscriber.unsubscribeToken);
+      let html = await getHtmlWithPosts(posts, postsSuggestions, subscriber.unsubscribeToken);
       html = minifyHtml(html);
+
+      // toDo (gonzalezext)[28.08.23]: remove this
+      require('fs').writeFileSync('./xxxxxxxx.html', html);
+
       await subscriptionsEmails.sendEmails([subscriber], subject, html);
     }
   },

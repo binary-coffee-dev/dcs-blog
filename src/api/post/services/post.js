@@ -1,5 +1,6 @@
 'use strict';
 
+const {sampleSize} = require('lodash');
 const {createCoreService} = require('@strapi/strapi').factories;
 
 const {Feed} = require('feed');
@@ -144,6 +145,33 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
       },
       limit: 10
     });
+  },
+
+  async getRandomArticles(days, articlesCount) {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    const where = {
+      publishedAt: {$lte: date},
+      enable: true,
+    };
+
+    const postNumber = await strapi.query('api::post.post').count({where});
+
+    // calculate random posts positions
+    const arr = new Array(postNumber).fill(0).map((v, i) => i);
+    const postRandomPositions = sampleSize(arr, Math.min(articlesCount, postNumber));
+
+    const posts = [];
+    for (const pos of postRandomPositions) {
+      const queryResult = await strapi.query('api::post.post').findMany({
+        where,
+        limit: 1,
+        offset: pos,
+        orderBy: {id: 'asc'},
+      });
+      posts.push(queryResult[0]);
+    }
+    return posts;
   },
 
   async getFeed(ctx, format) {

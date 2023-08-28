@@ -19,6 +19,64 @@
       font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif;
       font-weight: 200;
     }
+
+    .article-item {
+      flex-direction: row;
+      box-sizing: border-box;
+      display: flex;
+      border-bottom: 1px solid rgba(0, 0, 0, .06);
+      background-color: #fff;
+      width: calc(100% - 48px);
+      padding: 24px;
+      text-decoration: none
+    }
+
+    .article-item-item {
+      text-align: left;
+    }
+
+    .article-title-link {
+      text-decoration: none;
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 1.275rem;
+      color: #01b15e;
+      font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif;
+      font-weight: 200;
+      text-transform: uppercase
+    }
+
+    .article-date-container {
+      flex-direction: row;
+      box-sizing: border-box;
+      display: flex
+    }
+
+    .article-date {
+      color: #959595;
+      font-size: .8125rem;
+      position: relative;
+      margin-right: 15px
+    }
+
+    .article-body {
+      width: 100%;
+      font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif;
+      color: #000;
+      letter-spacing: 0;
+      font-weight: 300;
+      font-size: .95rem
+    }
+
+    .list-title {
+      font-size: 24px;
+      font-family: 'Source Code Pro','Roboto','Helvetica Neue',sans-serif;
+      text-transform: capitalize;
+      font-weight: 400;
+      margin-bottom: 0;
+      text-align: left;
+      padding-left: 20px;
+    }
   </style>
 </head>
 <body style="margin:0;padding:0;background-color:#e9ebf2;">
@@ -38,24 +96,44 @@
         </tr>
         <tr style="width: 100%">
           <td style="background-color:#fff;width: 100%;text-align: center;">
+            <% if (posts.length > 0) { %>
+            <h1 class="list-title">Artículos recientes</h1>
+            <% } %>
             <% for (var i = 0; i < posts.length; i++) {%>
-            <div
-              id="__article_item"
-              style="flex-direction: row; box-sizing: border-box; display: flex; border-bottom: 1px solid rgba(0, 0, 0, .06); background-color: #fff; width: calc(100% - 48px); padding: 24px; text-decoration: none">
-              <div style="text-align: left">
+            <div class="article-item">
+              <div class="article-item-item">
                 <a href="<%= siteUrl + '/post/' + posts[i].name %>"
-                   style="text-decoration: none; margin-top: 0; margin-bottom: 6px; font-size: 1.275rem; color: #01b15e; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; font-weight: 200; text-transform: uppercase">
+                   class="article-title-link">
                   <%= posts[i].title %>
                 </a>
-                <div style="flex-direction: row; box-sizing: border-box; display: flex">
-                  <span
-                    style="color: #959595; font-size: .8125rem; position: relative; margin-right: 15px">
+                <div class="article-date-container">
+                  <span class="article-date">
                       <%= posts[i].publishedAt.toString().slice(0, 15) %>
                   </span>
                 </div>
-                <span
-                  style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem">
+                <span class="article-body">
                   <%- posts[i].body.substr(0, Math.min(200, posts[i].body.length)) %>...
+                </span>
+              </div>
+            </div>
+            <% } %>
+            <% if (postsSuggestions.length > 0) { %>
+            <h1 class="list-title">Artículos recomendados</h1>
+            <% } %>
+            <% for (var i = 0; i < postsSuggestions.length; i++) {%>
+            <div class="article-item">
+              <div class="article-item-item">
+                <a href="<%= siteUrl + '/post/' + postsSuggestions[i].name %>"
+                   class="article-title-link">
+                  <%= postsSuggestions[i].title %>
+                </a>
+                <div class="article-date-container">
+                  <span class="article-date">
+                      <%= postsSuggestions[i].publishedAt.toString().slice(0, 15) %>
+                  </span>
+                </div>
+                <span class="article-body">
+                  <%- postsSuggestions[i].body.substr(0, Math.min(200, postsSuggestions[i].body.length)) %>...
                 </span>
               </div>
             </div>
