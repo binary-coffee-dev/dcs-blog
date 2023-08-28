@@ -68,9 +68,6 @@ const subscriptionsEmails = {
       let html = await getHtmlWithPosts(posts, postsSuggestions, subscriber.unsubscribeToken);
       html = minifyHtml(html);
 
-      // toDo (gonzalezext)[28.08.23]: remove this
-      require('fs').writeFileSync('./xxxxxxxx.html', html);
-
       await subscriptionsEmails.sendEmails([subscriber], subject, html);
     }
   },
