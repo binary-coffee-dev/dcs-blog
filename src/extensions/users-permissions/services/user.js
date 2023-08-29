@@ -1,42 +1,4 @@
-function buildSortObject(sort) {
-  if (!sort) {
-    sort = [];
-  }
-  return sort.reduce((p, v) => {
-    const vs = v.split(':');
-    if (vs.length === 2) {
-      p[vs[0]] = vs[1];
-    }
-    return p;
-  }, {});
-}
-
-const keys = ['and', 'or', 'in', 'ne', 'not', 'contains', 'eq', 'lte', 'lt', 'gt', 'gte'].reduce((p, v) => {
-  p.add(v);
-  return p;
-}, new Set());
-
-function buildWhereObject(obj) {
-  if (obj === undefined || obj === null) {
-    return obj;
-  } else if (typeof obj === 'object') {
-    for (let k of Object.keys(obj)) {
-      buildWhereObject(obj[k]);
-      if (keys.has(k)) {
-        obj['$' + k] = obj[k];
-        delete obj[k];
-      }
-    }
-  } else if (Array.isArray(obj)) {
-    for (let v of obj) {
-      buildWhereObject(v);
-    }
-  }
-  return obj;
-}
-
 module.exports = (services) => {
-  // const oldService = services.other;
 
   services.extra = ({strapi}) => ({
     async topActiveUsers() {
@@ -97,32 +59,6 @@ module.exports = (services) => {
       return {users: users.map(data => ({data})), values};
     },
 
-    async users(args) {
-      const users = await strapi.query('plugin::users-permissions.user').findMany({
-        where: buildWhereObject(args.filters || {}),
-        limit: args.pagination.limit,
-        start: args.pagination.start,
-        orderBy: buildSortObject(args.sort),
-        populate: ['role', 'avatar']
-      });
-      for (let user of users) {
-        user.posts = await strapi.query('api::post.post').count({
-          where: {
-            author: user.id,
-            publishedAt: {$lte: new Date()},
-            enable: true
-          }
-        });
-        user.comments = await strapi.query('api::comment.comment').count({
-          where: {
-            user: user.id,
-            post: {enable: true, publishedAt: {$lte: new Date()}}
-          }
-        });
-      }
-      return users;
-    },
-
     async findOrCreateProvide({username, provider, scope, avatar, html_url, name, token}) {
       let provide = await strapi.query('api::provider.provider').findOne({where: {username, provider}, populate: ['user']});
       if (!provide) {
@@ -173,6 +109,3 @@ module.exports = (services) => {
     }
   });
 };
-
-module.exports.buildSortObject = buildSortObject;
-module.exports.buildWhereObject = buildWhereObject;

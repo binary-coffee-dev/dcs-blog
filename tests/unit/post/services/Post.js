@@ -39,20 +39,6 @@ describe('Post service', function () {
     expect(name.substring(0, name.length - 5)).to.equal('que-pasa-08');
   });
 
-  it('should remove all not allowed atributes in the where object', () => {
-    const where = {author: '123ouhvsodflknl', title: 'sondflksdflkasjdf', not: 'asdf', enable: true};
-    expect(postService.cleanWhere(where)).to.deep.equal({author: '123ouhvsodflknl', title: 'sondflksdflkasjdf'});
-  });
-
-  it('should convert attributes to a reg expresion', () => {
-    const where = {author: '123ouhvsodflknl', title: 'sondflksdflkasjdf', not: 'asdf'};
-    expect(postService.convertToLikeQuery(where)).to.deep.equal({
-      author: '123ouhvsodflknl',
-      title_contains: 'sondflksdflkasjdf',
-      not: 'asdf'
-    });
-  });
-
   it('should take the date 7 days ago', function () {
     const date = new Date();
     date.setFullYear(2000, 0, 1);
