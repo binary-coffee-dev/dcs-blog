@@ -29,3 +29,9 @@ echo "SECRET2=$SECRET" >> .env
 # integration with 3th parties
 echo "GITHUB_CLIENT_ID=$GITHUB_CLIENT_ID" >> .env
 echo "GITHUB_CLIENT_SECRET=$GITHUB_CLIENT_SECRET" >> .env
+
+# email configurations
+echo "SMTP_HOST=$SMTP_HOST" >> .env
+echo "SMTP_PORT=$SMTP_PORT" >> .env
+echo "SMTP_USERNAME=$SMTP_USERNAME" >> .env
+echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env

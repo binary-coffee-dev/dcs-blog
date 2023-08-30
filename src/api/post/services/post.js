@@ -1,75 +1,12 @@
 'use strict';
 
+const {sampleSize} = require('lodash');
 const {createCoreService} = require('@strapi/strapi').factories;
 
 const {Feed} = require('feed');
 const marked = require('marked');
 
 module.exports = createCoreService('api::post.post', ({strapi}) => ({
-  async find(ctx, publicOnly, limit, start, where) {
-    const sort = (ctx.query.sort || ctx.query._sort);
-
-    const query = this.createQueryObject(ctx, publicOnly, where);
-    return await strapi.query('api::post.post').findMany({
-      where: {
-        ...query,
-        _sort: sort,
-        _limit: Math.min(limit, strapi.config.custom.maxPostRequestLimit),
-        _start: Math.max(start, 0)
-      }
-    });
-  },
-
-  async count(ctx, publicOnly, where) {
-    const query = this.createQueryObject(ctx, publicOnly, where);
-    return await strapi.query('api::post.post').count({where: query});
-  },
-
-  createQueryObject(ctx, publicOnly, where = {}) {
-    where = this.cleanWhere(where);
-    where = this.convertToLikeQuery(where);
-    if (strapi.service('api::post.post').isAuthenticated(ctx) && !publicOnly) {
-      return {...where, _or: [{published_at_lte: new Date(), enable: true}, {author: ctx.state.user.id}]};
-    } else if ((!strapi.service('api::post.post').isAdmin(ctx) && !strapi.service('api::post.post').isStaff(ctx)) || publicOnly) {
-      // public user
-      return {...where, published_at_lte: new Date(), enable: true};
-    }
-    return where;
-  },
-
-  /**
-   * Modify the matched keys and add the suffix *_like* at the end.
-   * @param where any
-   * @param attributes string[]
-   */
-  convertToLikeQuery(where = {}, attributes = ['title']) {
-    const mark = new Set();
-    attributes.forEach(attr => mark.add(attr));
-    return Object.keys(where).reduce((p, k) => {
-      if (mark.has(k)) {
-        p[k + '_contains'] = where[k];
-      } else {
-        p[k] = where[k];
-      }
-      return p;
-    }, {});
-  },
-
-  /**
-   * This method remove all the queries that are different from the defined in the **allowedAttributes** array.
-   * @param allowedAttributes string[]
-   * @param where any
-   */
-  cleanWhere(where = {}, allowedAttributes = ['title', 'author']) {
-    const mark = new Set();
-    allowedAttributes.forEach(attr => mark.add(attr));
-    return Object.keys(where).reduce((prev, value) => {
-      if (mark.has(value)) {
-        prev[value] = where[value];
-      }
-      return prev;
-    }, {});
-  },
 
   async findOneByName(ctx, name, noUpdate) {
     const link = await strapi.query('api::link.link').findOne({where: {name}, populate: ['post']});
@@ -136,10 +73,41 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
     date.setDate(date.getDate() - days);
     return await strapi.query('api::post.post').findMany({
       where: {
-        publishedAt: {$gt: date},
+        $and: [
+          {publishedAt: {$lte: new Date()}},
+          {publishedAt: {$gt: date}}
+        ],
         enable: true
-      }
+      },
+      limit: 10
     });
+  },
+
+  async getRandomArticles(days, articlesCount) {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    const where = {
+      publishedAt: {$lte: date},
+      enable: true,
+    };
+
+    const postNumber = await strapi.query('api::post.post').count({where});
+
+    // calculate random posts positions
+    const arr = new Array(postNumber).fill(0).map((v, i) => i);
+    const postRandomPositions = sampleSize(arr, Math.min(articlesCount, postNumber));
+
+    const posts = [];
+    for (const pos of postRandomPositions) {
+      const queryResult = await strapi.query('api::post.post').findMany({
+        where,
+        limit: 1,
+        offset: pos,
+        orderBy: {id: 'asc'},
+      });
+      posts.push(queryResult[0]);
+    }
+    return posts;
   },
 
   async getFeed(ctx, format) {

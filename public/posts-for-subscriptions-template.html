@@ -9,12 +9,82 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400;display=swap" type="text/css"
         rel="stylesheet"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    .link {
+      text-decoration: none;
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: .95rem;
+      color: #01b15e;
+      font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif;
+      font-weight: 200;
+    }
+
+    .article-item {
+      flex-direction: row;
+      box-sizing: border-box;
+      display: flex;
+      border-bottom: 1px solid rgba(0, 0, 0, .06);
+      background-color: #fff;
+      width: calc(100% - 48px);
+      padding: 24px;
+      text-decoration: none
+    }
+
+    .article-item-item {
+      text-align: left;
+    }
+
+    .article-title-link {
+      text-decoration: none;
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 1.275rem;
+      color: #01b15e;
+      font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif;
+      font-weight: 200;
+      text-transform: uppercase
+    }
+
+    .article-date-container {
+      flex-direction: row;
+      box-sizing: border-box;
+      display: flex
+    }
+
+    .article-date {
+      color: #959595;
+      font-size: .8125rem;
+      position: relative;
+      margin-right: 15px
+    }
+
+    .article-body {
+      width: 100%;
+      font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif;
+      color: #000;
+      letter-spacing: 0;
+      font-weight: 300;
+      font-size: .95rem
+    }
+
+    .list-title {
+      font-size: 24px;
+      font-family: 'Source Code Pro','Roboto','Helvetica Neue',sans-serif;
+      text-transform: capitalize;
+      font-weight: 400;
+      margin-bottom: 0;
+      text-align: left;
+      padding-left: 20px;
+    }
+  </style>
 </head>
 <body style="margin:0;padding:0;background-color:#e9ebf2;">
 <table style="border-spacing:0;padding:0;width:100%;border-width:0">
   <tr>
     <td>
-      <table style="border-spacing:0;padding:0;width:100%;max-width: 600px;border-width:0;margin-left:auto;margin-right:auto">
+      <table
+        style="border-spacing:0;padding:0;width:100%;max-width: 600px;border-width:0;margin-left:auto;margin-right:auto">
         <tr style="height:55px">
           <td style="padding:5px 30px 15px;background-color:#01CD6A;">
             <a href="https://binary-coffee.dev/"
@@ -25,34 +95,60 @@
           </td>
         </tr>
         <tr style="width: 100%">
-          <td style="background-color:#fff;width: 100%">
+          <td style="background-color:#fff;width: 100%;text-align: center;">
+            <% if (posts.length > 0) { %>
+            <h1 class="list-title">Artículos recientes</h1>
+            <% } %>
             <% for (var i = 0; i < posts.length; i++) {%>
-            <div
-              id="__article_item"
-              style="flex-direction: row; box-sizing: border-box; display: flex; border-bottom: 1px solid rgba(0, 0, 0, .06); background-color: #fff; width: calc(100% - 48px); padding: 24px; text-decoration: none">
-              <div>
+            <div class="article-item">
+              <div class="article-item-item">
                 <a href="<%= siteUrl + '/post/' + posts[i].name %>"
-                   style="text-decoration: none; margin-top: 0; margin-bottom: 6px; font-size: 1.275rem; color: #01b15e; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; font-weight: 200; text-transform: uppercase">
+                   class="article-title-link">
                   <%= posts[i].title %>
                 </a>
-                <div style="flex-direction: row; box-sizing: border-box; display: flex">
-                  <span
-                    style="color: #959595; font-size: .8125rem; position: relative; margin-right: 15px">
+                <div class="article-date-container">
+                  <span class="article-date">
                       <%= posts[i].publishedAt.toString().slice(0, 15) %>
                   </span>
                 </div>
-                <span
-                  style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem">
+                <span class="article-body">
                   <%- posts[i].body.substr(0, Math.min(200, posts[i].body.length)) %>...
                 </span>
               </div>
             </div>
             <% } %>
+            <% if (postsSuggestions.length > 0) { %>
+            <h1 class="list-title">Artículos recomendados</h1>
+            <% } %>
+            <% for (var i = 0; i < postsSuggestions.length; i++) {%>
+            <div class="article-item">
+              <div class="article-item-item">
+                <a href="<%= siteUrl + '/post/' + postsSuggestions[i].name %>"
+                   class="article-title-link">
+                  <%= postsSuggestions[i].title %>
+                </a>
+                <div class="article-date-container">
+                  <span class="article-date">
+                      <%= postsSuggestions[i].publishedAt.toString().slice(0, 15) %>
+                  </span>
+                </div>
+                <span class="article-body">
+                  <%- postsSuggestions[i].body.substr(0, Math.min(200, postsSuggestions[i].body.length)) %>...
+                </span>
+              </div>
+            </div>
+            <% } %>
+            <span
+              style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem; padding: 24px 0;margin: 0 24px">
+              Si no desea recivir más correos de este tipo, puede utilizar el link para
+              <a href="<%= siteUrl + '/unsubscribe/' + unsubscribeToken %>" class="link">desubscribirse</a>
+              del servicio
+            </span>
           </td>
         </tr>
         <tr>
           <td
-            style="background-color:#1f3b50;color:#ffffff;padding-top:5px;padding-bottom:5px;margin-left:auto;margin-right:auto">
+            style="background-color:#1f3b50;color:#ffffff;padding-top:5px;padding-bottom:5px;margin-top: 24px;margin-left:auto;margin-right:auto">
             <div style="text-align: center">
               <a href="https://github.com/dcs-community/"
                  style="text-decoration: none; color: #959595; margin-right: 5px; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif"
@@ -68,7 +164,7 @@
                  target="blanck">Faceboook</a>
             </div>
             <div style="text-align: center; color: #959595; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif">
-              Copyright ©2020 Todos los derechos reservados | Hecho con ❤ por DC's Community
+              Copyright ©<%= year %> Todos los derechos reservados | Hecho con ❤ por BinaryCoffee Community
             </div>
           </td>
         </tr>

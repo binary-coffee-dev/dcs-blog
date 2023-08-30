@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = {
+const migration = {
   version: '2.0.0',
   description: 'Populating tags',
 
@@ -18,3 +18,5 @@ module.exports = {
     }
   }
 };
+
+module.exports = migration;

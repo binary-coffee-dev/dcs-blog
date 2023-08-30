@@ -9,12 +9,24 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400;display=swap" type="text/css"
         rel="stylesheet"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    .link {
+      text-decoration: none;
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: .95rem;
+      color: #01b15e;
+      font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif;
+      font-weight: 200;
+    }
+  </style>
 </head>
 <body style="margin:0;padding:0;background-color:#e9ebf2;">
 <table style="border-spacing:0;padding:0;width:100%;border-width:0">
   <tr>
     <td>
-      <table style="border-spacing:0;padding:0;width:100%;max-width: 600px;border-width:0;margin-left:auto;margin-right:auto">
+      <table
+        style="border-spacing:0;padding:0;width:100%;max-width: 600px;border-width:0;margin-left:auto;margin-right:auto">
         <tr style="height:55px">
           <td style="padding:5px 30px 15px;background-color:#01CD6A;">
             <a href="https://binary-coffee.dev/"
@@ -29,13 +41,19 @@
             <div
               style="flex-direction: row; box-sizing: border-box; display: flex; border-bottom: 1px solid rgba(0, 0, 0, .06); background-color: #fff; width: calc(100% - 48px); padding: 24px; text-decoration: none">
               <div>
-                <span style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem">
+                <span
+                  style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem">
                   Se ha suscrito al blog Binary Coffee, para terminar el proceso de suscripción, utilice el siguiente link:
                 </span>
-                <a href="<%= verifyLink %>"
-                   style="text-decoration: none; margin-top: 0; margin-bottom: 6px; font-size: .95rem; color: #01b15e; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; font-weight: 200;">
+                <a href="<%= verifyLink %>" class="link">
                   confirmar suscripción
-                </a>
+                </a>.
+                <hr>
+                <span
+                  style="width: 100%; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif; color: #000; letter-spacing: 0; font-weight: 300; font-size: .95rem">
+                  Si ha recibido este correo sin su consentimiento, por favor contáctenos al email:
+                  <a href="mailto:website@binarycoffee.dev" class="link">website@binarycoffee.dev</a>.
+                </span>
               </div>
             </div>
           </td>
@@ -44,7 +62,7 @@
           <td
             style="background-color:#1f3b50;color:#ffffff;padding-top:5px;padding-bottom:5px;margin-left:auto;margin-right:auto">
             <div style="text-align: center">
-              <a href="https://github.com/dcs-community/"
+              <a href="https://github.com/binary-coffee-dev"
                  style="text-decoration: none; color: #959595; margin-right: 5px; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif"
                  target="blanck">GitHub</a>|
               <a href="https://t.me/binarycoffeedev"
@@ -52,13 +70,13 @@
                  target="blanck">Telegram</a>|
               <a href="https://twitter.com/CoffeeBinary"
                  style="text-decoration: none; color: #959595; margin-right: 5px; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif"
-                 target="blanck">Twitter</a>|
-              <a href="https://mbasic.facebook.com/Binary-Coffee-111577483710684/"
-                 style="text-decoration: none; color: #959595; margin-right: 5px; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif"
-                 target="blanck">Faceboook</a>
+                 target="blanck">Twitter</a>
             </div>
             <div style="text-align: center; color: #959595; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif">
-              Copyright ©2020 Todos los derechos reservados | Hecho con ❤ por DC's Community
+              Copyright ©2023 Todos los derechos reservados
+            </div>
+            <div style="text-align: center; color: #959595; font-family: Raleway, Roboto, 'Helvetica Neue', sans-serif">
+              Hecho con ❤ por BinaryCoffee Community
             </div>
           </td>
         </tr>

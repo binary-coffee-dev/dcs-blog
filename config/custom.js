@@ -1,10 +1,11 @@
 module.exports = ({env}) => ({
   myCustomConfiguration: 'This configuration is accessible through strapi.routes.myCustomConfiguration',
 
+  // toDo (gonzalezext)[19.08.23]: remove this captcha variable
   captchaSecret: env('CAPTCHA_SECRET', 'captcha-secret'),
 
-  apiUrl: env('API_URL', 'https://api.binary-coffee.dev'),
-  siteUrl: env('SITE_URL', 'https://binary-coffee.dev'),
+  apiUrl: env('API_URL', 'https://api.binarycoffee.dev'),
+  siteUrl: env('SITE_URL', 'https://binarycoffee.dev'),
 
   feedArticlesLimit: env.int('FEED_ARTICLES_LIMIT', 15),
   enableBotNotifications: false,

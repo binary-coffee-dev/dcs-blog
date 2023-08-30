@@ -2,7 +2,7 @@
 
 const {createCoreController} = require('@strapi/strapi').factories;
 
-const {j2xParser: Parser} = require('fast-xml-parser');
+const {XMLBuilder} = require('fast-xml-parser');
 
 module.exports = createCoreController('api::post.post', ({strapi}) => ({
   async find(ctx) {
@@ -58,7 +58,6 @@ module.exports = createCoreController('api::post.post', ({strapi}) => ({
 
   async sitemap(ctx) {
     const siteUrl = strapi.config.custom.siteUrl;
-    const parser = new Parser({ignoreAttributes: false});
 
     const mapsite = {
       urlset: {
@@ -86,7 +85,8 @@ module.exports = createCoreController('api::post.post', ({strapi}) => ({
       priority: 0.5
     }));
 
-    const xml = parser.parse(mapsite);
+    const builder = new XMLBuilder({ignoreAttributes: false});
+    const xml = builder.build(mapsite);
     ctx.type = 'xml';
     ctx.send(`<?xml version="1.0" encoding="UTF-8"?>\n${xml}`);
   }

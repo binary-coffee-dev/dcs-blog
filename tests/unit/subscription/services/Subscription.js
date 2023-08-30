@@ -1,19 +1,19 @@
 const expect = require('chai').expect;
 
-describe('Subscription service', function () {
-  let subscription;
+describe('Token util functions', function () {
+  let token;
 
   before(() => {
-    subscription = strapi.service('api::subscription.subscription');
+    token = strapi.config.functions.token;
   });
 
   it('should get a random text of size 12', function () {
-    const token = subscription.generateToken();
-    expect(token.length).to.be.equal(12);
+    const value = token.generate();
+    expect(value.length).to.be.equal(12);
   });
 
   it('should get a random text of size 60', function () {
-    const token = subscription.generateToken(60);
-    expect(token.length).to.be.equal(60);
+    const value = token.generate(60);
+    expect(value.length).to.be.equal(60);
   });
 });

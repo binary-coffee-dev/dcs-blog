@@ -16,8 +16,12 @@ module.exports = (controller) => {
       });
       let user;
       if (!providerItem.user) {
-        user = await authService.createUserByProvider(providerItem);
+        user = await authService.createUserByProvider(providerItem, userData.email);
       } else {
+        await strapi.query('plugin::users-permissions.user').update({
+          where: {id: providerItem.user.id},
+          data: {email: userData.email}
+        });
         user = {id: providerItem.user.id};
       }
       user = await strapi.query('plugin::users-permissions.user').findOne({where: {id: user.id}, populate: ['role']});

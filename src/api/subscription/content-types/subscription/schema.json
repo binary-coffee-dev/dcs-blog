@@ -8,12 +8,13 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": false,
-    "timestamps": true
+    "draftAndPublish": false
   },
   "attributes": {
     "email": {
-      "type": "email"
+      "type": "email",
+      "private": true,
+      "unique": true
     },
     "enable": {
       "type": "boolean",
@@ -24,7 +25,19 @@
       "default": false
     },
     "token": {
-      "type": "string"
+      "type": "string",
+      "private": true,
+      "unique": true
+    },
+    "unsubscribeToken": {
+      "type": "string",
+      "private": true,
+      "unique": true
+    },
+    "lastSubscriptionTime": {
+      "type": "datetime",
+      "private": true,
+      "required": true
     }
   }
 }

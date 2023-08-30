@@ -22,7 +22,10 @@ module.exports = {
 
     strapi.config.functions = {
       dateUtil: require('./functions/dateUtil'),
-      // sendBotNotification: require('./functions/sendBotNotification')
+      subscriptionsEmails: require('./functions/subscriptions.emails'),
+      token: require('./functions/token'),
+      email: require('./functions/email'),
+      // sendBotNotification: require('./functions/sendBotNotification'),
     };
   },
   async bootstrap() {

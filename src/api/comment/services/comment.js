@@ -15,6 +15,7 @@ module.exports = createCoreService('api::comment.comment', ({strapi}) => ({
       }
     });
 
+    // toDo (gonzalezext)[21.08.23]: rework this code
     if (strapi.config.environment !== 'test' && strapi.config.custom.enableBotNotifications) {
       const post = await strapi.query('api::post.post').findOne({where: {id: postId}});
       const postUrl = strapi.config.custom.siteUrl + '/post/' + post.name;

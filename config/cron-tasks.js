@@ -1,7 +1,28 @@
+/*
+Cron fromat:
+
+*    *    *    *    *    *
+┬    ┬    ┬    ┬    ┬    ┬
+│    │    │    │    │    |
+│    │    │    │    │    └ day of week (0 - 7) (0 or 7 is Sun)
+│    │    │    │    └───── month (1 - 12)
+│    │    │    └────────── day of month (1 - 31)
+│    │    └─────────────── hour (0 - 23)
+│    └──────────────────── minute (0 - 59)
+└───────────────────────── second (0 - 59, OPTIONAL)
+
+ */
+
 module.exports = {
-  '0 18 * * 5': async (/*{strapi}*/) => {
-    // Every Friday at 6pm
-    // await deliveryToEmailSubscriptions.send('Binary Coffee Weekly Posts', 7);
-    console.log('send weekly email');
-  }
+  subscriptionEmails: {
+    task: ({strapi}) => {
+      console.log('Sending emails to the subscribers');
+      strapi.config.functions.subscriptionsEmails
+        .sendEmailWithLatestPosts('Últimos artículos publicados en BinaryCoffee', 7).then();
+    },
+    options: {
+      // every friday (4:18 pm Friday)
+      rule: '0 18 16 * * 5',
+    },
+  },
 };

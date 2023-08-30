@@ -5,8 +5,8 @@ const MUTATION_UPDATE_POST = {
   query: 'mutation ($id: ID!, $title: String, $body: String, $enable: Boolean, $banner: ID, $tags: [ID], $publishedAt: DateTime) {\n    updatePost(id: $id, data: {publishedAt: $publishedAt, title: $title, body: $body, enable: $enable, banner: $banner, tags: $tags}) {\n        data {\n            id\n            attributes {\n                readingTime\n            }\n        }\n    }\n}\n'
 };
 
-module.exports = async function (strapi, chai, variables, jwt) {
-  const res = await new Promise((resolve, reject) => {
+async function request(strapi, chai, variables, jwt) {
+  return await new Promise((resolve, reject) => {
     chai.request(strapi.server.httpServer)
       .post('/graphql')
       .set('Authorization', `Bearer ${jwt}`)
@@ -21,5 +21,11 @@ module.exports = async function (strapi, chai, variables, jwt) {
       })
       .end((err, res) => err ? reject(err) : resolve(res));
   });
+}
+
+module.exports = async function (strapi, chai, variables, jwt) {
+  const res = await request(strapi, chai, variables, jwt);
   return res.body.data.updatePost.data;
 };
+
+module.exports.request = request;
