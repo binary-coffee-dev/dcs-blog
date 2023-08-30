@@ -21,9 +21,8 @@ module.exports = {
         .sendEmailWithLatestPosts('Últimos artículos publicados en BinaryCoffee', 7).then();
     },
     options: {
-      // every friday
-      // rule: "0 18 16 * * 5",
-      rule: '0 30 * * * *',
+      // every friday (4:18 pm Friday)
+      rule: '0 18 16 * * 5',
     },
   },
 };
