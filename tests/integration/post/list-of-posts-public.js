@@ -35,6 +35,7 @@ describe('Post list (public articles) INTEGRATION', () => {
     }
     await createPost(strapi, {enable: false});
     await createPost(strapi, {publishedAt: null});
+    await createPost(strapi, {adminApproval: false});
 
     authUser = await createUser({strapi});
     staffUser = await createUser({strapi, roleType: 'staff'});

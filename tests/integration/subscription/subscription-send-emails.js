@@ -29,9 +29,19 @@ describe('Send subscription emails INTEGRATION', () => {
   });
 
   it('should send email to subscription emails', async () => {
-    // create post to send in subscription
     const possibleSuggestedArticles = [];
+
+    // create post to send in subscription
     const post = await createPost(strapi, {publishedAt: new Date()});
+
+    // create articles without admin approval (this articles should not be send to the users)
+    const invalidArticles = [];
+    for (let i = 0; i < 10; i++) {
+      const postNotValid = await createPost(strapi, {publishedAt: new Date(), adminApproval: false});
+      invalidArticles.push(postNotValid.name);
+    }
+
+    // create valid articles 7 days before the current day
     for (let i = 0; i < 15; i++) {
       const date = new Date();
       const daysBefore = (Math.floor(Math.random() * 100) + 10);
@@ -64,7 +74,7 @@ describe('Send subscription emails INTEGRATION', () => {
 
     // mock email provider
     const SUBJECT = 'test subject';
-    mockSendEmails(emailsValid, SUBJECT, post.title, unsubscriptionTokens, possibleSuggestedArticles);
+    mockSendEmails(emailsValid, SUBJECT, post.title, unsubscriptionTokens, invalidArticles, possibleSuggestedArticles);
 
     await strapi.config.functions.subscriptionsEmails.sendEmailWithLatestPosts(SUBJECT, 7);
 
@@ -89,13 +99,18 @@ describe('Send subscription emails INTEGRATION', () => {
     return unsubscribeToken;
   }
 
-  function mockSendEmails(emails, expectedSubject, expectedTitle, unsubscriptionTokens, possibleSuggestedArticles) {
+  function mockSendEmails(emails, expectedSubject, expectedTitle, unsubscriptionTokens, invalidArticles, possibleSuggestedArticles) {
     strapi.plugins.email.provider = {
       send: chai.spy(async ({to, subject, html}) => {
         expect(emails.includes(to)).to.be.true;
         expect(subject).to.be.eq(expectedSubject);
 
         expect(html.indexOf(expectedTitle)).to.not.eq(-1);
+
+        const invalidEmails =
+          invalidArticles.reduce((p, v) => p + (html.indexOf(v) === -1 ? 0 : 1), 0);
+        expect(invalidEmails).to.be.eq(0);
+
         expect(html.indexOf(unsubscriptionTokens.get(to))).to.not.eq(-1);
 
         const numberSuggestedArticles =

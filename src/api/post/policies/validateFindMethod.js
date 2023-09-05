@@ -10,6 +10,7 @@ module.exports = async (ctx) => {
     }
   } else {
     filters.enable = {eq: true};
+    filters.adminApproval = {eq: true};
     filters.publishedAt = {lte: new Date()};
   }
   return true;

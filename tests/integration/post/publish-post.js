@@ -43,24 +43,63 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const post = await getPostById(strapi, postRes.id);
 
     expect(post.publishedAt).not.null;
+    expect(post.adminApproval).to.be.true;
   });
 
-  it('should create a post without the publishedAt attribute (staff user)', async () => {
+  it('should create a post with the publishedAt attribute (staff user)', async () => {
     const jwt = generateJwt(strapi, staffUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work',}, jwt);
 
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.publishedAt).to.be.null;
+    expect(post.publishedAt).not.null;
+    expect(post.adminApproval).to.be.true;
   });
 
-  it('should create a post without the publishedAt attribute (auth user)', async () => {
+  it('should create a post with the publishedAt attribute (auth user)', async () => {
     const jwt = generateJwt(strapi, authUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work two',}, jwt);
 
     const post = await getPostById(strapi, postRes.id);
 
+    expect(post.publishedAt).not.null;
+    expect(post.adminApproval).to.be.false;
+  });
+
+  it('should create a post without the publishedAt attribute (auth user)', async () => {
+    const jwt = generateJwt(strapi, authUser);
+    const postRes = await createPostRequest(strapi, chai, {title: 'not work two', publishedAt: undefined}, jwt);
+
+    const post = await getPostById(strapi, postRes.id);
+
     expect(post.publishedAt).to.be.null;
+    expect(post.adminApproval).to.be.false;
+  });
+
+  it('should create a post with the publishedAt attribute (validate minimum time of 30 min) (auth user)', async () => {
+    const jwt = generateJwt(strapi, authUser);
+    const postRes = await createPostRequest(strapi, chai, {title: 'not work two', publishedAt: new Date()}, jwt);
+
+    const post = await getPostById(strapi, postRes.id);
+
+    expect(post.publishedAt).not.null;
+    expect(new Date(post.publishedAt) > new Date(new Date().getTime() + 20 * 60000)).to.be.true;
+    expect(post.adminApproval).to.be.false;
+  });
+
+  it('should create a post with the publishedAt attribute (with valid date after 30 minutes) (auth user)', async () => {
+    const jwt = generateJwt(strapi, authUser);
+    const date = new Date(new Date().getTime() + 100 * 60000);
+    const postRes = await createPostRequest(strapi, chai, {
+      title: 'not work two',
+      publishedAt: date
+    }, jwt);
+
+    const post = await getPostById(strapi, postRes.id);
+
+    expect(post.publishedAt).not.null;
+    expect(post.publishedAt).to.be.eq(date.toISOString());
+    expect(post.adminApproval).to.be.false;
   });
 
   it('should update a post with the publishedAt attribute (admin user)', async () => {
@@ -74,6 +113,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const post = await getPostById(strapi, postRes.id);
 
     expect(post.publishedAt).not.null;
+    expect(post.adminApproval).to.be.true;
   });
 
   it('should update a post without the publishedAt attribute (staff user)', async () => {
@@ -86,7 +126,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const postRes = await updatePostRequest(strapi, chai, {id: staffPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.publishedAt).to.be.null;
+    expect(post.publishedAt).not.null;
+    expect(post.adminApproval).to.be.true;
   });
 
   it('should update a post without the publishedAt attribute (auth user)', async () => {
@@ -99,7 +140,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const postRes = await updatePostRequest(strapi, chai, {id: authPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
 
-    expect(post.publishedAt).to.be.null;
+    expect(post.publishedAt).not.null;
+    expect(post.adminApproval).to.be.false;
   });
 
   it('should not allow to publish a post with an empty title', async () => {

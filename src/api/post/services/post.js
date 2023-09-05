@@ -77,7 +77,8 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
           {publishedAt: {$lte: new Date()}},
           {publishedAt: {$gt: date}}
         ],
-        enable: true
+        enable: true,
+        adminApproval: true
       },
       limit: 10
     });
@@ -231,6 +232,6 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
   },
 
   isPublish(post) {
-    return post && post.enable && post.publishedAt && new Date(post.publishedAt).getTime() <= new Date().getTime();
+    return post && post.enable && post.adminApproval && post.publishedAt && new Date(post.publishedAt).getTime() <= new Date().getTime();
   }
 }));
