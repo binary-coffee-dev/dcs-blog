@@ -3,11 +3,11 @@
     "name": "binary-coffee"
   },
   "dependencies": {
-    "@strapi/plugin-graphql": "4.7.0",
-    "@strapi/plugin-i18n": "4.7.0",
-    "@strapi/plugin-users-permissions": "4.7.0",
+    "@strapi/plugin-graphql": "4.13.6",
+    "@strapi/plugin-i18n": "4.13.6",
+    "@strapi/plugin-users-permissions": "4.13.6",
     "@strapi/provider-email-nodemailer": "4.7.0",
-    "@strapi/strapi": "^4.10.1",
+    "@strapi/strapi": "^4.13.6",
     "axios": "^0.22.0",
     "ejs": "^3.0.1",
     "eslint": "^6.8.0",
