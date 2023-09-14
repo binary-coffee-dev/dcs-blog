@@ -5,7 +5,7 @@
   "dependencies": {
     "@strapi/plugin-graphql": "4.7.0",
     "@strapi/plugin-i18n": "4.7.0",
-    "@strapi/plugin-users-permissions": "4.7.0",
+    "@strapi/plugin-users-permissions": "4.12.1",
     "@strapi/provider-email-nodemailer": "4.7.0",
     "@strapi/strapi": "^4.11.7",
     "axios": "^0.22.0",
