@@ -135,7 +135,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     const authPost = await createPostRequest(strapi, chai, {author: authUser.id, publishedAt: null}, jwt);
 
-    expect(authPost.publishedAt).to.be.undefined;
+    expect(authPost.attributes.publishedAt).to.be.undefined;
 
     const postRes = await updatePostRequest(strapi, chai, {id: authPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
