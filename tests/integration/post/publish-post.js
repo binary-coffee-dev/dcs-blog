@@ -152,6 +152,27 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     expect(post.adminApproval).to.be.false;
   });
 
+  it('should update a published post without and the date should be not modified (auth user)', async () => {
+    const authUser = await createUser({strapi});
+    const jwt = generateJwt(strapi, authUser);
+
+    const authPost = await createPostRequest(strapi, chai, {author: authUser.id}, jwt);
+    await strapi.query('api::post.post').update({
+      where: {id: authPost.id},
+      data: {
+        publishedAt: new Date(new Date() - 30),
+        adminApproval: true
+      }
+    });
+    const updatedPost = await getPostById(strapi, authPost.id);
+
+    const postRes = await updatePostRequest(strapi, chai, {id: authPost.id,}, jwt);
+    const post = await getPostById(strapi, postRes.id);
+
+    expect(post.publishedAt).to.be.eq(updatedPost.publishedAt);
+    expect(post.adminApproval).to.be.true;
+  });
+
   it('should not allow to publish a post with an empty title', async () => {
     const adminUser = await createUser({strapi, roleType: 'administrator'});
     const jwt = generateJwt(strapi, adminUser);

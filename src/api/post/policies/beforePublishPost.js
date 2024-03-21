@@ -6,6 +6,17 @@ function addMinutes(date, minutes) {
 
 module.exports = async (ctx, config, {strapi}) => {
 
+  // this should be executed when editing
+  if (ctx.args.id) {
+    const post = await strapi.query('api::post.post').findOne({where: {id: ctx.args.id}, populate: ['author']});
+
+    if (post.publishedAt && new Date(post.publishedAt).getTime() <= new Date().getTime()) {
+      // do nothing with published articles
+      delete ctx.args.data.publishedAt;
+      return true;
+    }
+  }
+
   // minimum time to publish an article is 30min if the user is not an admin
   if (Boolean(ctx.args.data.publishedAt) && !strapi.service('api::post.post').isAdmin(ctx)) {
     let date = addMinutes(new Date(), 30);

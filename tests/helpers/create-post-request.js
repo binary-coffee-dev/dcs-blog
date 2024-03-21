@@ -16,7 +16,7 @@ async function request(strapi, chai, variables, jwt) {
           body: randomName(),
           title: randomName(),
           enable: true,
-          publishedAt: new Date(new Date() - 10),
+          publishedAt: new Date(new Date() - 30),
           ...variables
         }
       })
