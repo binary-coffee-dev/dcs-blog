@@ -27,8 +27,5 @@ module.exports = async (ctx, config, {strapi}) => {
     // set the current session as author of the post
     ctx.args.data.author = ctx.state.user.id;
   }
-  if (!strapi.service('api::post.post').isStaff(ctx) && !strapi.service('api::post.post').isAdmin(ctx)) {
-    delete ctx.args.data.tags;
-  }
   return true;
 };

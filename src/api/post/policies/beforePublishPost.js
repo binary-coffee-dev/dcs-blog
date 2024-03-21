@@ -7,11 +7,11 @@ function addMinutes(date, minutes) {
 module.exports = async (ctx, config, {strapi}) => {
 
   // this should be executed when editing
-  if (ctx.args.id) {
+  if (ctx.args.id && !strapi.service('api::post.post').isAdmin(ctx)) {
     const post = await strapi.query('api::post.post').findOne({where: {id: ctx.args.id}, populate: ['author']});
 
+    // do nothing with published articles
     if (post.publishedAt && new Date(post.publishedAt).getTime() <= new Date().getTime()) {
-      // do nothing with published articles
       delete ctx.args.data.publishedAt;
       return true;
     }

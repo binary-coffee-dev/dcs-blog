@@ -40,6 +40,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     const post = await getPostById(strapi, postRes.id);
 
+    expect(post.tags).to.have.lengthOf(1);
     expect(post.publishedAt).not.null;
     expect(post.adminApproval).to.be.true;
   });
@@ -51,6 +52,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     const post = await getPostById(strapi, postRes.id);
 
+    expect(post.tags).to.have.lengthOf(1);
     expect(post.publishedAt).not.null;
     expect(post.adminApproval).to.be.true;
   });
@@ -85,6 +87,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const post = await getPostById(strapi, postRes.id);
 
     expect(post.publishedAt).not.null;
+    expect(post.tags).to.have.lengthOf(1);
     expect(new Date(post.publishedAt) > new Date(new Date().getTime() + 20 * 60000)).to.be.true;
     expect(post.adminApproval).to.be.true;
   });
