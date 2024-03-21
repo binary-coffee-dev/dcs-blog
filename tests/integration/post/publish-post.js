@@ -21,14 +21,11 @@ const QUERY_GET_POST_BY_NAME = {
 };
 
 describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
-  let authUser;
-  let staffUser;
-  let adminUser;
+  // let authUser;
+  // let staffUser;
+  // let adminUser;
 
   before(async () => {
-    authUser = await createUser({strapi});
-    staffUser = await createUser({strapi, roleType: 'staff'});
-    adminUser = await createUser({strapi, roleType: 'administrator'});
   });
 
   after(async () => {
@@ -37,6 +34,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should create a post with the publishedAt attribute (admin user)', async () => {
+    const adminUser = await createUser({strapi, roleType: 'administrator'});
     const jwt = generateJwt(strapi, adminUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'The good one',}, jwt);
 
@@ -47,6 +45,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should create a post with the publishedAt attribute (staff user)', async () => {
+    const staffUser = await createUser({strapi, roleType: 'staff'});
     const jwt = generateJwt(strapi, staffUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work',}, jwt);
 
@@ -57,6 +56,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should create a post with the publishedAt attribute (auth user)', async () => {
+    const authUser = await createUser({strapi});
     const jwt = generateJwt(strapi, authUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work two',}, jwt);
 
@@ -67,6 +67,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should create a post without the publishedAt attribute (auth user)', async () => {
+    const authUser = await createUser({strapi});
     const jwt = generateJwt(strapi, authUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work two', publishedAt: undefined}, jwt);
 
@@ -77,6 +78,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should create a post with the publishedAt attribute (validate minimum time of 30 min) (auth user)', async () => {
+    const authUser = await createUser({strapi});
     const jwt = generateJwt(strapi, authUser);
     const postRes = await createPostRequest(strapi, chai, {title: 'not work two', publishedAt: new Date()}, jwt);
 
@@ -88,6 +90,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should create a post with the publishedAt attribute (with valid date after 30 minutes) (auth user)', async () => {
+    const authUser = await createUser({strapi});
     const jwt = generateJwt(strapi, authUser);
     const date = new Date(new Date().getTime() + 100 * 60000);
     const postRes = await createPostRequest(strapi, chai, {
@@ -103,6 +106,8 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should update a post with the publishedAt attribute (admin user)', async () => {
+    const authUser = await createUser({strapi});
+    const adminUser = await createUser({strapi, roleType: 'administrator'});
     const jwt = generateJwt(strapi, adminUser);
 
     const adminPost = await createPostRequest(strapi, chai, {author: authUser.id, publishedAt: null}, jwt);
@@ -117,11 +122,13 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should update a post without the publishedAt attribute (staff user)', async () => {
+    const authUser = await createUser({strapi});
+    const staffUser = await createUser({strapi, roleType: 'staff'});
     const jwt = generateJwt(strapi, staffUser);
 
     const staffPost = await createPostRequest(strapi, chai, {author: authUser.id, publishedAt: null}, jwt);
 
-    expect(staffPost.publishedAt).to.be.undefined;
+    expect(staffPost.attributes.publishedAt).to.be.null;
 
     const postRes = await updatePostRequest(strapi, chai, {id: staffPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
@@ -131,11 +138,12 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should update a post without the publishedAt attribute (auth user)', async () => {
+    const authUser = await createUser({strapi});
     const jwt = generateJwt(strapi, authUser);
 
     const authPost = await createPostRequest(strapi, chai, {author: authUser.id, publishedAt: null}, jwt);
 
-    expect(authPost.attributes.publishedAt).to.be.undefined;
+    expect(authPost.attributes.publishedAt).to.be.null;
 
     const postRes = await updatePostRequest(strapi, chai, {id: authPost.id}, jwt);
     const post = await getPostById(strapi, postRes.id);
@@ -145,6 +153,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should not allow to publish a post with an empty title', async () => {
+    const adminUser = await createUser({strapi, roleType: 'administrator'});
     const jwt = generateJwt(strapi, adminUser);
 
     let fail = false;
@@ -158,6 +167,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should not allow to edit a post with an empty title', async () => {
+    const adminUser = await createUser({strapi, roleType: 'administrator'});
     const jwt = generateJwt(strapi, adminUser);
 
     const post = await createPostRequest(strapi, chai, {}, jwt);
@@ -173,6 +183,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
   });
 
   it('should create and then update post and tests the created links', async () => {
+    const adminUser = await createUser({strapi, roleType: 'administrator'});
     // create post
     const jwt = generateJwt(strapi, adminUser);
     let postRes = await createPostRequest(strapi, chai, {title: 'The good one'}, jwt);
