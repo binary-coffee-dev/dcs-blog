@@ -27,7 +27,7 @@ module.exports = async (ctx, config, {strapi}) => {
     delete ctx.args.data.publishedAt;
   }
 
-  ctx.args.data.adminApproval = !(!strapi.service('api::post.post').isStaff(ctx) &&
-    !strapi.service('api::post.post').isAdmin(ctx));
+  // by default the admin approval is true
+  ctx.args.data.adminApproval = true;
   return true;
 };

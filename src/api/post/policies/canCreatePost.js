@@ -5,7 +5,7 @@
 module.exports = async (ctx, config, {strapi}) => {
   ctx.args.data.title = strapi.service('api::post.post').removeExtraSpaces(ctx.args.data.title);
   if (ctx.args.data.title === '') {
-    console.log('Empty title is not allowed');
+    console.info('Empty title is not allowed');
     return false;
   }
   if (!strapi.service('api::post.post').isAdmin(ctx)) {
@@ -21,7 +21,7 @@ module.exports = async (ctx, config, {strapi}) => {
       }
     });
     if (postCount >= strapi.config.custom.maxNumberOfArticlesPerDay) {
-      console.log('Limit of posts by user');
+      console.info('Limit of posts by user');
       return false;
     }
     // set the current session as author of the post

@@ -63,7 +63,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const post = await getPostById(strapi, postRes.id);
 
     expect(post.publishedAt).not.null;
-    expect(post.adminApproval).to.be.false;
+    expect(post.adminApproval).to.be.true;
   });
 
   it('should create a post without the publishedAt attribute (auth user)', async () => {
@@ -74,7 +74,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const post = await getPostById(strapi, postRes.id);
 
     expect(post.publishedAt).to.be.null;
-    expect(post.adminApproval).to.be.false;
+    expect(post.adminApproval).to.be.true;
   });
 
   it('should create a post with the publishedAt attribute (validate minimum time of 30 min) (auth user)', async () => {
@@ -86,7 +86,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     expect(post.publishedAt).not.null;
     expect(new Date(post.publishedAt) > new Date(new Date().getTime() + 20 * 60000)).to.be.true;
-    expect(post.adminApproval).to.be.false;
+    expect(post.adminApproval).to.be.true;
   });
 
   it('should create a post with the publishedAt attribute (with valid date after 30 minutes) (auth user)', async () => {
@@ -102,7 +102,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
 
     expect(post.publishedAt).not.null;
     expect(post.publishedAt).to.be.eq(date.toISOString());
-    expect(post.adminApproval).to.be.false;
+    expect(post.adminApproval).to.be.true;
   });
 
   it('should update a post with the publishedAt attribute (admin user)', async () => {
@@ -149,7 +149,7 @@ describe('Create/Update post with publishedAt attribute INTEGRATION', () => {
     const post = await getPostById(strapi, postRes.id);
 
     expect(post.publishedAt).not.null;
-    expect(post.adminApproval).to.be.false;
+    expect(post.adminApproval).to.be.true;
   });
 
   it('should update a published post without and the date should be not modified (auth user)', async () => {
