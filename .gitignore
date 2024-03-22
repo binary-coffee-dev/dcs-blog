@@ -1,4 +1,5 @@
 .strapi-updater.json
+.strapi
 
 .env
 .nyc_output
