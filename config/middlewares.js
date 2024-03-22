@@ -1,9 +1,9 @@
 module.exports = [
+  'strapi::logger',
   'strapi::errors',
   'strapi::security',
   'strapi::cors',
   {name: 'strapi::poweredBy', config: {poweredBy: 'Binary Coffee <strapi.io>'}},
-  'strapi::logger',
   'strapi::query',
   'strapi::body',
   {name: 'strapi::session', config: {signed: false}},
