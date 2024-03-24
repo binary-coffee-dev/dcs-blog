@@ -104,6 +104,7 @@ jobs:
           SMTP_PORT: ${{ secrets.PROD__SMTP_PORT }}
           SMTP_USERNAME: ${{ secrets.PROD__SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.PROD__SMTP_PASSWORD }}
+          BOT_NOTIFICATION_TOKEN: ${{ secrets.BOT_NOTIFICATION_TOKEN }}
 
       - name: Copy project to the hosting
         uses: easingthemes/ssh-deploy@v2.1.5
@@ -158,6 +159,7 @@ jobs:
           SMTP_PORT: ${{ secrets.PROD__SMTP_PORT }}
           SMTP_USERNAME: ${{ secrets.PROD__SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.PROD__SMTP_PASSWORD }}
+          BOT_NOTIFICATION_TOKEN: ${{ secrets.BOT_NOTIFICATION_TOKEN }}
 
       - name: Copy project to the hosting
         uses: easingthemes/ssh-deploy@v2.1.5
