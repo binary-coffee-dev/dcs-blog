@@ -1,21 +1,22 @@
-const Request = require('request');
+const axios = require('axios');
 
 /**
  *
  * @param strapi
  * @param message
- * @param channelName
  * @return {Promise<void>}
  */
-module.exports = async (strapi, {message, channelName = 'bcStaffs'}) => {
-  if (strapi && message && channelName) {
-    Request.post({
-      'headers': {'content-type': 'application/json'},
-      'url': strapi.config.custom.botNotifierUrl,
-      'body': JSON.stringify({
-        'Message': message,
-        'ChannelName': channelName
-      })
-    });
+module.exports = async (strapi, message) => {
+  if (strapi && message) {
+    try {
+      await axios.post(strapi.config.custom.botNotifierUrl, {message}, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${Buffer.from(strapi.config.custom.botNotificationToken).toString('base64')}`
+        }
+      });
+    } catch (e) {
+      console.error('Fail to send bot notification', e);
+    }
   }
 };
