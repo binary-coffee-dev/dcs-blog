@@ -8,6 +8,7 @@ module.exports = {
     const commentToBeRemoved = await strapi.query('api::comment.comment').findOne({where, populate: ['post']});
     event.state.postId = commentToBeRemoved.post.id;
   },
+
   afterDelete: async (event) => {
     const {state} = event;
     if (state && state.postId) {
@@ -24,7 +25,6 @@ module.exports = {
       await strapi.service('api::post.post').updateComments(comment.post.id);
     }
 
-    // toDo (gonzalezext)[21.08.23]: rework this code
     if (strapi.config.custom.enableBotNotifications) {
       const post = await strapi.query('api::post.post').findOne({where: {id: result.id}, populate: ['user']});
 
