@@ -14,6 +14,7 @@ module.exports = createCoreService('api::provider.provider', ({strapi}) => ({
   },
   github: {
     async auth(code) {
+      // toDo (gonzalezext)[24.03.24]: add this as custom configuration
       const req = await axios.post('https://github.com/login/oauth/access_token', {
         client_id: strapi.config.custom.githubClientId,
         client_secret: strapi.config.custom.githubClientSecret,
@@ -26,6 +27,7 @@ module.exports = createCoreService('api::provider.provider', ({strapi}) => ({
       return req.data;
     },
     async user(token) {
+      // toDo (gonzalezext)[24.03.24]: add this as custom configuration
       const req = await axios.get('https://api.github.com/user', {
         headers: {
           'Authorization': `token ${token}`

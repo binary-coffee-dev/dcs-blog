@@ -5,6 +5,7 @@ const {createCoreService} = require('@strapi/strapi').factories;
 
 const {Feed} = require('feed');
 const marked = require('marked');
+const moment = require('moment-timezone');
 
 module.exports = createCoreService('api::post.post', ({strapi}) => ({
 
@@ -77,7 +78,8 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
           {publishedAt: {$lte: new Date()}},
           {publishedAt: {$gt: date}}
         ],
-        enable: true
+        enable: true,
+        adminApproval: true
       },
       limit: 10
     });
@@ -217,20 +219,52 @@ module.exports = createCoreService('api::post.post', ({strapi}) => ({
     }
   },
 
+  async checkAndSendPublishedArticleNotification(post, wasPublishedBefore = false) {
+    const ctx = strapi.requestContext.get();
+    if (ctx) {
+      const isAdmin = this.isAdmin(ctx);
+      const isStaff = this.isStaff(ctx);
+      if (strapi.config.custom.enableBotNotifications && !(isAdmin || isStaff) && this.isPublishedSet(post) && !wasPublishedBefore) {
+        const msg = '*NEW ARTICLE*\n'
+          + `*Date*: ${moment(post.publishedAt).tz('America/Havana').format('DD MMMM hh:mm:ss A')}\n`
+          + `*Post*: [${post.title}](${strapi.config.custom.siteUrl}/post/${post.name})\n`
+          + `*User*: ${post.author.username}\n\n`;
+
+        await strapi.config.functions.sendBotNotification(strapi, msg);
+      }
+    }
+  },
+
   isStaff: (ctx) => {
-    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'staff';
+    return Boolean(ctx && ctx.state && ctx.state.user && ctx.state.user.role &&
+      ctx.state.user.role.type === 'staff');
   },
 
   isAuthenticated: (ctx) => {
-    return ctx && ctx.state && ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'authenticated';
+    return Boolean(ctx && ctx.state && ctx.state.user && ctx.state.user.role &&
+      ctx.state.user.role.type === 'authenticated');
   },
 
   isAdmin: (ctx) => {
-    return (ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator') ||
-      (ctx.state.user && ctx.state.user.roles && ctx.state.user.roles[0].code === 'strapi-super-admin');
+    return Boolean((ctx.state.user && ctx.state.user.role && ctx.state.user.role.type === 'administrator') ||
+      (ctx.state.user && ctx.state.user.roles && ctx.state.user.roles[0].code === 'strapi-super-admin'));
   },
 
+  /**
+   * *true* if the post is published and will be visible by the user in the blog
+   * @param post {Post}
+   */
   isPublish(post) {
-    return post && post.enable && post.publishedAt && new Date(post.publishedAt).getTime() <= new Date().getTime();
+    return Boolean(post && post.enable && post.adminApproval && post.publishedAt &&
+      new Date(post.publishedAt).getTime() <= new Date().getTime());
+  },
+
+  /**
+   * *true* if the post **publishedAt** attribute is set
+   * @param post {Post}
+   * @returns {*}
+   */
+  isPublishedSet(post) {
+    return Boolean(post && post.publishedAt);
   }
 }));

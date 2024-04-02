@@ -31,6 +31,10 @@
     "enable": {
       "type": "boolean"
     },
+    "adminApproval": {
+      "type": "boolean",
+      "default": true
+    },
     "name": {
       "unique": true,
       "type": "string"

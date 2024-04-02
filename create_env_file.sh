@@ -17,6 +17,9 @@ echo "NODE_ENV=$NODE_ENV" >> .env
 echo "SITE_URL=$SITE_URL" >> .env
 echo "API_URL=$API_URL" >> .env
 
+# bot notification
+echo "BOT_NOTIFICATION_TOKEN=$BOT_NOTIFICATION_TOKEN" >> .env
+
 # docker configurations
 echo "BLOG_RESOURCES=$BLOG_RESOURCES" >> .env
 

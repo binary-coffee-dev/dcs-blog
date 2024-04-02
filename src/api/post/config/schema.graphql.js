@@ -1,6 +1,6 @@
 const canCreatePost = require('../policies/canCreatePost');
 const canModifyPost = require('../policies/canModifyPost');
-const canPublishPost = require('../policies/canPublishPost');
+const beforePublishPost = require('../policies/beforePublishPost');
 const canSeePost = require('../policies/canSeePost');
 const validateFindMethod = require('../policies/validateFindMethod');
 
@@ -76,10 +76,10 @@ module.exports = (strapi) => {
         }
       },
       'Mutation.createPost': {
-        policies: [canPublishPost, canCreatePost]
+        policies: [beforePublishPost, canCreatePost]
       },
       'Mutation.updatePost': {
-        policies: [canPublishPost, canModifyPost]
+        policies: [beforePublishPost, canModifyPost]
       }
     }
   }));
