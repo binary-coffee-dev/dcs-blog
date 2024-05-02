@@ -10,7 +10,7 @@
     "@strapi/strapi": "4.15.5",
     "axios": "1.6.8",
     "better-sqlite3": "8.3.0",
-    "ejs": "^3.1.9",
+    "ejs": "^3.1.10",
     "eslint": "6.8.0",
     "fast-xml-parser": "4.2.5",
     "feed": "4.1.0",
