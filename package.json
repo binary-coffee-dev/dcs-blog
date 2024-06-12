@@ -7,7 +7,7 @@
     "@strapi/plugin-i18n": "^4.14.6",
     "@strapi/plugin-users-permissions": "^4.14.6",
     "@strapi/provider-email-nodemailer": "4.15.5",
-    "@strapi/strapi": "4.15.5",
+    "@strapi/strapi": "4.25.0",
     "axios": "1.6.8",
     "better-sqlite3": "8.3.0",
     "ejs": "^3.1.9",
