@@ -1,0 +1,17 @@
+version: "3.3"
+
+services:
+  blog-backend:
+    build:
+      context: .
+    restart: always
+    volumes:
+      - $BLOG_RESOURCES:/app/public/uploads
+    ports:
+      - "127.0.0.1:${BACKEND_PORT}:${PORT}"
+    networks:
+      - blogdbdev
+
+networks:
+  blogdbdev:
+    external: true

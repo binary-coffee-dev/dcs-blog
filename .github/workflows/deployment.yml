@@ -120,7 +120,7 @@ jobs:
       - name: Deploy project with docker in hosting
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: cd ${{ secrets.DEV__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.DEV__BACKEND_PORT }} ./deploy.sh blog-api-dev
+          command: cd ${{ secrets.DEV__REMOTE_TARGET }} && BACKEND_PORT=${{ secrets.DEV__BACKEND_PORT }} docker-compose -f docker-compose.dev.yml --project-name=blog-api-dev up -d --build
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           privateKey: ${{ secrets.SERVER_SSH_KEY}}
