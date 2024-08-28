@@ -85,6 +85,7 @@ jobs:
         run: ./create_env_file.sh
         env:
           NODE_ENV: development
+          PORT: 1339
           DATABASE_HOST: ${{ secrets.DEV__DATABASE_HOST }}
           DATABASE_PORT: ${{ secrets.DEV__DATABASE_PORT }}
           DATABASE_NAME: ${{ secrets.DEV__DATABASE_NAME }}

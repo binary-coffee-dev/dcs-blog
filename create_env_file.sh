@@ -10,7 +10,7 @@ echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
 echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> .env
 
 # application environments
-echo "PORT=1338" >> .env
+echo "PORT=${PORT:-1338}" >> .env
 echo "CORS=$CORS" >> .env
 echo "ORIGINS=$ORIGINS" >> .env
 echo "NODE_ENV=$NODE_ENV" >> .env
