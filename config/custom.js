@@ -20,5 +20,7 @@ module.exports = ({env}) => ({
   githubClientId: env('GITHUB_CLIENT_ID', ''),
   githubClientSecret: env('GITHUB_CLIENT_SECRET', ''),
 
-  podcastEspacioBinarioIdentifier: 'espacio-binario'
+  podcastEspacioBinarioIdentifier: 'espacio-binario',
+
+  testingUsersPassword: env('TESTING_USERS_PASSWORD', 'testing_password'),
 });

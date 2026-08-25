@@ -106,6 +106,7 @@ jobs:
           SMTP_USERNAME: ${{ secrets.PROD__SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.PROD__SMTP_PASSWORD }}
           BOT_NOTIFICATION_TOKEN: ${{ secrets.BOT_NOTIFICATION_TOKEN }}
+          TESTING_USERS_PASSWORD: ${{ secrets.TESTING_USERS_PASSWORD }}
 
       - name: Copy project to the hosting
         uses: easingthemes/ssh-deploy@main

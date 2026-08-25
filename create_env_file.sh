@@ -38,3 +38,6 @@ echo "SMTP_HOST=$SMTP_HOST" >> .env
 echo "SMTP_PORT=$SMTP_PORT" >> .env
 echo "SMTP_USERNAME=$SMTP_USERNAME" >> .env
 echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> .env
+
+# testing configurations
+echo "TESTING_USERS_PASSWORD=\"$TESTING_USERS_PASSWORD\"" >> .env
