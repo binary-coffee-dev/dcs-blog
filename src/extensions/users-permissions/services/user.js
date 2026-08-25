@@ -158,7 +158,7 @@ module.exports = (services) => {
           page: provider.url,
           avatarurl: provider.avatar,
           providers: [provider.id],
-          role: authenticatedrole.id,
+          role: authenticatedRole.id,
           email
         }
       });
