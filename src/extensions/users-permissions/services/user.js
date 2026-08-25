@@ -156,7 +156,7 @@ module.exports = (services) => {
           blocked: false,
           name: provider.name || username,
           page: provider.url,
-          avatarurl: provider.avatar,
+          avatarUrl: provider.avatar,
           providers: [provider.id],
           role: authenticatedRole.id,
           email
